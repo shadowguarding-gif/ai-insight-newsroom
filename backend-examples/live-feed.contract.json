@@ -1,0 +1,69 @@
+{
+  "refreshedAt": "2026-03-22T09:30:00Z",
+  "items": [
+    {
+      "id": "source-001",
+      "slug": "example-live-story",
+      "live": true,
+      "micro": false,
+      "category": "products",
+      "region": "global",
+      "signal": "breakout",
+      "date": "2026-03-22",
+      "sourceName": "Example Source",
+      "sourceType": "official",
+      "sourceUrl": "https://example.com/news/story",
+      "readingTime": 4,
+      "tags": ["AI", "Agents", "Workflow"],
+      "briefType": {
+        "zh": "实时快讯",
+        "en": "Live brief"
+      },
+      "metricLabel": {
+        "zh": "信号",
+        "en": "Signal"
+      },
+      "metricValue": "Source-backed · 2026-03-22",
+      "proNotes": {
+        "zh": ["专业版补充点一", "专业版补充点二"],
+        "en": ["Pro note one", "Pro note two"]
+      },
+      "title": {
+        "zh": "示例实时新闻标题",
+        "en": "Example live story title"
+      },
+      "deck": {
+        "zh": "一句话说明这条新闻为什么重要。",
+        "en": "One sentence explaining why this matters."
+      },
+      "summaryPoints": {
+        "zh": ["要点一", "要点二", "要点三"],
+        "en": ["Point one", "Point two", "Point three"]
+      },
+      "editorialSummary": {
+        "zh": "编辑总结内容。",
+        "en": "Editorial summary content."
+      },
+      "aiSummary": {
+        "zh": "预置 AI 摘要。",
+        "en": "Seed AI summary."
+      },
+      "insight": {
+        "zh": "编辑洞察。",
+        "en": "Editorial insight."
+      },
+      "who": {
+        "zh": "谁应该关注。",
+        "en": "Who should care."
+      },
+      "watchpoint": {
+        "zh": "下一观察点。",
+        "en": "Next watchpoint."
+      },
+      "content": {
+        "zh": ["正文段落一", "正文段落二"],
+        "en": ["Paragraph one", "Paragraph two"]
+      }
+    }
+  ]
+}
