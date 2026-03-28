@@ -60,6 +60,10 @@
 
   const searchAliasMap = {
     nvidia: ["英伟达", "nvidia", "rtx", "dgx"],
+    gpu: ["显卡", "gpu", "graphics", "rtx", "cuda", "算力卡"],
+    cloud: ["云", "cloud", "infra", "infrastructure", "基础设施", "算力"],
+    launch: ["发布", "发布会", "launch", "release", "introducing", "unveil", "unveils", "announce"],
+    conference: ["会议", "峰会", "大会", "summit", "conference", "event", "gtc", "mwc"],
     microsoft: ["微软", "microsoft", "copilot", "azure"],
     openai: ["openai", "chatgpt", "gpt"],
     anthropic: ["anthropic", "claude"],
@@ -81,6 +85,7 @@
     vllm: ["vllm", "推理服务", "openai compatible"],
     "open webui": ["open webui", "open-webui", "ai 工作台", "本地界面"]
   };
+  const genericSearchBuckets = new Set(["gpu", "cloud", "launch", "conference"]);
 
   const copy = {
     zh: {
@@ -357,8 +362,27 @@
 
   function normalizeSearchToken(value) {
     return String(value || "")
-      .trim()
-      .toLowerCase();
+      .toLowerCase()
+      .replace(/[\u2018\u2019']/g, "")
+      .replace(/[\u201c\u201d"]/g, "")
+      .replace(/[()（）[\]{}]/g, " ")
+      .replace(/[,:;!?，。！？、|/\\+\-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function tokenizeSearchInput(value) {
+    const normalized = normalizeSearchToken(value);
+
+    if (!normalized) {
+      return [];
+    }
+
+    const spaced = normalized
+      .replace(/([a-z0-9])([\u4e00-\u9fff])/g, "$1 $2")
+      .replace(/([\u4e00-\u9fff])([a-z0-9])/g, "$1 $2");
+
+    return uniqueStrings(spaced.split(/\s+/).filter(Boolean));
   }
 
   function getAliasTerms(text) {
@@ -382,6 +406,106 @@
     });
 
     return [...aliases];
+  }
+
+  function getMatchedSearchBuckets(text) {
+    const normalized = normalizeSearchToken(text);
+
+    if (!normalized) {
+      return [];
+    }
+
+    return Object.entries(searchAliasMap)
+      .filter(([key, terms]) => {
+        const bucket = [key, ...(terms || [])].map(normalizeSearchToken);
+        return bucket.some((term) => term && normalized.includes(term));
+      })
+      .map(([key]) => key);
+  }
+
+  function createSearchHaystack(item) {
+    const baseSegments = [
+      item.title.zh,
+      item.title.en,
+      item.deck.zh,
+      item.deck.en,
+      item.insight && item.insight.zh,
+      item.insight && item.insight.en,
+      item.watchpoint && item.watchpoint.zh,
+      item.watchpoint && item.watchpoint.en,
+      item.who && item.who.zh,
+      item.who && item.who.en,
+      item.editorialSummary && item.editorialSummary.zh,
+      item.editorialSummary && item.editorialSummary.en,
+      item.aiSummary && item.aiSummary.zh,
+      item.aiSummary && item.aiSummary.en,
+      item.briefType && item.briefType.zh,
+      item.briefType && item.briefType.en,
+      item.metricLabel && item.metricLabel.zh,
+      item.metricLabel && item.metricLabel.en,
+      item.metricValue,
+      item.proNotes && item.proNotes.zh && item.proNotes.zh.join(" "),
+      item.proNotes && item.proNotes.en && item.proNotes.en.join(" "),
+      item.sourceName,
+      item.sourceType,
+      item.sourceUrl,
+      item.tags.join(" "),
+      getCategoryLabel(item.category, "zh"),
+      getCategoryLabel(item.category, "en"),
+      getRegionLabel(item.region, "zh"),
+      getRegionLabel(item.region, "en")
+    ].filter(Boolean);
+    const aliasSegments = getAliasTerms(baseSegments.join(" "));
+
+    return normalizeSearchToken([...baseSegments, ...aliasSegments].join(" "));
+  }
+
+  function getSearchScore(item, rawQuery) {
+    const query = normalizeSearchToken(rawQuery);
+
+    if (!query) {
+      return 1;
+    }
+
+    const haystack = createSearchHaystack(item);
+
+    if (!haystack) {
+      return 0;
+    }
+
+    const queryBuckets = getMatchedSearchBuckets(query);
+    const haystackBuckets = new Set(getMatchedSearchBuckets(haystack));
+    const specificBuckets = queryBuckets.filter((bucket) => !genericSearchBuckets.has(bucket));
+    const specificBucketMatches = specificBuckets.filter((bucket) => haystackBuckets.has(bucket));
+
+    if (specificBuckets.length && !specificBucketMatches.length) {
+      return 0;
+    }
+
+    let score = 0;
+    score += specificBucketMatches.length * 6;
+    score += queryBuckets.filter((bucket) => genericSearchBuckets.has(bucket) && haystackBuckets.has(bucket)).length * 2;
+
+    const exactNeedles = uniqueStrings([query, ...getAliasTerms(query)]);
+    const queryTokens = tokenizeSearchInput(query);
+    const tokenNeedles = uniqueStrings([
+      ...queryTokens,
+      ...queryTokens.flatMap((token) => getAliasTerms(token))
+    ]);
+
+    exactNeedles.forEach((term) => {
+      if (term && haystack.includes(term)) {
+        score += term === query ? 8 : 4;
+      }
+    });
+
+    tokenNeedles.forEach((term) => {
+      if (term && haystack.includes(term)) {
+        score += term.length <= 2 ? 1 : 2;
+      }
+    });
+
+    return score;
   }
 
   function getStoredObject(key) {
@@ -1693,12 +1817,21 @@
   }
 
   function filterNews(news, filters) {
-    const query = (filters.query || "").trim().toLowerCase();
+    const query = filters.query || "";
     const category = filters.category || "all";
     const region = filters.region || "all";
     const format = filters.format || "all";
 
-    return news.filter((item) => {
+    return news
+      .map((item) => {
+        const searchScore = query ? getSearchScore(item, query) : 1;
+
+        return {
+          item,
+          searchScore
+        };
+      })
+      .filter(({ item, searchScore }) => {
       const categoryMatch = category === "all" || item.category === category;
       const regionMatch = region === "all" || item.region === region;
       const formatMatch = matchesFormat(item, format);
@@ -1711,44 +1844,16 @@
         return true;
       }
 
-      const baseSegments = [
-        item.title.zh,
-        item.title.en,
-        item.deck.zh,
-        item.deck.en,
-        item.insight && item.insight.zh,
-        item.insight && item.insight.en,
-        item.watchpoint && item.watchpoint.zh,
-        item.watchpoint && item.watchpoint.en,
-        item.who && item.who.zh,
-        item.who && item.who.en,
-        item.editorialSummary && item.editorialSummary.zh,
-        item.editorialSummary && item.editorialSummary.en,
-        item.aiSummary && item.aiSummary.zh,
-        item.aiSummary && item.aiSummary.en,
-        item.briefType && item.briefType.zh,
-        item.briefType && item.briefType.en,
-        item.metricLabel && item.metricLabel.zh,
-        item.metricLabel && item.metricLabel.en,
-        item.metricValue,
-        item.proNotes && item.proNotes.zh && item.proNotes.zh.join(" "),
-        item.proNotes && item.proNotes.en && item.proNotes.en.join(" "),
-        item.sourceName,
-        item.sourceType,
-        item.sourceUrl,
-        item.tags.join(" "),
-        getCategoryLabel(item.category, "zh"),
-        getCategoryLabel(item.category, "en"),
-        getRegionLabel(item.region, "zh"),
-        getRegionLabel(item.region, "en")
-      ].filter(Boolean);
-      const aliasSegments = getAliasTerms(baseSegments.join(" "));
-      const haystack = [...baseSegments, ...aliasSegments]
-        .join(" ")
-        .toLowerCase();
+      return searchScore > 0;
+      })
+      .sort((left, right) => {
+        if (right.searchScore !== left.searchScore) {
+          return right.searchScore - left.searchScore;
+        }
 
-      return haystack.includes(query);
-    });
+        return String(right.item.date || "").localeCompare(String(left.item.date || ""));
+      })
+      .map(({ item }) => item);
   }
 
   function getTopTags(news, limit) {
