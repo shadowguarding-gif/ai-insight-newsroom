@@ -766,5 +766,389 @@ window.AIInsightLiveData = [
         "For a global AI news site, infrastructure coverage should not stop at chips and facilities. Telecom is becoming another layer worth tracking continuously."
       ]
     }
+  },
+  {
+    "id": 1013,
+    "slug": "microsoft-copilot-wave-3-spring-release",
+    "live": true,
+    "featured": true,
+    "category": "products",
+    "region": "global",
+    "signal": "breakout",
+    "date": "2026-03-09",
+    "sourceName": "Microsoft",
+    "sourceType": "official",
+    "sourceUrl": "https://www.microsoft.com/es-es/microsoft-365/blog/2026/03/09/microsoft-unveils-microsoft-365-copilot-wave-3-spring-release/",
+    "tags": ["Microsoft", "Copilot", "Enterprise AI"],
+    "title": {
+      "zh": "Microsoft 365 Copilot Wave 3 继续把企业 AI 推向日常工作流中心",
+      "en": "Microsoft 365 Copilot Wave 3 pushes enterprise AI deeper into everyday workflows"
+    },
+    "deck": {
+      "zh": "真正重要的不是单个按钮，而是 Copilot 正在从功能补丁变成组织级工作界面。",
+      "en": "The bigger story is not any single feature, but Copilot becoming an organizational work interface rather than a feature add-on."
+    },
+    "summaryPoints": {
+      "zh": [
+        "Microsoft 正继续把 Copilot 深嵌到文档、会议、搜索和协作流程里。",
+        "企业 AI 的竞争焦点越来越像“谁能进入默认工作台”，而不是“谁多一个演示功能”。",
+        "这类更新非常适合放在首页主线，因为它直接影响全球知识工作者。"
+      ],
+      "en": [
+        "Microsoft is embedding Copilot more deeply into documents, meetings, search, and collaboration loops.",
+        "Enterprise AI competition is increasingly about who becomes the default work surface, not who adds one more demo feature.",
+        "This belongs in the lead lane because it affects knowledge workers globally."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "Copilot Wave 3 的新闻价值，在于它让企业 AI 更像“界面和流程重写”，而不是单次生成工具升级。",
+      "en": "The editorial value of Wave 3 is that it frames enterprise AI as an interface and workflow rewrite rather than a one-off generation upgrade."
+    },
+    "aiSummary": {
+      "zh": "Microsoft 正在把 Copilot 从功能层推进到工作流核心层，这意味着企业 AI 的护城河会越来越来自嵌入深度与组织采用。",
+      "en": "Microsoft is moving Copilot from a feature layer into the core workflow layer, which means enterprise AI moats will increasingly come from depth of embedding and organizational adoption."
+    },
+    "insight": {
+      "zh": "对普通用户来说，这类新闻比纯模型基准更接近真实生产力；对专业用户来说，它反映了企业软件入口权的重新分配。",
+      "en": "For casual readers this is closer to real productivity than model benchmarks, and for expert readers it signals a redistribution of control over enterprise software entry points."
+    },
+    "who": {
+      "zh": "企业 IT、数字化转型团队、知识工作者产品负责人",
+      "en": "Enterprise IT teams, digital-transformation leaders, and product owners for knowledge work"
+    },
+    "watchpoint": {
+      "zh": "继续观察 Copilot 是否会公布更明确的组织级采用率、留存和 ROI 数据。",
+      "en": "Watch whether Microsoft starts publishing stronger organizational adoption, retention, and ROI evidence."
+    },
+    "content": {
+      "zh": [
+        "这类 Microsoft 新闻之所以值得进站内主线，不是因为它又发布了一串产品更新，而是因为它显示企业 AI 已经进入“默认界面之争”。当 Copilot 逐步进入文档、会议和搜索中枢，它影响的不是一次问答，而是整个组织的工作路径。",
+        "从编辑策略看，这类内容很适合服务两类用户：普通用户能快速判断 AI 办公到底进化到了哪一步，专业用户则会更关注 Microsoft 是否借此进一步强化在企业软件工作台上的控制力。"
+      ],
+      "en": [
+        "This matters not because Microsoft shipped another bundle of product updates, but because it shows enterprise AI has entered a battle over default interfaces. As Copilot moves into documents, meetings, and search, it shapes an organization’s working path rather than one isolated interaction.",
+        "Editorially, the story serves both casual and expert readers: one group sees how far AI productivity has actually moved, while the other watches whether Microsoft is strengthening control over the enterprise work surface."
+      ]
+    }
+  },
+  {
+    "id": 1014,
+    "slug": "nvidia-rtx-pcs-dgx-sparks-local-agents",
+    "live": true,
+    "featured": false,
+    "category": "chips",
+    "region": "global",
+    "signal": "frontier",
+    "date": "2026-03-18",
+    "sourceName": "NVIDIA",
+    "sourceType": "official",
+    "sourceUrl": "https://nvidianews.nvidia.com/news/gtc-spotlights-nvidia-rtx-pcs-and-dgx-sparks-running-latest-open-models-and-ai-agents-locally",
+    "tags": ["NVIDIA", "RTX", "Local AI"],
+    "title": {
+      "zh": "NVIDIA 把 RTX PC 和 DGX Spark 重新讲成“本地跑开源模型与 Agent”的入口",
+      "en": "NVIDIA reframes RTX PCs and DGX Spark as local entry points for open models and AI agents"
+    },
+    "deck": {
+      "zh": "如果你关心新显卡和 AI 的关系，这类新闻最关键，因为它直接把消费级与桌面级算力接上了本地 AI 工作流。",
+      "en": "If you care about how new GPUs connect to AI, this is the meaningful layer: consumer and desktop compute is being tied directly to local AI workflows."
+    },
+    "summaryPoints": {
+      "zh": [
+        "NVIDIA 正把 RTX PC 不只是定义成游戏或创作硬件，而是本地模型与 Agent 终端。",
+        "本地运行开源模型的叙事，会显著影响开发者、内容创作者和 AI PC 用户。",
+        "这类消息能把“新显卡”翻译成普通用户也能理解的 AI 场景价值。"
+      ],
+      "en": [
+        "NVIDIA is no longer positioning RTX PCs only as gaming or creator hardware, but as local endpoints for models and agents.",
+        "The narrative around running open models locally will strongly influence developers, creators, and AI-PC buyers.",
+        "This helps translate a 'new GPU' story into everyday AI utility."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "对 AI 资讯站来说，新显卡真正值得讲的不是参数堆叠，而是它是否把本地模型、推理和 Agent 使用门槛拉低了。",
+      "en": "For an AI newsroom, the interesting angle in a new GPU story is not raw specs but whether it lowers the barrier to local models, inference, and agent workflows."
+    },
+    "aiSummary": {
+      "zh": "NVIDIA 正把 RTX 与 DGX Spark 塑造成个人与团队运行本地开源模型、视频生成和 Agent 的平台，这让消费级硬件新闻与 AI 生产力直接连上了。",
+      "en": "NVIDIA is positioning RTX and DGX Spark as platforms for local open models, generation workflows, and agents, which directly connects consumer hardware news to AI productivity."
+    },
+    "insight": {
+      "zh": "很多用户并不关心完整数据中心叙事，但会关心“我手上的电脑能不能真的跑 AI”；这正是这类新闻该进入首页的原因。",
+      "en": "Many readers do not care about the full data-center story, but they do care whether their own machines can run AI in practice; that is why this belongs on the homepage."
+    },
+    "who": {
+      "zh": "本地部署用户、创作者、AI PC 购买者、独立开发者",
+      "en": "Local-deployment users, creators, AI-PC buyers, and indie developers"
+    },
+    "watchpoint": {
+      "zh": "继续看 NVIDIA 是否把这套本地 AI PC 叙事延伸到更多消费级产品、工作站和软件工具链。",
+      "en": "Watch whether NVIDIA extends this local-AI-PC narrative across more consumer GPUs, workstations, and software stacks."
+    },
+    "content": {
+      "zh": [
+        "你提到 NVIDIA 新显卡很对，但对网站来说，真正该放进内容结构的不是“又发了一张卡”，而是“这张卡和本地 AI 使用场景有什么关系”。GTC 这类官方更新的价值就在这里，它把 RTX、DGX Spark、开源模型和 Agent 体验连成了一条线。",
+        "这类报道也非常适合放在 Pulse 和 Light 里，因为普通用户能快速看懂“本地 AI 值不值得关心”，而专业用户则会去看它对工作站、边缘推理和开发者工具链的长期影响。"
+      ],
+      "en": [
+        "You were right to call out NVIDIA GPUs, but editorially the real question is not simply whether a new card exists. It is how that card changes local AI usage. Updates like this matter because they connect RTX hardware, DGX Spark, open models, and agent workflows into one usable story.",
+        "This also fits Pulse and Light well: casual readers can quickly understand whether local AI is worth paying attention to, while expert readers will think about the longer-term impact on workstations, edge inference, and developer stacks."
+      ]
+    }
+  },
+  {
+    "id": 1015,
+    "slug": "alibaba-cloud-mwc-2026-global-ai-upgrades",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "china",
+    "signal": "breakout",
+    "date": "2026-03-06",
+    "sourceName": "Alibaba Cloud",
+    "sourceType": "official",
+    "sourceUrl": "https://www.alibabacloud.com/blog/mwc-2026-alibaba-cloud-unveils-new-ai-models-tools-and-infrastructure-upgrades-for-global-customers_603740",
+    "tags": ["Alibaba Cloud", "China", "Global rollout"],
+    "title": {
+      "zh": "Alibaba Cloud 在 MWC 2026 继续推模型、工具链和全球基础设施升级",
+      "en": "Alibaba Cloud uses MWC 2026 to push new models, tools, and global infrastructure upgrades"
+    },
+    "deck": {
+      "zh": "这类新闻很适合放进中国与全球交叉视角里，因为它既是国内厂商动作，也是国际化 AI 基础设施竞争。 ",
+      "en": "This sits naturally at the intersection of China coverage and global infrastructure competition."
+    },
+    "summaryPoints": {
+      "zh": [
+        "阿里云在国际舞台上继续把模型、平台工具和云基础设施打包推进。",
+        "对全球用户来说，它代表中国厂商不只在模型上竞争，也在全球交付与平台化上竞争。",
+        "这能补足站点里容易偏向美国公司的叙事。"
+      ],
+      "en": [
+        "Alibaba Cloud is continuing to package models, platform tools, and cloud infrastructure together for international rollout.",
+        "For global readers, it shows Chinese players competing not only on models but also on delivery and platformization.",
+        "It helps counter a newsroom narrative that can otherwise tilt too heavily toward U.S. companies."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "把 Alibaba Cloud 放进首页不是为了地域平衡，而是因为全球 AI 竞争确实正在变成平台、模型和基础设施的组合竞争。",
+      "en": "Alibaba Cloud belongs on the homepage not for token geographic balance, but because global AI competition is genuinely becoming a combined contest across platforms, models, and infrastructure."
+    },
+    "aiSummary": {
+      "zh": "Alibaba Cloud 在 MWC 2026 的更新反映出中国厂商正在用“模型 + 工具 + 全球云基础设施”组合拳参与国际 AI 竞争。",
+      "en": "Alibaba Cloud’s MWC 2026 update shows how Chinese players are entering international AI competition with a combined play across models, tools, and global cloud infrastructure."
+    },
+    "insight": {
+      "zh": "如果网站想让全球用户持续看下去，中国厂商的国际动作必须被自然放进主叙事，而不是只放在边角栏目里。",
+      "en": "If the site wants to retain global readers, Chinese companies’ international AI moves need to sit in the main narrative rather than in a side column."
+    },
+    "who": {
+      "zh": "全球化产品团队、云采购方、关注中国 AI 国际竞争的人",
+      "en": "Global product teams, cloud buyers, and readers tracking China’s international AI competition"
+    },
+    "watchpoint": {
+      "zh": "继续看阿里云是否会披露更多跨区域客户案例、模型调用数据与平台采用信号。",
+      "en": "Watch for more cross-region customer references, model-usage evidence, and platform-adoption signals."
+    },
+    "content": {
+      "zh": [
+        "你提到要补国内厂商，这一步非常关键。Alibaba Cloud 这类新闻不是“国内专区内容”，而是全球 AI 平台竞争的组成部分。它既有中国公司的身份，也有全球客户和基础设施升级的含义。",
+        "从内容结构上，它特别适合放进一个 China + Global 的观察位里，这样用户不会觉得中国厂商被硬塞进来，而是会自然意识到它们本来就处在全球竞争主线里。"
+      ],
+      "en": [
+        "You were right to ask for stronger domestic coverage. Stories like this are not just 'China-only' content; they are part of the global AI platform race. Alibaba Cloud carries both the identity of a Chinese company and the implications of serving international customers with infrastructure upgrades.",
+        "Structurally, this fits best inside a China-plus-global watch lane so readers do not feel these companies are being forced into the mix. Instead, they see them as part of the same competitive map."
+      ]
+    }
+  },
+  {
+    "id": 1016,
+    "slug": "anthropic-claude-sonnet-4-6",
+    "live": true,
+    "featured": false,
+    "category": "models",
+    "region": "global",
+    "signal": "frontier",
+    "date": "2026-02-17",
+    "sourceName": "Anthropic",
+    "sourceType": "official",
+    "sourceUrl": "https://www.anthropic.com/news/introducing-claude-sonnet-4-6",
+    "tags": ["Anthropic", "Claude", "Model release"],
+    "title": {
+      "zh": "Anthropic 发布 Claude Sonnet 4.6，继续把模型新闻推回主舞台",
+      "en": "Anthropic launches Claude Sonnet 4.6 and puts model competition back on center stage"
+    },
+    "deck": {
+      "zh": "模型更新仍然重要，但高质量网站不该只报版本号，还要解释它会改写哪些使用场景。",
+      "en": "Model upgrades still matter, but a strong newsroom should explain the usage shifts behind the version number."
+    },
+    "summaryPoints": {
+      "zh": [
+        "Claude Sonnet 4.6 代表 Anthropic 继续在主力商用模型带上迭代。",
+        "模型新闻依然是高流量入口，但编辑价值来自解释它将影响哪些工作流。",
+        "它适合留在首页主线，但要和应用、企业采用和工具层一起呈现。"
+      ],
+      "en": [
+        "Claude Sonnet 4.6 marks another iteration in Anthropic’s core commercial-model lane.",
+        "Model news remains a high-traffic entry point, but editorial value comes from explaining the workflows it changes.",
+        "It belongs in the lead stream, but alongside product, adoption, and tooling coverage."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "模型发布还是 AI 新闻的重要入口，但如果站点只剩模型更新，就很难形成持续阅读价值。",
+      "en": "Model launches remain a major AI-news entry point, but a site that covers only model updates struggles to build sustained reading value."
+    },
+    "aiSummary": {
+      "zh": "Claude Sonnet 4.6 的意义不只在于版本升级，而在于它提醒市场：模型层竞争仍在继续，但用户真正关心的是升级后能做什么。",
+      "en": "Claude Sonnet 4.6 matters not just as a version increment, but as a reminder that model-layer competition continues while users increasingly care about what upgrades actually enable."
+    },
+    "insight": {
+      "zh": "模型新闻可以继续做流量入口，但站点的护城河会来自后续解读、工具连接和使用场景翻译。",
+      "en": "Model stories can remain traffic entry points, but the newsroom moat comes from interpretation, tool linkage, and usage translation."
+    },
+    "who": {
+      "zh": "模型用户、开发者、企业采购方、关注基座模型竞争的人",
+      "en": "Model users, developers, enterprise buyers, and readers tracking frontier competition"
+    },
+    "watchpoint": {
+      "zh": "继续看 Anthropic 是否披露更具体的编码、企业任务和长上下文表现信号。",
+      "en": "Watch for more specific signals on coding, enterprise tasks, and long-context performance."
+    },
+    "content": {
+      "zh": [
+        "Anthropic 这类消息一定要有，但它不应该单独定义整站。更好的做法是让模型发布和企业采用、工具生态、区域竞争一起出现，这样用户才能快速建立完整判断。",
+        "从产品设计看，模型新闻非常适合作为首页注意力抓手，而深度价值则留给后面的结构化简报和详情页。"
+      ],
+      "en": [
+        "You definitely want Anthropic stories in the mix, but they should not define the entire site on their own. A better approach is to let model launches appear alongside enterprise adoption, tooling, and regional competition so readers can build a fuller judgment quickly.",
+        "From a product-design perspective, model news works well as an attention grabber on the homepage, while deeper value comes from structured briefs and detail pages."
+      ]
+    }
+  },
+  {
+    "id": 1017,
+    "slug": "xai-joins-spacex",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "us",
+    "signal": "breakout",
+    "date": "2026-02-02",
+    "sourceName": "xAI",
+    "sourceType": "official",
+    "sourceUrl": "https://x.ai/news/xai-joins-spacex",
+    "tags": ["xAI", "Musk", "Infrastructure"],
+    "title": {
+      "zh": "xAI 加入 SpaceX 生态，让马斯克系 AI 叙事再次变成平台新闻",
+      "en": "xAI joins the SpaceX ecosystem, turning Musk’s AI story back into a platform story"
+    },
+    "deck": {
+      "zh": "这类新闻不只是人物八卦，它关系到算力、分发、品牌和用户触达被怎样重新打包。",
+      "en": "This is not just personality-driven news; it is about how compute, distribution, branding, and user reach are being repackaged together."
+    },
+    "summaryPoints": {
+      "zh": [
+        "xAI 和 SpaceX 的靠近，会强化市场对“算力 + 网络 + 分发平台”组合的想象。",
+        "马斯克相关 AI 新闻会天然带来更高大众关注度，适合放在 Light 和 Pulse 的大盘中。",
+        "对专业用户来说，它更像一个平台整合与资源协同信号。"
+      ],
+      "en": [
+        "The xAI–SpaceX connection strengthens the market narrative around combined compute, network, and distribution advantages.",
+        "Musk-related AI stories naturally attract broader attention and fit well inside Pulse and Light.",
+        "For expert readers, it is more a signal of platform integration and resource coordination."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "这类新闻要做，但要把它从“人物热度”翻译成“平台资源与产业位置变化”，网站才会显得专业。",
+      "en": "Stories like this are worth doing, but they need to be translated from personality heat into platform resources and industry positioning if the site is to feel professional."
+    },
+    "aiSummary": {
+      "zh": "xAI 加入 SpaceX 生态之后，市场会更关注它如何整合计算资源、品牌分发和更广泛的产品入口。",
+      "en": "With xAI now inside the SpaceX orbit, the market will focus more on how it combines compute resources, brand distribution, and broader product entry points."
+    },
+    "insight": {
+      "zh": "大众会被“马斯克又做了什么”吸引进来，但站点要做的是把这种注意力转成对平台竞争格局的理解。",
+      "en": "General audiences may arrive because 'Musk did something again,' but the product’s job is to convert that attention into understanding of platform competition."
+    },
+    "who": {
+      "zh": "泛科技用户、投资人、关注平台竞争与资源整合的人",
+      "en": "General tech readers, investors, and people tracking platform competition and resource integration"
+    },
+    "watchpoint": {
+      "zh": "继续看 xAI 是否把这种整合体现在模型发布节奏、分发产品和算力能力上。",
+      "en": "Watch whether xAI turns this integration into model cadence, distribution products, and compute capability."
+    },
+    "content": {
+      "zh": [
+        "你提到像马斯克开会、讲话这类新闻，其实背后是有产品位置的。不是每一条都值得放大，但像 xAI 和 SpaceX 这种整合型动作，本质上是在改变 AI 公司如何利用更大的资源网络。",
+        "这类内容特别适合放在大众版的首页，因为它能快速抓注意力；但真正专业的处理方式，是把它解释成平台竞争与资源协同，而不是只停留在人物新闻层。"
+      ],
+      "en": [
+        "You were right to point out Musk-style stories. Not every appearance deserves amplification, but integration moves like xAI and SpaceX genuinely alter how an AI company can use a broader resource network.",
+        "This works especially well in a more public-facing homepage layer because it captures attention quickly; the professional treatment is to explain it as platform competition and resource coordination, not just personality coverage."
+      ]
+    }
+  },
+  {
+    "id": 1018,
+    "slug": "tencent-ai-for-all-wef-2026",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "china",
+    "signal": "watch",
+    "date": "2026-01-29",
+    "sourceName": "Tencent",
+    "sourceType": "official",
+    "sourceUrl": "https://www.tencent.com/en-us/articles/2204475.html",
+    "tags": ["Tencent", "Hunyuan", "China AI"],
+    "title": {
+      "zh": "Tencent 把“让 AI 人人可用”抬到国际舞台，强调混元与产业落地",
+      "en": "Tencent brings its 'AI for all' narrative to an international stage around Hunyuan and deployment"
+    },
+    "deck": {
+      "zh": "它不只是品牌表态，更反映出腾讯在模型、应用和产业场景之间寻找更稳的叙事位置。",
+      "en": "This is more than brand messaging; it reflects Tencent’s attempt to define a steadier narrative position across models, applications, and industry deployment."
+    },
+    "summaryPoints": {
+      "zh": [
+        "腾讯正在把 AI 叙事从单点技术突破转向更普及的产品与行业使用场景。",
+        "这类新闻适合放进中国厂商观察位，而不是只靠国外公司撑主线。",
+        "它也能帮助普通用户理解国内大厂在 AI 竞争中的不同打法。"
+      ],
+      "en": [
+        "Tencent is shifting its AI narrative from isolated technical breakthroughs toward broader product and industry use cases.",
+        "This belongs in a China watch lane rather than leaving the main story to overseas companies alone.",
+        "It also helps general readers understand how Chinese platforms are competing differently in AI."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "如果网站要真正面向全球用户，中国平台型公司的 AI 叙事必须是主干内容，而不是补充背景。",
+      "en": "If the site truly wants to face a global audience, Chinese platform companies need to sit inside the main AI narrative rather than as optional background."
+    },
+    "aiSummary": {
+      "zh": "腾讯正尝试用“AI 人人可用”和混元生态，把自身定位成更偏平台化、普及化的 AI 参与者。",
+      "en": "Tencent is using an 'AI for all' framing and the Hunyuan ecosystem to position itself as a more platform-oriented, mass-adoption AI player."
+    },
+    "insight": {
+      "zh": "中国厂商并不只是跟随模型竞争，它们更大的差异往往来自平台分发和产品场景。",
+      "en": "Chinese players are not just following the model race; their bigger differentiation often comes from platform distribution and product scenarios."
+    },
+    "who": {
+      "zh": "关注中国 AI 平台、消费互联网与产业落地的人",
+      "en": "Readers tracking Chinese AI platforms, consumer internet, and industry deployment"
+    },
+    "watchpoint": {
+      "zh": "继续看腾讯会如何把混元进一步嵌进内容、社交、办公和云产品体系。",
+      "en": "Watch how Tencent pushes Hunyuan further into content, social, productivity, and cloud products."
+    },
+    "content": {
+      "zh": [
+        "如果你的站点只讲 OpenAI、Anthropic、NVIDIA，它会显得像单极叙事。腾讯这类内容的价值在于，它让用户看到另一种 AI 竞争路径：不是只比模型能力，也比平台、分发和场景。",
+        "这类报道不一定每条都需要放到最显眼位置，但一定要稳定出现在首页某个观察位里，这样网站的全球视角才会更完整。"
+      ],
+      "en": [
+        "If the site talks only about OpenAI, Anthropic, and NVIDIA, it begins to feel like a single-pole narrative. Tencent helps readers see another path in AI competition: not just competing on model capability, but on platform, distribution, and scenario coverage.",
+        "Not every Tencent story needs the very top slot, but it should appear consistently in a dedicated watch lane so the site’s global perspective feels complete."
+      ]
+    }
   }
 ];

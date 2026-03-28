@@ -5,117 +5,265 @@ document.addEventListener("DOMContentLoaded", async () => {
   await AIInsight.initShell("home");
   AIInsight.startAutoRefresh();
 
-  function getCopy(language, meta, liveCount, totalCount, latestDate, sourceCount) {
-    const providerCount = AIInsight.getProviderIds().length;
+  function uniqueById(items) {
+    const seen = new Set();
+
+    return (Array.isArray(items) ? items : []).filter((item) => {
+      const key = String(item && item.id);
+      if (!item || seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function buildSearchText(item) {
+    return [
+      AIInsight.localize(item.title, "zh"),
+      AIInsight.localize(item.title, "en"),
+      AIInsight.localize(item.deck, "zh"),
+      AIInsight.localize(item.deck, "en"),
+      AIInsight.localize(item.insight, "zh"),
+      AIInsight.localize(item.insight, "en"),
+      AIInsight.localize(item.watchpoint, "zh"),
+      AIInsight.localize(item.watchpoint, "en"),
+      item.sourceName,
+      item.sourceType,
+      (item.tags || []).join(" ")
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  }
+
+  function matchesKeywords(item, keywords) {
+    const haystack = buildSearchText(item);
+    return (keywords || []).some((keyword) => haystack.includes(String(keyword || "").toLowerCase()));
+  }
+
+  function pickStories(primary, fallback, limit) {
+    return uniqueById([...(primary || []), ...(fallback || [])]).slice(0, limit);
+  }
+
+  function getModeProfile(viewMode) {
+    const shared = {
+      boardroomKeywords: ["openai", "anthropic", "claude", "microsoft", "copilot", "nvidia", "rtx", "google", "gemini", "xai", "musk", "meta"],
+      chinaKeywords: ["alibaba", "qwen", "tencent", "hunyuan", "baidu", "deepseek", "minimax", "阿里", "腾讯", "百度", "通义", "混元", "豆包"],
+      researchKeywords: ["research", "paper", "journal", "arxiv", "benchmark", "study", "evaluation", "reasoning"]
+    };
+
+    if (viewMode === "pro") {
+      return {
+        ...shared,
+        liveLimit: 5,
+        microLimit: 4,
+        briefLimit: 4,
+        boardroomLimit: 3,
+        chinaLimit: 3,
+        researchLimit: 3,
+        journalLimit: 4,
+        showProviders: true,
+        showJournals: true,
+        showQuickResearchRoute: true
+      };
+    }
+
+    if (viewMode === "light") {
+      return {
+        ...shared,
+        liveLimit: 5,
+        microLimit: 4,
+        briefLimit: 4,
+        boardroomLimit: 3,
+        chinaLimit: 3,
+        researchLimit: 2,
+        journalLimit: 0,
+        showProviders: true,
+        showJournals: false,
+        showQuickResearchRoute: false
+      };
+    }
+
+    return {
+      ...shared,
+      liveLimit: 4,
+      microLimit: 4,
+      briefLimit: 3,
+      boardroomLimit: 3,
+      chinaLimit: 3,
+      researchLimit: 2,
+      journalLimit: 0,
+      showProviders: false,
+      showJournals: false,
+      showQuickResearchRoute: false
+    };
+  }
+
+  function getCopy(language, meta, counts, viewMode) {
+    const isPro = viewMode === "pro";
+    const isLight = viewMode === "light";
 
     return {
       zh: {
-        eyebrow: "Global AI Briefing",
-        title: "把实时资讯、原文来源和 AI 总结做成一个真正能用的全球 AI 新闻入口",
-        lead: "这个版本会同时承载时事新闻、原文网址、编辑判断和 AI 摘要能力。用户既能快速看到发生了什么，也能立刻跳到原文，并按自己偏好的摘要引擎继续深挖。",
-        primary: "进入实时资讯流",
-        secondary: "搜索新闻主题",
+        eyebrow: isPro ? "Professional AI Desk" : isLight ? "Global AI Digest" : "AI Pulse",
+        title: isPro
+          ? "把主线新闻、公司动态、工具雷达和期刊入口压进一个更专业的 AI 工作台"
+          : isLight
+            ? "先给用户一个清楚、耐看的 AI 日报入口，而不是堆满所有信息"
+            : "更快地看到 AI 行业今天最值得扫一遍的新闻、工具和变化",
+        lead: isPro
+          ? "专业版不再只是换肤，而是把新闻主线、区域观察、开发者工具和期刊入口分层摆出来，减少跳出和来回寻找的负担。"
+          : isLight
+            ? "亮色版会优先给出更清楚的视觉层级和较低的认知负担，适合持续阅读与跨区域扫盘。"
+            : "Pulse 会优先服务想快速了解 AI 行业发生了什么的人，减少首屏决策成本，把注意力集中在最值得点开的内容上。",
+        primary: "进入资讯流",
+        secondary: "按主题搜索",
+        featuredLabel: isPro ? "值班主线" : "主线头条",
         statusLead: meta.remoteConnected
-          ? "站点已经接入远端 live 源，首页会继续混合站内精选和远端时事更新。"
-          : "当前首页会先用站内结构化内容与官方种子快讯撑起主视图，接上后端后会自动扩成真正的实时模式。",
-        stats: [
+          ? "首页当前会把远端 live 源、站内精选和工具雷达合并展示。"
+          : "当前首页仍会优先使用站内高信号内容，远端接口连通后会自动继续扩容。",
+        routesTitle: "阅读路径",
+        routesNote: isPro
+          ? "专业用户优先进入稳定工作台；普通用户优先进入低负担的浏览路径。"
+          : "先决定你现在是想追头条、找工具，还是系统理解，再进入对应视图。",
+        nowTitle: isPro ? "主线监测" : "现在最值得先看的",
+        nowNote: isPro
+          ? "这里保留高信号主线，不让工具和研究消息打散第一层注意力。"
+          : "先用少量主线卡片建立今天的行业轮廓，再决定要不要深挖。",
+        boardroomTitle: "公司与平台动向",
+        boardroomNote: "优先看会改变平台入口、企业采用和资源分配的消息。",
+        chinaTitle: "中国与区域观察",
+        chinaNote: "补足国内厂商和亚洲市场，不让整站只剩美国公司视角。",
+        toolsTitle: "工具与开源 Radar",
+        toolsNote: "专门放高信号小新闻、热门工具、GitHub 项目和本地模型接口路线。",
+        briefsTitle: "深度简报",
+        briefsNote: "把热点之外更值得慢读的判断放在第二层，适合从“知道发生了什么”进入“理解为什么重要”。",
+        providersTitle: "摘要引擎与开源接口",
+        providersNote: "除了付费模型，现在也给了开源 / 本地兼容接口路线，后面接 Ollama、vLLM 会更顺。",
+        proDeskTitle: "专业版工作台",
+        proDeskNote: "把主线、区域、研究和期刊入口压成一个更像新闻终端的布局。",
+        researchTitle: "研究与期刊入口",
+        researchNote: "只在专业版里保留这层，避免普通用户被过多专业入口稀释注意力。",
+        scanCards: [
           {
-            label: "实时条目",
-            value: `${liveCount}`,
-            copy: "实时层已经不只是一排卡片，而是首页第一层的时事入口。"
+            label: "主线快讯",
+            value: `${counts.live}`,
+            note: "先抓今天行业在推进什么。"
           },
           {
-            label: "全站条目",
-            value: `${totalCount}`,
-            copy: "实时快讯、结构化简报和专业来源提示已经开始合并。"
+            label: "工具信号",
+            value: `${counts.tools}`,
+            note: "再看开发者和普通用户真正会点开的东西。"
           },
           {
-            label: "最近刷新",
-            value: latestDate,
-            copy: "统一展示绝对日期和时间，全球用户不容易误读。"
+            label: "中国观察",
+            value: `${counts.china}`,
+            note: "保证全球视角不是单极叙事。"
           },
           {
             label: "专业来源",
-            value: `${sourceCount}`,
-            copy: "权威期刊、会议和预印本都能从专业入口继续深挖。"
-          },
-          {
-            label: "摘要引擎",
-            value: `${providerCount}`,
-            copy: "支持 OpenAI / ChatGPT 与 DeepSeek 两条摘要路径。"
-          },
-          {
-            label: "内容结构",
-            value: `${AIInsight.categories.length - 1}`,
-            copy: "模型、算力、产品、研究、机器人与政策统一呈现。"
+            value: `${counts.sources}`,
+            note: "专业版再进入论文和期刊。"
           }
-        ],
-        featuredLabel: "实时主线",
-        liveTitle: "实时资讯流",
-        liveNote: "每条都带原文网址，适合快速判断后继续深读。",
-        briefsTitle: "深度简报",
-        briefsNote: "把时事新闻之外更有判断力的分析内容放在第二层。",
-        engineTitle: "摘要引擎",
-        engineNote: "用户可以根据预算和偏好，选择更完整的 ChatGPT 路线或更轻量的 DeepSeek 路线。",
-        sourceDeskTitle: "权威期刊、会议与专业源",
-        sourceDeskNote: "给更专业的用户准备的入口，直接通往顶级期刊、开放获取来源、会议论文和预印本。"
+        ]
       },
       en: {
-        eyebrow: "Global AI Briefing",
-        title: "Turn live news, source links, and AI summaries into a real global AI destination",
-        lead: "This version combines timely news, original source URLs, editorial judgment, and AI-generated summaries so readers can scan what changed, jump to the source, and continue with the summary engine they prefer.",
-        primary: "Open the live feed",
-        secondary: "Search news topics",
+        eyebrow: isPro ? "Professional AI Desk" : isLight ? "Global AI Digest" : "AI Pulse",
+        title: isPro
+          ? "Turn headline news, company movement, tooling radar, and journals into a denser AI workbench"
+          : isLight
+            ? "Give readers a clearer, calmer AI daily front page instead of a wall of information"
+            : "See the AI news, launches, and shifts worth scanning first today",
+        lead: isPro
+          ? "Pro mode is no longer just a visual skin. It separates lead news, regional watch, developer tools, and journal routes so readers spend less time hunting."
+          : isLight
+            ? "Light mode prioritizes cleaner hierarchy and lower cognitive load for readers who want to stay longer and scan across regions."
+            : "Pulse is tuned for readers who want the fastest useful snapshot of what changed in AI without too many early decisions.",
+        primary: "Open the feed",
+        secondary: "Search themes",
+        featuredLabel: isPro ? "Duty lead" : "Lead story",
         statusLead: meta.remoteConnected
-          ? "A remote live source is connected, and the homepage now blends it with in-house curated coverage."
-          : "The homepage is still anchored by structured in-house coverage and official seed updates, and it will become truly live once the backend endpoint is connected.",
-        stats: [
-          {
-            label: "Live briefs",
-            value: `${liveCount}`,
-            copy: "The live layer now acts as the first editorial surface rather than a decorative add-on."
-          },
-          {
-            label: "All briefs",
-            value: `${totalCount}`,
-            copy: "Live updates, structured briefs, and professional-source prompts are beginning to merge."
-          },
-          {
-            label: "Last refresh",
-            value: latestDate,
-            copy: "Absolute dates and times keep the experience globally legible."
-          },
-          {
-            label: "Professional sources",
-            value: `${sourceCount}`,
-            copy: "Journals, conferences, and preprints remain one click away for deeper work."
-          },
-          {
-            label: "Summary engines",
-            value: `${providerCount}`,
-            copy: "Readers can choose between OpenAI / ChatGPT and DeepSeek for summaries."
-          },
-          {
-            label: "Coverage lanes",
-            value: `${AIInsight.categories.length - 1}`,
-            copy: "Models, compute, products, research, robotics, and policy live in one structure."
-          }
-        ],
-        featuredLabel: "Live lead",
-        liveTitle: "Live feed",
-        liveNote: "Every brief includes a source link so readers can move from summary to original reporting instantly.",
+          ? "The homepage is now blending remote live updates, in-house curation, and the tooling radar."
+          : "The homepage still leans on in-house high-signal coverage first and expands naturally once the remote endpoint responds.",
+        routesTitle: "Reading paths",
+        routesNote: isPro
+          ? "Expert readers can enter the workbench; broader readers can enter through lower-friction browsing paths."
+          : "Choose whether you want breaking news, tools, or deeper context before you dive in.",
+        nowTitle: isPro ? "Lead monitor" : "What to read first",
+        nowNote: isPro
+          ? "The first layer keeps the core signal intact instead of letting tools and research fragment attention."
+          : "Use a small set of lead cards to build today’s map before deciding whether to go deeper.",
+        boardroomTitle: "Company and platform movement",
+        boardroomNote: "Focus on stories that change platform control, enterprise adoption, and resource positioning.",
+        chinaTitle: "China and regional watch",
+        chinaNote: "Balance the product so it does not default to a U.S.-only worldview.",
+        toolsTitle: "Launches & OSS Radar",
+        toolsNote: "A dedicated lane for high-signal small news, hot tools, GitHub projects, and local-model interface routes.",
         briefsTitle: "Deep briefs",
-        briefsNote: "A second layer for more interpretive editorial coverage beyond breaking updates.",
-        engineTitle: "Summary engines",
-        engineNote: "Readers can choose between a more polished ChatGPT route and a lighter, lower-cost DeepSeek route.",
-        sourceDeskTitle: "Journals, conferences, and professional sources",
-        sourceDeskNote: "A dedicated path for expert readers, with direct routes into top journals, open-access sources, conference proceedings, and preprint feeds."
+        briefsNote: "The second layer is reserved for slower, more interpretive reading after the headlines.",
+        providersTitle: "Summary engines and OSS routes",
+        providersNote: "Beyond paid APIs, the site now exposes an OSS and local-compatible route so Ollama or vLLM can fit more naturally later.",
+        proDeskTitle: "Professional workbench",
+        proDeskNote: "A denser homepage that behaves more like a news terminal than a marketing splash page.",
+        researchTitle: "Research and journals",
+        researchNote: "This lane stays inside Pro so casual readers are not diluted by too many expert entry points.",
+        scanCards: [
+          {
+            label: "Lead updates",
+            value: `${counts.live}`,
+            note: "Start with what the industry is actively moving on."
+          },
+          {
+            label: "Tool signals",
+            value: `${counts.tools}`,
+            note: "Then scan what builders and users may actually try."
+          },
+          {
+            label: "China watch",
+            value: `${counts.china}`,
+            note: "Keep the global story from becoming one-pole coverage."
+          },
+          {
+            label: "Research sources",
+            value: `${counts.sources}`,
+            note: "Only then step into journals and formal research."
+          }
+        ]
       }
     }[language];
   }
 
+  function createMonitorCard(title, note, items, language, href) {
+    return `
+      <article class="monitor-card panel page-fade">
+        <div class="monitor-card-head">
+          <div>
+            <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "观察位" : "Watch lane")}</span>
+            <h3>${AIInsight.escapeHtml(title)}</h3>
+            <p class="panel-text">${AIInsight.escapeHtml(note)}</p>
+          </div>
+          ${href ? `<a class="story-link" href="${AIInsight.escapeHtml(href)}">${AIInsight.escapeHtml(language === "zh" ? "打开" : "Open")}</a>` : ""}
+        </div>
+        <div class="compact-stack">
+          ${
+            items.length
+              ? items.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")
+              : AIInsight.createEmptyState(
+                  language === "zh" ? "内容准备中" : "Coverage loading",
+                  language === "zh" ? "这条观察位会在有更多匹配内容后自动补齐。" : "This lane fills in automatically as more matching stories arrive."
+                )
+          }
+        </div>
+      </article>
+    `;
+  }
+
   function render() {
     const language = AIInsight.getLanguage();
+    const viewMode = AIInsight.getViewMode();
+    const profile = getModeProfile(viewMode);
     const meta = AIInsight.getNewsMeta();
 
     if (!news.length) {
@@ -137,85 +285,70 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const liveStories = AIInsight.getLiveStories(news).filter((item) => !AIInsight.isMicroStory(item)).slice(0, 6);
-    const microStories = AIInsight.getMicroStories(news).slice(0, 6);
     const headlineStories = AIInsight.getHeadlineStories(news);
-    const editorialStories = AIInsight.getEditorialStories(news);
-    const researchSources = AIInsight.getJournalSources().slice(0, 6);
-    const featured = liveStories[0] || editorialStories.find((item) => item.featured) || headlineStories[0] || news[0];
-    const topEditorial = (editorialStories.length ? editorialStories : headlineStories).slice(0, 4);
+    const allLiveStories = AIInsight.getLiveStories(news).filter((item) => !AIInsight.isMicroStory(item));
+    const allMicroStories = AIInsight.getMicroStories(news);
+    const editorialStories = headlineStories.filter((item) => !AIInsight.isLiveItem(item));
+    const researchSources = AIInsight.getJournalSources();
+    const liveStories = allLiveStories.slice(0, profile.liveLimit);
+    const microStories = allMicroStories.slice(0, profile.microLimit);
+    const briefStories = (editorialStories.length ? editorialStories : headlineStories.filter((item) => !AIInsight.isMicroStory(item))).slice(0, profile.briefLimit);
+    const boardroomStories = pickStories(
+      headlineStories.filter((item) => !AIInsight.isMicroStory(item) && matchesKeywords(item, profile.boardroomKeywords)),
+      headlineStories.filter((item) => !AIInsight.isMicroStory(item)),
+      profile.boardroomLimit
+    );
+    const chinaStories = pickStories(
+      headlineStories.filter((item) => !AIInsight.isMicroStory(item) && (item.region === "china" || matchesKeywords(item, profile.chinaKeywords))),
+      headlineStories.filter((item) => !AIInsight.isMicroStory(item) && item.region !== "global"),
+      profile.chinaLimit
+    );
+    const researchStories = pickStories(
+      headlineStories.filter((item) => !AIInsight.isMicroStory(item) && (item.category === "research" || matchesKeywords(item, profile.researchKeywords))),
+      editorialStories,
+      profile.researchLimit
+    );
+    const featured = uniqueById([...boardroomStories, ...allLiveStories, ...briefStories, ...headlineStories])[0] || news[0];
     const latestDate = AIInsight.formatDateTime(meta.refreshedAt || news[0].date, language);
-    const pageCopy = getCopy(language, meta, AIInsight.getLiveStories(news).length, news.length, latestDate, AIInsight.getJournalSources().length);
-    const quickRoutes = language === "zh"
-      ? [
-          {
-            title: "实时新闻",
-            note: "优先看带原文链接的最新动态，适合快速扫一遍行业变化。",
-            href: "list.html?format=live"
-          },
-          {
-            title: "深度简报",
-            note: "跳到编辑整理过的结构化内容，更适合系统理解。",
-            href: "list.html?format=briefs"
-          },
-          {
-            title: "工具与开源",
-            note: "集中看小新闻、热门工具、GitHub 项目和产品发布。",
-            href: "list.html?format=tools"
-          },
-          {
-            title: "研究来源",
-            note: "直接进入期刊、会议和预印本入口，适合更专业的阅读路径。",
-            href: "sources.html"
-          }
-        ]
-      : [
-          {
-            title: "Live news",
-            note: "Start with the newest source-linked updates for a fast scan of what changed.",
-            href: "list.html?format=live"
-          },
-          {
-            title: "Deep briefs",
-            note: "Jump into more structured editorial coverage for higher-context reading.",
-            href: "list.html?format=briefs"
-          },
-          {
-            title: "Tools & OSS",
-            note: "Focus on small news, hot tools, GitHub projects, and product launches.",
-            href: "list.html?format=tools"
-          },
-          {
-            title: "Research desk",
-            note: "Move directly into journals, conferences, and preprint sources.",
-            href: "sources.html"
-          }
-        ];
-    const toolRadarTitle = language === "zh" ? "工具与开源 Radar" : "Launches & OSS Radar";
-    const toolRadarNote = language === "zh"
-      ? "补上小新闻、热门 AI 工具、GitHub 高信号项目和版本更新，让首页不仅看大公司，也能看见开发者生态。"
-      : "A compact layer for small news, hot AI tools, GitHub projects, and release signals so the homepage covers more than just large-company headlines.";
-    const proDeskTitle = language === "zh" ? "专业版信息台" : "Pro desk";
-    const proDeskMetrics = [
+    const counts = {
+      live: allLiveStories.length,
+      tools: allMicroStories.length,
+      china: headlineStories.filter((item) => item.region === "china" || matchesKeywords(item, profile.chinaKeywords)).length,
+      sources: researchSources.length,
+      total: news.length
+    };
+    const pageCopy = getCopy(language, meta, counts, viewMode);
+    const quickRoutes = [
       {
-        value: String(liveStories.length),
-        label: language === "zh" ? "主线快讯" : "lead updates"
+        title: language === "zh" ? "实时新闻" : "Live news",
+        note: language === "zh" ? "先扫一遍高时效新闻，再决定要不要深入。" : "Scan the highest-tempo coverage before going deeper.",
+        href: "list.html?format=live"
       },
       {
-        value: String(microStories.length),
-        label: language === "zh" ? "工具信号" : "tool signals"
+        title: language === "zh" ? "工具与开源" : "Tools & OSS",
+        note: language === "zh" ? "看最近值得试的新工具、接口和 GitHub 动向。" : "Track the newest tools, interfaces, and GitHub movement.",
+        href: "list.html?format=tools"
       },
       {
-        value: String(researchSources.length),
-        label: language === "zh" ? "专业来源" : "research sources"
+        title: language === "zh" ? "主题搜索" : "Theme search",
+        note: language === "zh" ? "按公司、赛道、产品和地区切入。" : "Search by company, lane, product, or region.",
+        href: "search.html"
       }
     ];
+
+    if (profile.showQuickResearchRoute) {
+      quickRoutes.push({
+        title: language === "zh" ? "期刊与来源" : "Journals & sources",
+        note: language === "zh" ? "在专业模式里直接进入期刊、会议和预印本入口。" : "Jump straight into journals, conferences, and preprints in Pro mode.",
+        href: "sources.html"
+      });
+    }
 
     document.title = language === "zh" ? "AI Insight | 全球 AI 实时资讯情报台" : "AI Insight | Global AI live intelligence desk";
 
     app.innerHTML = `
       <div class="page-shell">
-        <section class="hero page-fade">
+        <section class="hero home-hero page-fade">
           <div class="hero-grid">
             <div>
               <span class="eyebrow">${AIInsight.escapeHtml(pageCopy.eyebrow)}</span>
@@ -224,6 +357,11 @@ document.addEventListener("DOMContentLoaded", async () => {
               <div class="hero-actions">
                 <a class="button button-primary" href="list.html">${AIInsight.escapeHtml(pageCopy.primary)}</a>
                 <a class="button button-secondary" href="search.html">${AIInsight.escapeHtml(pageCopy.secondary)}</a>
+              </div>
+              <div class="hero-note-row">
+                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "最近刷新" : "Last refresh")}: ${AIInsight.escapeHtml(latestDate)}</span>
+                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "全站内容" : "All coverage")}: ${AIInsight.escapeHtml(String(counts.total))}</span>
+                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "当前模式" : "Current mode")}: ${AIInsight.escapeHtml(viewMode === "pro" ? "Pro" : viewMode === "light" ? "Light" : "Pulse")}</span>
               </div>
             </div>
 
@@ -238,7 +376,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <p class="lead">${AIInsight.escapeHtml(AIInsight.localize(featured.deck, language))}</p>
                 <div class="story-source">
                   <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
-                  <strong>${AIInsight.escapeHtml(featured.sourceName || featured.source || "AI Insight")}</strong>
+                  <strong>${AIInsight.escapeHtml(featured.sourceName || "AI Insight")}</strong>
                   <span>·</span>
                   <span>${AIInsight.escapeHtml(AIInsight.formatDate(featured.date, language))}</span>
                 </div>
@@ -272,14 +410,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead })}
 
         <section class="section">
-          <div class="stats-grid">
-            ${pageCopy.stats
+          <div class="scan-rail">
+            ${pageCopy.scanCards
+              .filter((item, index) => profile.showJournals || index < 3)
               .map(
-                (stat) => `
-                  <article class="stat-card page-fade">
-                    <span class="stat-label">${AIInsight.escapeHtml(stat.label)}</span>
-                    <div class="stat-value">${AIInsight.escapeHtml(stat.value)}</div>
-                    <p class="stat-copy">${AIInsight.escapeHtml(stat.copy)}</p>
+                (card) => `
+                  <article class="scan-card page-fade">
+                    <span class="stat-label">${AIInsight.escapeHtml(card.label)}</span>
+                    <strong class="scan-value">${AIInsight.escapeHtml(card.value)}</strong>
+                    <p class="scan-note">${AIInsight.escapeHtml(card.note)}</p>
                   </article>
                 `
               )
@@ -290,11 +429,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <section class="section">
           <div class="section-head">
             <div>
-              <h2>${AIInsight.escapeHtml(language === "zh" ? "快速进入你想看的视图" : "Jump straight into the view you want")}</h2>
-              <p class="section-note">${AIInsight.escapeHtml(language === "zh" ? "把首页当成路由台，而不是把所有内容都塞进同一个混合入口。" : "Use the homepage as a routing surface instead of forcing every reader into one mixed stream.")}</p>
+              <h2>${AIInsight.escapeHtml(pageCopy.routesTitle)}</h2>
+              <p class="section-note">${AIInsight.escapeHtml(pageCopy.routesNote)}</p>
             </div>
           </div>
-          <div class="promise-grid">
+          <div class="promise-grid home-route-grid">
             ${quickRoutes
               .map(
                 (route) => `
@@ -310,46 +449,103 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
+        ${
+          viewMode === "pro"
+            ? `
+              <section class="section">
+                <div class="section-head">
+                  <div>
+                    <h2>${AIInsight.escapeHtml(pageCopy.proDeskTitle)}</h2>
+                    <p class="section-note">${AIInsight.escapeHtml(pageCopy.proDeskNote)}</p>
+                  </div>
+                </div>
+                <div class="pro-home-grid">
+                  <article class="pro-home-column panel page-fade">
+                    <div class="monitor-card-head">
+                      <div>
+                        <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "主线" : "Lead")}</span>
+                        <h3>${AIInsight.escapeHtml(pageCopy.nowTitle)}</h3>
+                        <p class="panel-text">${AIInsight.escapeHtml(pageCopy.nowNote)}</p>
+                      </div>
+                    </div>
+                    <div class="compact-stack">
+                      ${liveStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
+                    </div>
+                  </article>
+
+                  <article class="pro-home-column panel page-fade">
+                    <div class="monitor-card-head">
+                      <div>
+                        <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "平台与区域" : "Platform & region")}</span>
+                        <h3>${AIInsight.escapeHtml(pageCopy.boardroomTitle)}</h3>
+                        <p class="panel-text">${AIInsight.escapeHtml(pageCopy.boardroomNote)}</p>
+                      </div>
+                    </div>
+                    <div class="compact-stack">
+                      ${boardroomStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
+                    </div>
+                    <div class="pro-divider"></div>
+                    <div class="monitor-card-head">
+                      <div>
+                        <h3>${AIInsight.escapeHtml(pageCopy.chinaTitle)}</h3>
+                        <p class="panel-text">${AIInsight.escapeHtml(pageCopy.chinaNote)}</p>
+                      </div>
+                    </div>
+                    <div class="compact-stack">
+                      ${chinaStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
+                    </div>
+                  </article>
+
+                  <article class="pro-home-column panel page-fade">
+                    <div class="monitor-card-head">
+                      <div>
+                        <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "研究台" : "Research desk")}</span>
+                        <h3>${AIInsight.escapeHtml(pageCopy.researchTitle)}</h3>
+                        <p class="panel-text">${AIInsight.escapeHtml(pageCopy.researchNote)}</p>
+                      </div>
+                      <a class="story-link" href="sources.html">${AIInsight.escapeHtml(AIInsight.t("nav.sources", language))}</a>
+                    </div>
+                    <div class="compact-stack">
+                      ${researchStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
+                    </div>
+                    <div class="mini-journal-grid">
+                      ${researchSources.slice(0, profile.journalLimit).map((item) => AIInsight.createJournalCard(item, language)).join("")}
+                    </div>
+                  </article>
+                </div>
+              </section>
+            `
+            : `
+              <section class="section">
+                <div class="section-head">
+                  <div>
+                    <h2>${AIInsight.escapeHtml(pageCopy.nowTitle)}</h2>
+                    <p class="section-note">${AIInsight.escapeHtml(pageCopy.nowNote)}</p>
+                  </div>
+                </div>
+                <div class="story-grid feed-grid">
+                  ${liveStories.map((item) => AIInsight.createStoryCard(item, { language })).join("")}
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="monitor-grid">
+                  ${createMonitorCard(pageCopy.boardroomTitle, pageCopy.boardroomNote, boardroomStories, language, "search.html?q=Microsoft")}
+                  ${createMonitorCard(pageCopy.chinaTitle, pageCopy.chinaNote, chinaStories, language, "search.html?region=china")}
+                </div>
+              </section>
+            `
+        }
+
         <section class="section">
           <div class="section-head">
             <div>
-              <h2>${AIInsight.escapeHtml(pageCopy.liveTitle)}</h2>
-              <p class="section-note">${AIInsight.escapeHtml(pageCopy.liveNote)}</p>
+              <h2>${AIInsight.escapeHtml(pageCopy.toolsTitle)}</h2>
+              <p class="section-note">${AIInsight.escapeHtml(pageCopy.toolsNote)}</p>
             </div>
-          </div>
-          <div class="story-grid feed-grid">
-            ${liveStories.length ? liveStories.map((item) => AIInsight.createStoryCard(item, { language })).join("") : AIInsight.createEmptyState(pageCopy.liveTitle, pageCopy.liveNote)}
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head section-head-split">
-            <div>
-              <h2>${AIInsight.escapeHtml(toolRadarTitle)}</h2>
-              <p class="section-note">${AIInsight.escapeHtml(toolRadarNote)}</p>
-            </div>
-            <article class="pro-desk-card pro-only page-fade">
-              <span class="meta-label">${AIInsight.escapeHtml(proDeskTitle)}</span>
-              <div class="pro-desk-metrics">
-                ${proDeskMetrics
-                  .map(
-                    (metric) => `
-                      <div class="pro-desk-metric">
-                        <strong>${AIInsight.escapeHtml(metric.value)}</strong>
-                        <span>${AIInsight.escapeHtml(metric.label)}</span>
-                      </div>
-                    `
-                  )
-                  .join("")}
-              </div>
-              <div class="story-links">
-                <a class="story-link" href="sources.html">${AIInsight.escapeHtml(AIInsight.t("nav.sources", language))}</a>
-                <a class="story-link" href="radar.html">${AIInsight.escapeHtml(AIInsight.t("nav.radar", language))}</a>
-              </div>
-            </article>
           </div>
           <div class="signal-grid">
-            ${microStories.length ? microStories.map((item) => AIInsight.createSignalCard(item, { language })).join("") : AIInsight.createEmptyState(toolRadarTitle, toolRadarNote)}
+            ${microStories.length ? microStories.map((item) => AIInsight.createSignalCard(item, { language })).join("") : AIInsight.createEmptyState(pageCopy.toolsTitle, pageCopy.toolsNote)}
           </div>
         </section>
 
@@ -361,34 +557,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
           </div>
           <div class="story-grid">
-            ${topEditorial.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
+            ${briefStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
           </div>
         </section>
 
-        <section class="section">
-          <div class="section-head">
-            <div>
-              <h2>${AIInsight.escapeHtml(pageCopy.engineTitle)}</h2>
-              <p class="section-note">${AIInsight.escapeHtml(pageCopy.engineNote)}</p>
-            </div>
-          </div>
-          <div class="provider-grid">
-            ${AIInsight.createProviderCards(language)}
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head">
-            <div>
-              <h2>${AIInsight.escapeHtml(pageCopy.sourceDeskTitle)}</h2>
-              <p class="section-note">${AIInsight.escapeHtml(pageCopy.sourceDeskNote)}</p>
-            </div>
-            <a class="button button-secondary" href="sources.html">${AIInsight.escapeHtml(AIInsight.t("nav.sources", language))}</a>
-          </div>
-          <div class="journal-grid">
-            ${researchSources.map((item) => AIInsight.createJournalCard(item, language)).join("")}
-          </div>
-        </section>
+        ${
+          profile.showProviders
+            ? `
+              <section class="section">
+                <div class="section-head">
+                  <div>
+                    <h2>${AIInsight.escapeHtml(pageCopy.providersTitle)}</h2>
+                    <p class="section-note">${AIInsight.escapeHtml(pageCopy.providersNote)}</p>
+                  </div>
+                </div>
+                <div class="provider-grid">
+                  ${AIInsight.createProviderCards(language)}
+                </div>
+              </section>
+            `
+            : `
+              <section class="section">
+                <article class="insight-card page-fade">
+                  <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "摘要路线" : "Summary route")}</span>
+                  <h3>${AIInsight.escapeHtml(pageCopy.providersTitle)}</h3>
+                  <p>${AIInsight.escapeHtml(pageCopy.providersNote)}</p>
+                  <div class="story-links">
+                    <a class="story-link" href="detail.html?id=${featured.id}">${AIInsight.escapeHtml(language === "zh" ? "去详情页试摘要" : "Try a summary in detail view")}</a>
+                  </div>
+                </article>
+              </section>
+            `
+        }
       </div>
     `;
 
@@ -407,6 +607,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.addEventListener("ai-insight:language", render);
+  document.addEventListener("ai-insight:view-mode", render);
 
   news = await AIInsight.getNews();
   render();

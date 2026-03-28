@@ -58,6 +58,30 @@
     }
   ];
 
+  const searchAliasMap = {
+    nvidia: ["英伟达", "nvidia", "rtx", "dgx"],
+    microsoft: ["微软", "microsoft", "copilot", "azure"],
+    openai: ["openai", "chatgpt", "gpt"],
+    anthropic: ["anthropic", "claude"],
+    google: ["谷歌", "google", "gemini", "alphabet"],
+    meta: ["meta", "llama", "facebook", "脸书"],
+    xai: ["xai", "x.ai", "马斯克", "musk", "grok"],
+    musk: ["马斯克", "musk", "xai", "grok"],
+    tesla: ["特斯拉", "tesla", "马斯克", "musk"],
+    alibaba: ["阿里", "阿里云", "阿里巴巴", "alibaba", "qwen", "通义"],
+    qwen: ["通义", "千问", "qwen", "阿里", "阿里云"],
+    tencent: ["腾讯", "tencent", "hunyuan", "混元"],
+    hunyuan: ["混元", "hunyuan", "腾讯", "tencent"],
+    baidu: ["百度", "baidu", "ernie", "文心"],
+    deepseek: ["deepseek", "深度求索", "深度搜索"],
+    bytedance: ["字节", "字节跳动", "bytedance", "doubao", "豆包"],
+    doubao: ["豆包", "doubao", "字节", "字节跳动"],
+    minimax: ["minimax", "海螺", "abab"],
+    ollama: ["ollama", "本地模型", "本地接口"],
+    vllm: ["vllm", "推理服务", "openai compatible"],
+    "open webui": ["open webui", "open-webui", "ai 工作台", "本地界面"]
+  };
+
   const copy = {
     zh: {
       siteTitle: "AI Insight",
@@ -249,6 +273,18 @@
         },
         models: ["deepseek-chat", "deepseek-reasoner"],
         defaultModel: "deepseek-chat"
+      },
+      oss: {
+        label: {
+          zh: "开源 / 本地接口",
+          en: "OSS / local API"
+        },
+        description: {
+          zh: "适合接入 Ollama、vLLM、llama.cpp 或其他 OpenAI 兼容接口，用开源模型做更可控的摘要。",
+          en: "Best for Ollama, vLLM, llama.cpp, or other OpenAI-compatible endpoints when you want more controllable open-weight summaries."
+        },
+        models: ["gpt-oss:20b", "gpt-oss:120b", "qwen3-coder", "glm-4.7"],
+        defaultModel: "gpt-oss:20b"
       }
     }
   };
@@ -317,6 +353,35 @@
         seen.add(value);
         return true;
       });
+  }
+
+  function normalizeSearchToken(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
+  }
+
+  function getAliasTerms(text) {
+    const normalized = normalizeSearchToken(text);
+
+    if (!normalized) {
+      return [];
+    }
+
+    const aliases = new Set();
+
+    Object.entries(searchAliasMap).forEach(([key, terms]) => {
+      const bucket = [key, ...(terms || [])].map(normalizeSearchToken);
+      if (bucket.some((term) => term && normalized.includes(term))) {
+        bucket.forEach((term) => {
+          if (term) {
+            aliases.add(term);
+          }
+        });
+      }
+    });
+
+    return [...aliases];
   }
 
   function getStoredObject(key) {
@@ -1646,7 +1711,7 @@
         return true;
       }
 
-      const haystack = [
+      const baseSegments = [
         item.title.zh,
         item.title.en,
         item.deck.zh,
@@ -1676,8 +1741,9 @@
         getCategoryLabel(item.category, "en"),
         getRegionLabel(item.region, "zh"),
         getRegionLabel(item.region, "en")
-      ]
-        .filter(Boolean)
+      ].filter(Boolean);
+      const aliasSegments = getAliasTerms(baseSegments.join(" "));
+      const haystack = [...baseSegments, ...aliasSegments]
         .join(" ")
         .toLowerCase();
 
@@ -1872,6 +1938,7 @@
 
   function renderHeader(currentPage) {
     const language = getLanguage();
+    const viewMode = getViewMode();
     const account = getAccountState();
     const accountStatusLabel = !account.remoteEnabled
       ? (language === "en" ? "Local mode" : "本地模式")
@@ -1895,10 +1962,11 @@
       { key: "feed", href: "list.html" },
       { key: "search", href: "search.html" },
       { key: "radar", href: "radar.html" },
-      { key: "sources", href: "sources.html" },
+      { key: "sources", href: "sources.html", visible: viewMode === "pro" },
       { key: "briefing", href: "briefing.html" },
       { key: "account", href: "account.html" }
     ]
+      .filter((item) => item.visible !== false)
       .map((item) => {
         const activeClass = item.key === currentPage ? "is-active" : "";
         const label = item.label || t(`nav.${item.key}`, language);
@@ -1943,18 +2011,26 @@
 
   function renderFooter() {
     const language = getLanguage();
+    const viewMode = getViewMode();
+    const footerLinks = [
+      { key: "home", href: "index.html" },
+      { key: "feed", href: "list.html" },
+      { key: "search", href: "search.html" },
+      { key: "radar", href: "radar.html" },
+      { key: "sources", href: "sources.html", visible: viewMode === "pro" },
+      { key: "briefing", href: "briefing.html" },
+      { key: "account", href: "account.html" }
+    ]
+      .filter((item) => item.visible !== false)
+      .map((item) => `<a href="${item.href}">${escapeHtml(t(`nav.${item.key}`, language))}</a>`)
+      .join("");
+
     return `
       <div class="page-shell">
         <div class="site-footer panel footer-inner">
           <div class="footer-copy">${escapeHtml(t("footer", language))}</div>
           <div class="footer-links">
-            <a href="index.html">${escapeHtml(t("nav.home", language))}</a>
-            <a href="list.html">${escapeHtml(t("nav.feed", language))}</a>
-            <a href="search.html">${escapeHtml(t("nav.search", language))}</a>
-            <a href="radar.html">${escapeHtml(t("nav.radar", language))}</a>
-            <a href="sources.html">${escapeHtml(t("nav.sources", language))}</a>
-            <a href="briefing.html">${escapeHtml(t("nav.briefing", language))}</a>
-            <a href="account.html">${escapeHtml(t("nav.account", language))}</a>
+            ${footerLinks}
           </div>
         </div>
       </div>

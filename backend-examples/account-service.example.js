@@ -28,6 +28,7 @@ const VIEW_MODES = new Set(["pulse", "light", "pro"]);
 const LOCAL_MODELS = new Set(["local-brief", "local-expanded"]);
 const OPENAI_MODELS = new Set(["gpt-5.4-mini", "gpt-5.4-nano"]);
 const DEEPSEEK_MODELS = new Set(["deepseek-chat", "deepseek-reasoner"]);
+const OSS_MODELS = new Set(["gpt-oss:20b", "gpt-oss:120b", "qwen3-coder", "glm-4.7"]);
 
 let storeCache;
 let storePromise;
@@ -119,9 +120,24 @@ function dedupeTrackedTopics(values) {
 
 function normalizeSummaryPreference(value) {
   const source = value && typeof value === "object" ? value : {};
-  const provider = source.provider === "deepseek" || source.provider === "local" ? source.provider : "openai";
-  const modelSet = provider === "local" ? LOCAL_MODELS : provider === "deepseek" ? DEEPSEEK_MODELS : OPENAI_MODELS;
-  const defaultModel = provider === "local" ? "local-brief" : provider === "deepseek" ? "deepseek-chat" : "gpt-5.4-mini";
+  const provider =
+    source.provider === "deepseek" || source.provider === "local" || source.provider === "oss"
+      ? source.provider
+      : "openai";
+  const modelSet = provider === "local"
+    ? LOCAL_MODELS
+    : provider === "deepseek"
+      ? DEEPSEEK_MODELS
+      : provider === "oss"
+        ? OSS_MODELS
+        : OPENAI_MODELS;
+  const defaultModel = provider === "local"
+    ? "local-brief"
+    : provider === "deepseek"
+      ? "deepseek-chat"
+      : provider === "oss"
+        ? "gpt-oss:20b"
+        : "gpt-5.4-mini";
 
   return {
     provider,

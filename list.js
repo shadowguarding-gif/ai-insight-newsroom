@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resultsTitle: "综合资讯流",
         resultsMeta: `当前展示 ${resultsCount} 条内容，其中 ${liveCount} 条带原文链接；全站共 ${totalCount} 条`,
         asideTitle: "摘要引擎支持",
-        asideBody: "站点现在支持切换 OpenAI / ChatGPT 与 DeepSeek 两类摘要引擎，适合高质量路线和更低成本路线两种策略。",
+        asideBody: "站点现在支持 OpenAI / ChatGPT、DeepSeek，以及兼容 Ollama / vLLM 的开源本地接口路线，方便在质量、成本和私有化之间切换。",
         suggestionTitle: "热门关键词",
         reset: "清空条件",
         metrics: [
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           {
             label: "摘要引擎",
             value: `${AIInsight.getProviderIds().length}`,
-            copy: "支持多提供商路线，便于后续按成本和质量切换。"
+            copy: "支持付费与开源兼容路线，便于按质量、成本和私有化能力切换。"
           },
           {
             label: "远端新增",
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resultsTitle: "Unified feed",
         resultsMeta: `Showing ${resultsCount} briefs, including ${liveCount} source-backed updates, out of ${totalCount} total`,
         asideTitle: "Summary engine support",
-        asideBody: "The site now supports both OpenAI / ChatGPT and DeepSeek summary paths, giving you one route optimized for polish and another for lower-cost generation.",
+        asideBody: "The site now supports OpenAI / ChatGPT, DeepSeek, and OSS-compatible local endpoints such as Ollama or vLLM, so quality, cost, and privacy can be balanced more deliberately.",
         suggestionTitle: "Popular topics",
         reset: "Clear filters",
         metrics: [
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           {
             label: "Summary engines",
             value: `${AIInsight.getProviderIds().length}`,
-            copy: "Multi-provider support makes it easier to balance quality and cost later."
+            copy: "Paid and OSS-compatible routes make it easier to balance quality, cost, and private deployment."
           },
           {
             label: "Remote adds",

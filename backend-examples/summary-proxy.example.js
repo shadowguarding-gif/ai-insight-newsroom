@@ -5,8 +5,8 @@
 
   Expected request body:
   {
-    "provider": "local" | "openai" | "deepseek",
-    "model": "local-brief" | "local-expanded" | "gpt-5.4-mini" | "gpt-5.4-nano" | "deepseek-chat" | "deepseek-reasoner",
+    "provider": "local" | "openai" | "deepseek" | "oss",
+    "model": "local-brief" | "local-expanded" | "gpt-5.4-mini" | "gpt-5.4-nano" | "deepseek-chat" | "deepseek-reasoner" | "gpt-oss:20b" | "gpt-oss:120b" | "qwen3-coder" | "glm-4.7",
     "language": "zh" | "en",
     "story": {
       "title": "...",
@@ -90,6 +90,10 @@ function clampSummaryText(value, maxLength) {
   return `${trimmed}...`;
 }
 
+function stripTerminalPunctuation(value) {
+  return normalizeSummaryText(value).replace(/[。！？.!?；;，,\s]+$/g, "").trim();
+}
+
 function uniqueStrings(values) {
   const seen = new Set();
 
@@ -111,7 +115,11 @@ function buildLocalSummary(language, story, model) {
   const deck = normalizeSummaryText(story.deck);
   const contentFragments = uniqueStrings(content).map((item) => clampSummaryText(item, isChinese ? 52 : 110));
   const primary = deck || contentFragments[0] || normalizeSummaryText(story.title);
-  const secondary = contentFragments.filter((item) => item && item !== primary).slice(0, model === "local-expanded" ? 2 : 1);
+  const secondary = contentFragments
+    .filter((item) => item && item !== primary)
+    .map(stripTerminalPunctuation)
+    .filter(Boolean)
+    .slice(0, model === "local-expanded" ? 2 : 1);
   const sourceLead = normalizeSummaryText(story.sourceName);
 
   if (isChinese) {
@@ -179,6 +187,51 @@ async function summarizeWithDeepSeek(model, prompt) {
     : "";
 }
 
+async function summarizeWithCompatibleApi(model, prompt) {
+  const baseUrl = String(process.env.OSS_API_BASE_URL || process.env.OPENAI_COMPAT_BASE_URL || "").trim().replace(/\/$/, "");
+
+  if (!baseUrl) {
+    throw new Error("OSS compatible endpoint is not configured");
+  }
+
+  const headers = {
+    "Content-Type": "application/json"
+  };
+
+  if (process.env.OSS_API_KEY || process.env.OPENAI_COMPAT_API_KEY) {
+    headers.Authorization = `Bearer ${process.env.OSS_API_KEY || process.env.OPENAI_COMPAT_API_KEY}`;
+  }
+
+  const response = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model,
+      messages: [
+        {
+          role: "system",
+          content: "You are a precise AI news editor. Return only the requested summary."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.2,
+      stream: false
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`OSS compatible API error ${response.status}`);
+  }
+
+  const payload = await response.json();
+  return payload.choices && payload.choices[0] && payload.choices[0].message
+    ? payload.choices[0].message.content
+    : "";
+}
+
 export async function handleSummaryRequest(request) {
   if (request.method === "OPTIONS") {
     return json({}, 200);
@@ -190,7 +243,7 @@ export async function handleSummaryRequest(request) {
 
   try {
     const body = await request.json();
-    let provider = body.provider === "deepseek" || body.provider === "local" ? body.provider : "openai";
+    let provider = body.provider === "deepseek" || body.provider === "local" || body.provider === "oss" ? body.provider : "openai";
     const language = body.language === "en" ? "en" : "zh";
     const story = body.story || {};
     const prompt = buildPrompt(language, story);
@@ -201,6 +254,16 @@ export async function handleSummaryRequest(request) {
     if (provider === "local") {
       model = body.model || "local-brief";
       summary = buildLocalSummary(language, story, model);
+    } else if (provider === "oss") {
+      const hasCompatibleEndpoint = Boolean(process.env.OSS_API_BASE_URL || process.env.OPENAI_COMPAT_BASE_URL);
+      if (!hasCompatibleEndpoint) {
+        provider = "local";
+        model = "local-brief";
+        summary = buildLocalSummary(language, story, model);
+      } else {
+        model = body.model || process.env.OSS_API_DEFAULT_MODEL || "gpt-oss:20b";
+        summary = await summarizeWithCompatibleApi(model, prompt);
+      }
     } else if (provider === "deepseek") {
       if (!process.env.DEEPSEEK_API_KEY) {
         provider = "local";

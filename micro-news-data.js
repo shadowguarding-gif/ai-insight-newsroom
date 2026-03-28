@@ -763,5 +763,260 @@ window.AIInsightMicroData = [
         "Once they sit inside a dedicated tool column, the site stops serving only a narrow professional audience and becomes more useful for people who simply want to keep up with AI progress."
       ]
     }
+  },
+  {
+    id: 2010,
+    slug: "ollama-openai-codex-cli",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "breakout",
+    date: "2026-01-09",
+    sourceName: "Ollama",
+    sourceType: "official",
+    sourceUrl: "https://ollama.com/blog/run-openai-codex-cli-with-ollama",
+    readingTime: 2,
+    tags: ["Ollama", "Local models", "OpenAI-compatible"],
+    briefType: {
+      zh: "本地接口",
+      en: "Local interface"
+    },
+    metricLabel: {
+      zh: "工具价值",
+      en: "Tool value"
+    },
+    metricValue: "OpenAI-compatible · local-first · 2026-01-09",
+    title: {
+      zh: "Ollama 让 OpenAI 风格工具链更容易跑在本地模型之上",
+      en: "Ollama makes OpenAI-style tooling easier to run on top of local models"
+    },
+    deck: {
+      zh: "这类更新很关键，因为它让“开源模型也能接进成熟工具链”这件事更现实。",
+      en: "This matters because it makes it more realistic to plug open-weight models into established tooling workflows."
+    },
+    summaryPoints: {
+      zh: [
+        "本地模型真正变好用，往往不是模型本身，而是接口兼容性开始变强。",
+        "Ollama 这类路线适合你站内新增的开源 / 本地接口摘要档。",
+        "它很适合放在工具雷达区，吸引开发者和本地部署用户。"
+      ],
+      en: [
+        "Local models become truly useful when interface compatibility improves, not just the models themselves.",
+        "This fits the new OSS and local API lane in your summary stack.",
+        "It belongs in the tool radar for developers and local-deployment users."
+      ]
+    },
+    editorialSummary: {
+      zh: "这类工具新闻的意义在于，它让“开源模型能不能真正接进工作流”这个问题往前走了一步。",
+      en: "The significance here is that it moves the question of whether open-weight models can plug into real workflows one step forward."
+    },
+    aiSummary: {
+      zh: "Ollama 正在把本地模型从单独运行的体验，推进到可兼容成熟工具链和代理工作流的层面。",
+      en: "Ollama is moving local models beyond isolated execution toward compatibility with mature tooling and agent workflows."
+    },
+    insight: {
+      zh: "如果网站只给用户选付费 API，而不给开源接口入口，就很难服务真正会折腾的开发者用户。",
+      en: "If the site offers only paid APIs and no open-source interface path, it will struggle to serve developers who actually tinker."
+    },
+    who: {
+      zh: "本地部署用户、开发者、想用开源模型替代商业 API 的团队",
+      en: "Local-deployment users, developers, and teams that want open models in place of commercial APIs"
+    },
+    watchpoint: {
+      zh: "继续看更多前端工具、CLI 与代理框架会不会默认支持这类本地兼容接口。",
+      en: "Watch whether more front-end tools, CLIs, and agent frameworks begin to support these local-compatible endpoints by default."
+    },
+    proNotes: {
+      zh: [
+        "这类兼容接口对你的网站很实用，因为摘要能力可以不再只绑定付费模型。",
+        "它也让未来接入 Ollama、vLLM、llama.cpp 这类路线更顺。"
+      ],
+      en: [
+        "This is practical for your site because summaries no longer have to depend only on paid models.",
+        "It also makes future integration with Ollama, vLLM, and llama.cpp much smoother."
+      ]
+    },
+    content: {
+      zh: [
+        "Ollama 这种更新对新闻站非常有价值，因为它不是单纯又多一个模型，而是让一整套本地工作流变得更现实。对于想降低成本、控制隐私或尝试开源模型的用户来说，接口兼容性比参数表更重要。",
+        "你前面提到 AI 总结还差一点，这正好对应这类开源接口路线。后面网站既能继续保留 OpenAI 和 DeepSeek，也能把本地模型接进来。"
+      ],
+      en: [
+        "This kind of Ollama update is valuable because it is not merely another model story. It makes an entire local workflow more realistic. For users who care about privacy, cost control, or open-weight experimentation, interface compatibility matters more than a spec sheet.",
+        "You mentioned that AI summaries still feel a bit short. This is exactly where the open-interface route becomes useful. The site can keep OpenAI and DeepSeek while also opening the door to local models."
+      ]
+    }
+  },
+  {
+    id: 2011,
+    slug: "qwen-code-weekly-march-6-2026",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "china",
+    signal: "breakout",
+    date: "2026-03-06",
+    sourceName: "Qwen",
+    sourceType: "official",
+    sourceUrl: "https://qwenlm.github.io/blog/qwen-code-weekly-feb-26-march-6-2026.html",
+    readingTime: 2,
+    tags: ["Qwen", "Coding", "China AI"],
+    briefType: {
+      zh: "编码工具",
+      en: "Coding tool"
+    },
+    metricLabel: {
+      zh: "开发者信号",
+      en: "Developer signal"
+    },
+    metricValue: "Coding agent updates · 2026-03-06",
+    title: {
+      zh: "Qwen Code 周报值得进首页工具栏，因为它代表中国厂商在编码代理上也在持续发力",
+      en: "Qwen Code weekly updates belong in the tool lane because Chinese players are pushing on coding agents too"
+    },
+    deck: {
+      zh: "这类内容能让网站的“中国厂商”不只停在大模型新闻，也进入真正的开发者工作流。",
+      en: "This helps Chinese coverage move beyond model headlines into actual developer workflow surfaces."
+    },
+    summaryPoints: {
+      zh: [
+        "Qwen 的代码工具更新说明中国厂商也在正面参与 coding agent 竞争。",
+        "这类开发者内容非常适合和 OpenHands、browser-use 放在同一层比较。",
+        "它既能服务专业用户，也能让站点国际叙事更平衡。"
+      ],
+      en: [
+        "Qwen’s coding-tool updates show Chinese players are directly participating in the coding-agent race.",
+        "This is the right layer to compare alongside OpenHands and browser-use.",
+        "It serves expert readers while balancing the site’s international narrative."
+      ]
+    },
+    editorialSummary: {
+      zh: "如果你的网站要真正面向全球开发者，Qwen 这类编码工具更新不能缺席。",
+      en: "If the site wants to face global developers seriously, coding-tool updates like this cannot be missing."
+    },
+    aiSummary: {
+      zh: "Qwen Code 的周度更新显示，中国厂商不仅在基础模型上竞争，也在快速争夺开发者工作流入口。",
+      en: "Qwen Code’s weekly updates show that Chinese players are competing not only on base models but also on access to developer workflows."
+    },
+    insight: {
+      zh: "真正世界级的 AI 新闻站，必须同时覆盖美国产品、全球基础设施和中国开发者工具链。",
+      en: "A world-class AI newsroom has to cover U.S. products, global infrastructure, and Chinese developer tooling at the same time."
+    },
+    who: {
+      zh: "开发者、编码代理用户、关注中国开源工具的人",
+      en: "Developers, coding-agent users, and readers following Chinese open tooling"
+    },
+    watchpoint: {
+      zh: "继续看 Qwen Code 是否在 IDE 集成、Agent 协作和低成本调用上继续强化。",
+      en: "Watch whether Qwen Code strengthens IDE integration, agent collaboration, and lower-cost usage."
+    },
+    proNotes: {
+      zh: [
+        "把这类更新放进工具雷达，能明显改善你站点当前偏大公司 headline 的倾向。",
+        "它也能让中国内容不只集中在企业新闻和平台动作。"
+      ],
+      en: [
+        "Putting this into the tool radar noticeably reduces the site’s current tilt toward large-company headlines.",
+        "It also keeps China coverage from clustering only around enterprise and platform news."
+      ]
+    },
+    content: {
+      zh: [
+        "Qwen Code 这类更新非常适合你现在的网站阶段，因为它既是官方工具线，也是开发者真正会点进去看的内容。比起单纯再加一条大厂新闻，它能更直接提升用户停留和搜索价值。",
+        "从结构上，它适合放在 Pulse 和 Light 的工具区，也能在 Pro 模式里作为中国开发者工具链的一部分出现。"
+      ],
+      en: [
+        "Updates like Qwen Code fit the current stage of your site especially well because they sit at the intersection of official product work and content developers actually click into. Compared with adding one more big-company headline, they improve both retention and search value more directly.",
+        "Structurally, it fits the tool zone in Pulse and Light while also serving as part of the Chinese developer-tooling picture in Pro mode."
+      ]
+    }
+  },
+  {
+    id: 2012,
+    slug: "open-webui-ai-workspace-layer",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "watch",
+    date: "2026-03-28",
+    sourceName: "GitHub / Open WebUI",
+    sourceType: "github",
+    sourceUrl: "https://github.com/open-webui/open-webui",
+    readingTime: 2,
+    tags: ["Open WebUI", "Interface layer", "GitHub"],
+    briefType: {
+      zh: "AI 工作台",
+      en: "AI workspace"
+    },
+    metricLabel: {
+      zh: "工具角色",
+      en: "Tool role"
+    },
+    metricValue: "Interface layer · multi-model · GitHub radar",
+    title: {
+      zh: "Open WebUI 这类项目值得常驻，因为它们决定普通用户怎么真正使用多模型",
+      en: "Projects like Open WebUI deserve a standing slot because they shape how people actually use multiple models"
+    },
+    deck: {
+      zh: "很多用户最后接触到的不是底层模型，而是这种上层 AI 工作台和界面层。",
+      en: "For many users, the thing they actually touch is not the base model, but a workspace and interface layer like this."
+    },
+    summaryPoints: {
+      zh: [
+        "AI 新闻站如果想兼顾普通用户，就不能只追模型，也要追界面层项目。",
+        "Open WebUI 这类工具能把本地模型、多模型切换和知识库管理变成可用产品。",
+        "它非常适合补到首页的小新闻 Radar 里。"
+      ],
+      en: [
+        "If an AI newsroom wants to serve general readers, it cannot track only models; it must also track the interface layer.",
+        "Tools like Open WebUI turn local models, multi-model switching, and knowledge-base management into usable products.",
+        "This fits naturally into the small-news radar on the homepage."
+      ]
+    },
+    editorialSummary: {
+      zh: "AI 产品真正被大众理解，往往是从界面层开始，而不是从模型层开始。",
+      en: "AI products are often understood by mainstream users through the interface layer before the model layer."
+    },
+    aiSummary: {
+      zh: "Open WebUI 这类项目提醒我们，AI 竞争不只发生在模型和 API 上，也发生在用户每天看到的工作台界面上。",
+      en: "Projects like Open WebUI remind us that AI competition happens not only at the model and API layer, but also at the workspace interface users see every day."
+    },
+    insight: {
+      zh: "网站越想服务更广用户群，越需要稳定追踪这些“离使用最近”的项目。",
+      en: "The more broadly the site wants to serve users, the more consistently it needs to track the projects closest to actual usage."
+    },
+    who: {
+      zh: "普通用户、团队管理员、本地模型爱好者、多模型重度用户",
+      en: "General users, team admins, local-model enthusiasts, and heavy multi-model users"
+    },
+    watchpoint: {
+      zh: "继续看它在权限、团队协作、知识库与工作流编排上的扩张。",
+      en: "Watch how it expands across permissions, collaboration, knowledge bases, and workflow orchestration."
+    },
+    proNotes: {
+      zh: [
+        "这种项目很适合首页的高频扫描位，因为它解释了模型最终怎么变成产品。",
+        "如果远端 GitHub 源有波动，这条种子内容也能保证工具层不掉线。"
+      ],
+      en: [
+        "This is ideal for a high-frequency scan slot because it explains how models become products.",
+        "If the remote GitHub layer fluctuates, this seed item still keeps the tooling lane alive."
+      ]
+    },
+    content: {
+      zh: [
+        "Open WebUI 对网站的价值，在于它不是又一个抽象框架，而是接近用户真实交互的产品层。很多人并不会自己搭 API 网关，但会愿意用一个现成界面管理本地模型、多模型切换和知识库。",
+        "这种项目一旦长期稳定出现在工具雷达里，网站会更像一个真正的 AI 发现入口，而不是只播报 headline 的地方。"
+      ],
+      en: [
+        "The value of Open WebUI is that it is not just another abstract framework; it sits close to the actual product layer people use. Many users will not build their own API gateway, but they will use a ready-made interface to manage local models, multi-model switching, and knowledge bases.",
+        "When projects like this appear consistently in the tool radar, the site feels more like a real AI discovery destination and less like a headline-only surface."
+      ]
+    }
   }
 ];

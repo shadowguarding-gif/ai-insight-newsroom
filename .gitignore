@@ -1,0 +1,8 @@
+.env
+node_modules
+data/account-store.json
+data/server.stdout.log
+data/server.stderr.log
+.vercel
+
+.vercel

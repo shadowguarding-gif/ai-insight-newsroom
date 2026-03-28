@@ -48,6 +48,18 @@
         },
         models: ["deepseek-chat", "deepseek-reasoner"],
         defaultModel: "deepseek-chat"
+      },
+      oss: {
+        label: {
+          zh: "开源 / 本地接口",
+          en: "OSS / local API"
+        },
+        description: {
+          zh: "适合接入 Ollama、vLLM、llama.cpp 或其他 OpenAI 兼容接口，用开源模型做更可控的摘要。",
+          en: "Best for Ollama, vLLM, llama.cpp, or other OpenAI-compatible endpoints when you want more controllable open-weight summaries."
+        },
+        models: ["gpt-oss:20b", "gpt-oss:120b", "qwen3-coder", "glm-4.7"],
+        defaultModel: "gpt-oss:20b"
       }
     }
   };

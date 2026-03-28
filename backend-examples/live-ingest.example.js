@@ -20,7 +20,7 @@ import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const CACHE_TTL_MS = Number(process.env.LIVE_FEED_CACHE_TTL_MS || 5 * 60 * 1000);
-const MAX_ITEMS_TOTAL = Number(process.env.LIVE_FEED_MAX_ITEMS || 36);
+const MAX_ITEMS_TOTAL = Number(process.env.LIVE_FEED_MAX_ITEMS || 48);
 const REQUEST_TIMEOUT_MS = Number(process.env.LIVE_FEED_TIMEOUT_MS || 12000);
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 const GITHUB_SOURCE_CACHE_TTL_MS = Number(process.env.GITHUB_SOURCE_CACHE_TTL_MS || 30 * 60 * 1000);
@@ -106,6 +106,19 @@ const BUILTIN_SOURCE_REGISTRY = [
     maxItems: 4,
     includePatterns: [/\bai\b/i, /machine learning/i, /large language/i, /foundation model/i, /multimodal/i, /reasoning/i, /agent/i, /speech/i, /vision/i],
     tags: ["Microsoft", "Research", "Official"]
+  },
+  {
+    id: "microsoft-blog-feed",
+    type: "rss",
+    url: "https://blogs.microsoft.com/feed/",
+    sourceName: "Microsoft",
+    sourceType: "official",
+    category: "products",
+    region: "global",
+    signal: "breakout",
+    maxItems: 4,
+    includePatterns: [/\bai\b/i, /copilot/i, /agent/i, /model/i, /azure ai/i, /reasoning/i, /frontier/i],
+    tags: ["Microsoft", "Official", "Copilot"]
   },
   {
     id: "nvidia-newsroom-releases",
@@ -224,6 +237,46 @@ const BUILTIN_SOURCE_REGISTRY = [
     signal: "watch",
     tags: ["GitHub", "LLMOps", "Evaluation"],
     briefType: "Evaluation stack"
+  }),
+  createGitHubSource({
+    id: "github-ollama",
+    repo: "ollama/ollama",
+    sourceName: "GitHub / Ollama",
+    signal: "breakout",
+    tags: ["GitHub", "Local models", "Open source"],
+    briefType: "Local model runtime"
+  }),
+  createGitHubSource({
+    id: "github-open-webui",
+    repo: "open-webui/open-webui",
+    sourceName: "GitHub / Open WebUI",
+    signal: "breakout",
+    tags: ["GitHub", "AI interface", "Open source"],
+    briefType: "AI workspace"
+  }),
+  createGitHubSource({
+    id: "github-vllm",
+    repo: "vllm-project/vllm",
+    sourceName: "GitHub / vLLM",
+    signal: "breakout",
+    tags: ["GitHub", "Inference", "Serving"],
+    briefType: "Inference engine"
+  }),
+  createGitHubSource({
+    id: "github-llama-cpp",
+    repo: "ggml-org/llama.cpp",
+    sourceName: "GitHub / llama.cpp",
+    signal: "watch",
+    tags: ["GitHub", "Local inference", "C++"],
+    briefType: "Local inference"
+  }),
+  createGitHubSource({
+    id: "github-litellm",
+    repo: "BerriAI/litellm",
+    sourceName: "GitHub / LiteLLM",
+    signal: "watch",
+    tags: ["GitHub", "Gateway", "LLMOps"],
+    briefType: "Model gateway"
   })
 ];
 
