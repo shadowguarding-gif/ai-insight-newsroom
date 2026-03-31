@@ -109,28 +109,57 @@ function uniqueStrings(values) {
     });
 }
 
-function buildLocalSummary(language, story, model) {
+function getStoryQuickRead(language, story) {
   const isChinese = language === "zh";
   const content = Array.isArray(story.content) ? story.content : [story.content];
   const deck = normalizeSummaryText(story.deck);
-  const contentFragments = uniqueStrings(content).map((item) => clampSummaryText(item, isChinese ? 52 : 110));
-  const primary = deck || contentFragments[0] || normalizeSummaryText(story.title);
-  const secondary = contentFragments
-    .filter((item) => item && item !== primary)
+  const editorial = normalizeSummaryText(story.editorialSummary || story.insight);
+  const points = uniqueStrings(content)
+    .map((item) => clampSummaryText(item, isChinese ? 52 : 110))
+    .filter(Boolean);
+  const oneLine = deck || normalizeSummaryText(story.title) || points[0] || "";
+  const why = editorial || points[0] || oneLine;
+  const who = normalizeSummaryText(story.who) || (isChinese
+    ? "适合跟踪公司动态、模型能力和产业落地的人优先阅读。"
+    : "Best for readers tracking company moves, model capability, and adoption.");
+  const next = normalizeSummaryText(story.watchpoint) || (isChinese
+    ? "先看原文和官方发布，再决定是否继续追后续信号。"
+    : "Check the original source and official release first, then decide whether to keep tracking follow-up signals.");
+  const bullets = points
+    .filter((item) => item && item !== oneLine && item !== why)
+    .slice(0, 3);
+
+  return {
+    oneLine: clampSummaryText(oneLine, isChinese ? 52 : 120),
+    why: clampSummaryText(why, isChinese ? 82 : 180),
+    who: clampSummaryText(who, isChinese ? 68 : 140),
+    next: clampSummaryText(next, isChinese ? 68 : 140),
+    bullets
+  };
+}
+
+function buildLocalSummary(language, story, model) {
+  const isChinese = language === "zh";
+  const quickRead = getStoryQuickRead(language, story);
+  const sourceLead = normalizeSummaryText(story.sourceName);
+  const primary = quickRead.oneLine || normalizeSummaryText(story.title);
+  const why = quickRead.why && quickRead.why !== primary ? quickRead.why : "";
+  const secondary = quickRead.bullets
     .map(stripTerminalPunctuation)
     .filter(Boolean)
     .slice(0, model === "local-expanded" ? 2 : 1);
-  const sourceLead = normalizeSummaryText(story.sourceName);
 
   if (isChinese) {
-    const lead = sourceLead ? `这条更新来自${sourceLead}。` : "";
-    const focus = secondary.length ? `重点包括：${secondary.join("；")}。` : "";
-    return clampSummaryText(`${lead}${primary}${/[。！？]$/.test(primary) ? "" : "。"}${focus}`, 140);
+    const lead = sourceLead ? `${sourceLead}这次的核心变化是：` : "这条更新的核心变化是：";
+    const whyLine = why ? `为什么重要：${why.replace(/[。！？]$/g, "")}。` : "";
+    const focusLine = secondary.length ? `补充看点：${secondary.join("；")}。` : quickRead.next ? `下一步关注：${quickRead.next.replace(/[。！？]$/g, "")}。` : "";
+    return clampSummaryText(`${lead}${primary.replace(/[。！？]$/g, "")}。${whyLine}${focusLine}`, model === "local-expanded" ? 170 : 148);
   }
 
-  const lead = sourceLead ? `From ${sourceLead}, ` : "";
-  const focus = secondary.length ? ` Key details: ${secondary.join("; ")}.` : "";
-  return clampSummaryText(`${lead}${primary}${/[.!?]$/.test(primary) ? "" : "."}${focus}`, 240);
+  const lead = sourceLead ? `${sourceLead} in one line: ` : "In one line: ";
+  const whyLine = why ? ` Why it matters: ${why.replace(/[.!?]$/g, "")}.` : "";
+  const focusLine = secondary.length ? ` Extra signal: ${secondary.join("; ")}.` : quickRead.next ? ` What to watch next: ${quickRead.next.replace(/[.!?]$/g, "")}.` : "";
+  return clampSummaryText(`${lead}${primary.replace(/[.!?]$/g, "")}.${whyLine}${focusLine}`, model === "local-expanded" ? 280 : 240);
 }
 
 async function summarizeWithOpenAI(model, prompt) {

@@ -66,7 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         journalLimit: 4,
         showProviders: true,
         showJournals: true,
-        showQuickResearchRoute: true
+        showQuickResearchRoute: true,
+        videoLimit: 3
       };
     }
 
@@ -80,9 +81,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         chinaLimit: 3,
         researchLimit: 2,
         journalLimit: 0,
-        showProviders: true,
+        showProviders: false,
         showJournals: false,
-        showQuickResearchRoute: false
+        showQuickResearchRoute: false,
+        videoLimit: 3
       };
     }
 
@@ -97,7 +99,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       journalLimit: 0,
       showProviders: false,
       showJournals: false,
-      showQuickResearchRoute: false
+      showQuickResearchRoute: false,
+      videoLimit: 2
     };
   }
 
@@ -138,6 +141,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         chinaNote: "补足国内厂商和亚洲市场，不让整站只剩美国公司视角。",
         toolsTitle: "工具与开源 Radar",
         toolsNote: "专门放高信号小新闻、热门工具、GitHub 项目和本地模型接口路线。",
+        watchDeskTitle: "视频与解读入口",
+        watchDeskNote: "先看原始视频，再看中文或英文解读，比一上来读长文更高效。",
         briefsTitle: "深度简报",
         briefsNote: "把热点之外更值得慢读的判断放在第二层，适合从“知道发生了什么”进入“理解为什么重要”。",
         providersTitle: "摘要引擎与开源接口",
@@ -201,6 +206,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         chinaNote: "Balance the product so it does not default to a U.S.-only worldview.",
         toolsTitle: "Launches & OSS Radar",
         toolsNote: "A dedicated lane for high-signal small news, hot tools, GitHub projects, and local-model interface routes.",
+        watchDeskTitle: "Video and explainer routes",
+        watchDeskNote: "Start with original video, then move to Chinese or English explainers if the topic deserves more time.",
         briefsTitle: "Deep briefs",
         briefsNote: "The second layer is reserved for slower, more interpretive reading after the headlines.",
         providersTitle: "Summary engines and OSS routes",
@@ -260,10 +267,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  function createWatchCard(item, language) {
+    const quickRead = AIInsight.getStoryQuickRead(item, language);
+    const videoLinks = AIInsight.getStoryVideoLinks(item, language);
+    const featuredLinks = [videoLinks[0], videoLinks[1], videoLinks[3]].filter(Boolean);
+
+    return `
+      <article class="video-launch-card panel page-fade">
+        <div class="story-meta">
+          <span class="ghost-badge">${AIInsight.escapeHtml(item.sourceName || "AI Insight")}</span>
+          <span class="ghost-badge">${AIInsight.escapeHtml(AIInsight.getCategoryLabel(item.category, language))}</span>
+        </div>
+        <h3>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</h3>
+        <p class="panel-text">${AIInsight.escapeHtml(quickRead.oneLine)}</p>
+        <div class="video-link-list">
+          ${featuredLinks
+            .map(
+              (link) => `
+                <a class="video-link-pill" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>
+                  <span>${AIInsight.escapeHtml(link.platform)}</span>
+                  <strong>${AIInsight.escapeHtml(link.title)}</strong>
+                </a>
+              `
+            )
+            .join("")}
+        </div>
+      </article>
+    `;
+  }
+
   function render() {
     const language = AIInsight.getLanguage();
     const viewMode = AIInsight.getViewMode();
     const profile = getModeProfile(viewMode);
+    const compactViewport = window.matchMedia("(max-width: 820px)").matches;
     const meta = AIInsight.getNewsMeta();
 
     if (!news.length) {
@@ -290,9 +327,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const allMicroStories = AIInsight.getMicroStories(news);
     const editorialStories = headlineStories.filter((item) => !AIInsight.isLiveItem(item));
     const researchSources = AIInsight.getJournalSources();
-    const liveStories = allLiveStories.slice(0, profile.liveLimit);
-    const microStories = allMicroStories.slice(0, profile.microLimit);
-    const briefStories = (editorialStories.length ? editorialStories : headlineStories.filter((item) => !AIInsight.isMicroStory(item))).slice(0, profile.briefLimit);
+    const liveStories = allLiveStories.slice(0, compactViewport ? Math.min(profile.liveLimit, 3) : profile.liveLimit);
+    const microStories = allMicroStories.slice(0, compactViewport ? Math.min(profile.microLimit, 3) : profile.microLimit);
+    const briefStories = (editorialStories.length ? editorialStories : headlineStories.filter((item) => !AIInsight.isMicroStory(item))).slice(0, compactViewport ? Math.min(profile.briefLimit, 2) : profile.briefLimit);
     const boardroomStories = pickStories(
       headlineStories.filter((item) => !AIInsight.isMicroStory(item) && matchesKeywords(item, profile.boardroomKeywords)),
       headlineStories.filter((item) => !AIInsight.isMicroStory(item)),
@@ -309,6 +346,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       profile.researchLimit
     );
     const featured = uniqueById([...boardroomStories, ...allLiveStories, ...briefStories, ...headlineStories])[0] || news[0];
+    const watchStories = uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).slice(0, compactViewport ? Math.min(profile.videoLimit, 2) : profile.videoLimit);
     const latestDate = AIInsight.formatDateTime(meta.refreshedAt || news[0].date, language);
     const counts = {
       live: allLiveStories.length,
@@ -333,6 +371,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         title: language === "zh" ? "主题搜索" : "Theme search",
         note: language === "zh" ? "按公司、赛道、产品和地区切入。" : "Search by company, lane, product, or region.",
         href: "search.html"
+      },
+      {
+        title: language === "zh" ? "视频与解读" : "Watch routes",
+        note: language === "zh" ? "直接跳到原始视频、英文分析和中文解读入口。" : "Jump to original videos, English analysis, and Chinese explainers.",
+        href: "#watch-desk"
       }
     ];
 
@@ -549,6 +592,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
+        <section class="section" id="watch-desk">
+          <div class="section-head">
+            <div>
+              <h2>${AIInsight.escapeHtml(pageCopy.watchDeskTitle)}</h2>
+              <p class="section-note">${AIInsight.escapeHtml(pageCopy.watchDeskNote)}</p>
+            </div>
+          </div>
+          <div class="video-launch-grid">
+            ${watchStories.map((item) => createWatchCard(item, language)).join("")}
+          </div>
+        </section>
+
         <section class="section">
           <div class="section-head">
             <div>
@@ -608,6 +663,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.addEventListener("ai-insight:language", render);
   document.addEventListener("ai-insight:view-mode", render);
+  window.addEventListener("resize", render);
 
   news = await AIInsight.getNews();
   render();

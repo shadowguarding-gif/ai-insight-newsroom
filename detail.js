@@ -10,28 +10,51 @@ document.addEventListener("DOMContentLoaded", async () => {
     model: preference.model,
     loading: false,
     summaryText: "",
-    summaryState: "idle"
+    summaryState: "idle",
+    bodyExpanded: false
   };
 
   function getCopy(language) {
     return {
       zh: {
         summaryTitle: "关键信号",
-        whoTitle: "谁应该重点关注",
-        watchTitle: "下一观察点",
-        bodyTitle: "深度解读",
+        bodyTitle: "全文精读",
         relatedTitle: "延伸阅读",
-        sourceTitle: "原文来源",
-        engineTitle: "AI 摘要实验台"
+        engineTitle: "AI 摘要实验台",
+        quickReadTitle: "三十秒快读卡",
+        oneLineTitle: "一句话看完",
+        whyTitle: "为什么重要",
+        audienceTitle: "适合谁看",
+        nextTitle: "下一步看什么",
+        mediaTitle: "原始材料与视频入口",
+        mediaLead: "先看官方原文或原视频，再看解读，会比一上来读长文更省时间。",
+        bodyHint: "默认只展示前几段，先帮你判断这条值不值得继续往下读。",
+        expandBody: "展开全文",
+        collapseBody: "收起全文",
+        hiddenParagraphs: (count) => `还有 ${count} 段未展开`,
+        localSummaryLabel: "本地快读",
+        generatedSummaryLabel: "模型视角",
+        proContextTitle: "专业版观察"
       },
       en: {
         summaryTitle: "Key signals",
-        whoTitle: "Who should care",
-        watchTitle: "Next watchpoint",
-        bodyTitle: "Deep read",
+        bodyTitle: "Full read",
         relatedTitle: "Related briefs",
-        sourceTitle: "Original source",
-        engineTitle: "AI summary studio"
+        engineTitle: "AI summary studio",
+        quickReadTitle: "30-second brief",
+        oneLineTitle: "In one line",
+        whyTitle: "Why it matters",
+        audienceTitle: "Who should care",
+        nextTitle: "What to watch next",
+        mediaTitle: "Source and video routes",
+        mediaLead: "Start with the official source or original video, then move to explainers if the topic deserves more time.",
+        bodyHint: "The article opens in a shorter preview first so you can decide whether the full read is worth it.",
+        expandBody: "Expand full article",
+        collapseBody: "Collapse article",
+        hiddenParagraphs: (count) => `${count} more paragraphs hidden`,
+        localSummaryLabel: "Local brief",
+        generatedSummaryLabel: "Model lens",
+        proContextTitle: "Pro context"
       }
     }[language];
   }
@@ -60,6 +83,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return AIInsight.t("common.configureBackend", language);
   }
 
+  function getLocalPreview(article, language, quickRead) {
+    if (language === "zh") {
+      return `一句话：${quickRead.oneLine} 为什么重要：${quickRead.why}`;
+    }
+
+    return `In one line: ${quickRead.oneLine} Why it matters: ${quickRead.why}`;
+  }
+
+  function getPreviewParagraphCount() {
+    return window.matchMedia("(max-width: 640px)").matches ? 2 : 3;
+  }
+
   function render() {
     const language = AIInsight.getLanguage();
     const article = news.find((item) => String(item.id) === String(id));
@@ -76,8 +111,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       .slice(0, 3);
     const paragraphs = AIInsight.localize(article.content, language);
     const summary = AIInsight.localize(article.summaryPoints, language);
-    const editorialSummary = AIInsight.localize(article.editorialSummary, language) || AIInsight.localize(article.insight, language);
-    const aiSummary = state.summaryText || AIInsight.localize(article.aiSummary, language) || editorialSummary;
+    const quickRead = AIInsight.getStoryQuickRead(article, language);
+    const editorialSummary = AIInsight.localize(article.editorialSummary, language) || AIInsight.localize(article.insight, language) || quickRead.why;
+    const localPreview = getLocalPreview(article, language, quickRead);
+    const aiSummary = state.summaryText
+      || (state.provider === "local" ? localPreview : AIInsight.localize(article.aiSummary, language))
+      || localPreview;
     const providerMeta = AIInsight.getProviderMeta(state.provider);
     const models = providerMeta.models;
     const proNotes = AIInsight.localize(article.proNotes, language).slice(0, 3);
@@ -102,6 +141,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return haystack.includes(article.category) || article.tags.some((tag) => haystack.includes(String(tag).toLowerCase()));
       })
       .slice(0, 3);
+    const videoLinks = AIInsight.getStoryVideoLinks(article, language);
+    const previewCount = getPreviewParagraphCount();
+    const previewParagraphs = state.bodyExpanded ? paragraphs : paragraphs.slice(0, previewCount);
+    const hiddenParagraphCount = Math.max(0, paragraphs.length - previewParagraphs.length);
 
     if (!models.includes(state.model)) {
       state.model = models[0];
@@ -156,6 +199,62 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
+        <section class="section article-fast-grid">
+          <article class="article-block quick-read-card page-fade">
+            <div class="summary-headline">
+              <span class="meta-label">${AIInsight.escapeHtml(pageCopy.quickReadTitle)}</span>
+              <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.localSummaryLabel)}</span>
+            </div>
+            <div class="quick-read-grid">
+              <div class="quick-read-item">
+                <span class="mini-label">${AIInsight.escapeHtml(pageCopy.oneLineTitle)}</span>
+                <p>${AIInsight.escapeHtml(quickRead.oneLine)}</p>
+              </div>
+              <div class="quick-read-item">
+                <span class="mini-label">${AIInsight.escapeHtml(pageCopy.whyTitle)}</span>
+                <p>${AIInsight.escapeHtml(quickRead.why)}</p>
+              </div>
+              <div class="quick-read-item">
+                <span class="mini-label">${AIInsight.escapeHtml(pageCopy.audienceTitle)}</span>
+                <p>${AIInsight.escapeHtml(quickRead.who)}</p>
+              </div>
+              <div class="quick-read-item">
+                <span class="mini-label">${AIInsight.escapeHtml(pageCopy.nextTitle)}</span>
+                <p>${AIInsight.escapeHtml(quickRead.next)}</p>
+              </div>
+            </div>
+            ${
+              quickRead.bullets.length
+                ? `
+                  <ul class="signal-notes quick-read-notes">
+                    ${quickRead.bullets.map((note) => `<li>${AIInsight.escapeHtml(note)}</li>`).join("")}
+                  </ul>
+                `
+                : ""
+            }
+          </article>
+
+          <article class="article-block media-desk-card page-fade">
+            <div class="summary-headline">
+              <span class="meta-label">${AIInsight.escapeHtml(pageCopy.mediaTitle)}</span>
+              <span class="ghost-badge">${AIInsight.escapeHtml(article.sourceName || "AI Insight")}</span>
+            </div>
+            <p class="panel-text">${AIInsight.escapeHtml(pageCopy.mediaLead)}</p>
+            <div class="detail-actions media-actions">
+              ${
+                article.sourceUrl
+                  ? `<a class="button button-primary" href="${AIInsight.escapeHtml(article.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.t("common.openSource", language))}</a>`
+                  : ""
+              }
+              <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[0].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[0].title)}</a>
+              <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[3].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[3].title)}</a>
+            </div>
+            <div class="video-link-grid">
+              ${videoLinks.map((link) => AIInsight.createVideoLinkCard(link, language)).join("")}
+            </div>
+          </article>
+        </section>
+
         <section class="section article-wrap">
           <div>
             <article class="article-block page-fade">
@@ -177,6 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               <article class="article-block summary-box summary-box-ai page-fade">
                 <div class="summary-headline">
                   <span class="meta-label">${AIInsight.escapeHtml(AIInsight.t("common.aiSummary", language))}</span>
+                  <span class="ghost-badge">${AIInsight.escapeHtml(state.summaryText ? pageCopy.generatedSummaryLabel : pageCopy.localSummaryLabel)}</span>
                   <span class="ghost-badge">${AIInsight.escapeHtml(providerMeta ? AIInsight.localize(providerMeta.label, language) : "")}</span>
                 </div>
                 <p>${AIInsight.escapeHtml(aiSummary)}</p>
@@ -184,22 +284,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
 
             <article class="article-block article-body page-fade">
-              <span class="meta-label">${AIInsight.escapeHtml(pageCopy.bodyTitle)}</span>
-              ${paragraphs.map((paragraph) => `<p>${AIInsight.escapeHtml(paragraph)}</p>`).join("")}
+              <div class="summary-headline">
+                <span class="meta-label">${AIInsight.escapeHtml(pageCopy.bodyTitle)}</span>
+                <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.bodyHint)}</span>
+              </div>
+              ${previewParagraphs.map((paragraph) => `<p>${AIInsight.escapeHtml(paragraph)}</p>`).join("")}
+              ${
+                hiddenParagraphCount
+                  ? `
+                    <div class="body-toggle-row">
+                      <span class="panel-text">${AIInsight.escapeHtml(pageCopy.hiddenParagraphs(hiddenParagraphCount))}</span>
+                      <button class="button button-secondary body-toggle-btn" type="button" id="toggle-body">${AIInsight.escapeHtml(state.bodyExpanded ? pageCopy.collapseBody : pageCopy.expandBody)}</button>
+                    </div>
+                  `
+                  : ""
+              }
             </article>
           </div>
 
           <aside class="article-sidebar">
-            <article class="article-block page-fade">
-              <h3>${AIInsight.escapeHtml(pageCopy.sourceTitle)}</h3>
-              <p>${AIInsight.escapeHtml(article.sourceName || article.source || "AI Insight")}</p>
-              ${
-                article.sourceUrl
-                  ? `<a class="text-link" href="${AIInsight.escapeHtml(article.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(article.sourceUrl)}</a>`
-                  : `<p>${AIInsight.escapeHtml(language === "zh" ? "当前为站内编辑整合内容。" : "This is currently an internal editorial brief.")}</p>`
-              }
-            </article>
-
             <article class="article-block page-fade">
               <h3>${AIInsight.escapeHtml(pageCopy.engineTitle)}</h3>
               <div class="provider-form">
@@ -234,21 +337,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               </div>
             </article>
 
-            <article class="article-block page-fade">
-              <h3>${AIInsight.escapeHtml(pageCopy.whoTitle)}</h3>
-              <p>${AIInsight.escapeHtml(AIInsight.localize(article.who, language))}</p>
-            </article>
-
-            <article class="article-block page-fade">
-              <h3>${AIInsight.escapeHtml(pageCopy.watchTitle)}</h3>
-              <p>${AIInsight.escapeHtml(AIInsight.localize(article.watchpoint, language))}</p>
-              <div class="tag-row">
-                ${article.tags.map((tag) => `<span class="tag">${AIInsight.escapeHtml(tag)}</span>`).join("")}
-              </div>
-            </article>
-
             <article class="article-block page-fade pro-only">
-              <h3>${AIInsight.escapeHtml(language === "zh" ? "专业版观察" : "Pro context")}</h3>
+              <h3>${AIInsight.escapeHtml(pageCopy.proContextTitle)}</h3>
               <div class="story-pro-meta is-static">
                 <span>${AIInsight.escapeHtml(formatLabel)}</span>
                 <span>${AIInsight.escapeHtml(metricLabel)}: ${AIInsight.escapeHtml(metricValue)}</span>
@@ -301,6 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const providerSelect = document.getElementById("provider-select");
     const modelSelect = document.getElementById("model-select");
     const generateButton = document.getElementById("generate-summary");
+    const toggleBodyButton = document.getElementById("toggle-body");
 
     providerSelect.addEventListener("change", () => {
       state.provider = providerSelect.value;
@@ -339,10 +430,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       render();
     });
 
+    if (toggleBodyButton) {
+      toggleBodyButton.addEventListener("click", () => {
+        state.bodyExpanded = !state.bodyExpanded;
+        render();
+      });
+    }
+
     AIInsight.bindStoryCards(app);
     AIInsight.bindSaveButtons(app, render);
   }
 
   render();
   document.addEventListener("ai-insight:language", render);
+  window.addEventListener("resize", () => {
+    if (!state.bodyExpanded) {
+      render();
+    }
+  });
 });

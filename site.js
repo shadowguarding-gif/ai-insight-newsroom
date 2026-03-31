@@ -2526,29 +2526,129 @@
     };
   }
 
+  function getStoryQuickRead(story, language) {
+    const nextLanguage = language || getLanguage();
+    const isChinese = nextLanguage === "zh";
+    const title = normalizeSummaryText(localize(story && story.title, nextLanguage));
+    const editorial = normalizeSummaryText(localize(story && story.editorialSummary, nextLanguage));
+    const insight = normalizeSummaryText(localize(story && story.insight, nextLanguage));
+    const audience = normalizeSummaryText(localize(story && story.who, nextLanguage));
+    const watchpoint = normalizeSummaryText(localize(story && story.watchpoint, nextLanguage));
+    const { deck, points, paragraphs } = getStorySummaryCandidates(story || {}, nextLanguage);
+    const oneLine = deck || title || points[0] || paragraphs[0] || "";
+    const why = editorial || insight || points[0] || paragraphs[0] || oneLine;
+    const who = audience || (isChinese
+      ? "适合跟踪公司动态、模型能力和产业落地的人优先阅读。"
+      : "Best for readers tracking company moves, model capability, and real-world adoption.");
+    const next = watchpoint || (isChinese
+      ? "先看原文和官方发布，再决定是否继续追后续信号。"
+      : "Check the original source and official release first, then decide whether to keep tracking follow-up signals.");
+    const bullets = uniqueStrings([...points, ...paragraphs])
+      .filter((item) => item && item !== oneLine && item !== why)
+      .slice(0, 3);
+
+    return {
+      oneLine: clampSummaryText(oneLine, isChinese ? 52 : 120),
+      why: clampSummaryText(why, isChinese ? 82 : 180),
+      who: clampSummaryText(who, isChinese ? 68 : 140),
+      next: clampSummaryText(next, isChinese ? 68 : 140),
+      bullets
+    };
+  }
+
   function buildLocalSummary(story, language, model, fallback) {
     const sourceName = normalizeSummaryText(story && story.sourceName);
     const isChinese = language === "zh";
-    const maxPoints = model === "local-expanded" ? 3 : 2;
-    const { deck, points, paragraphs, highlights } = getStorySummaryCandidates(story || {}, language);
-    const primary = deck || highlights[0] || normalizeSummaryText(fallback);
-    const secondaryItems = uniqueStrings([...points, ...paragraphs])
-      .filter((item) => item && item !== primary)
-      .slice(0, maxPoints);
+    const maxPoints = model === "local-expanded" ? 2 : 1;
+    const quickRead = getStoryQuickRead(story, language);
+    const primary = quickRead.oneLine || normalizeSummaryText(fallback);
+    const secondaryItems = quickRead.bullets.slice(0, maxPoints);
+    const why = quickRead.why && quickRead.why !== primary ? quickRead.why : "";
+    const next = quickRead.next;
 
     if (!primary) {
       return clampSummaryText(fallback, isChinese ? 120 : 220);
     }
 
     if (isChinese) {
-      const lead = sourceName ? `这条更新来自${sourceName}。` : "";
-      const focus = secondaryItems.length ? `重点包括：${secondaryItems.join("；")}。` : "";
-      return clampSummaryText(`${lead}${primary}${/[。！？]$/.test(primary) ? "" : "。"}${focus}`, 140);
+      const lead = sourceName ? `${sourceName}这次的核心变化是：` : "这条更新的核心变化是：";
+      const whyLine = why ? `为什么重要：${why.replace(/[。！？]$/g, "")}。` : "";
+      const focusLine = secondaryItems.length ? `补充看点：${secondaryItems.map((item) => item.replace(/[。！？]$/g, "")).join("；")}。` : "";
+      const nextLine = !focusLine && next ? `下一步关注：${next.replace(/[。！？]$/g, "")}。` : "";
+      return clampSummaryText(`${lead}${primary.replace(/[。！？]$/g, "")}。${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 170 : 148);
     }
 
-    const lead = sourceName ? `From ${sourceName}, ` : "";
-    const focus = secondaryItems.length ? ` Key details: ${secondaryItems.join("; ")}.` : "";
-    return clampSummaryText(`${lead}${primary}${/[.!?]$/.test(primary) ? "" : "."}${focus}`, 240);
+    const lead = sourceName ? `${sourceName} in one line: ` : "In one line: ";
+    const whyLine = why ? ` Why it matters: ${why.replace(/[.!?]$/g, "")}.` : "";
+    const focusLine = secondaryItems.length ? ` Extra signal: ${secondaryItems.map((item) => item.replace(/[.!?]$/g, "")).join("; ")}.` : "";
+    const nextLine = !focusLine && next ? ` What to watch next: ${next.replace(/[.!?]$/g, "")}.` : "";
+    return clampSummaryText(`${lead}${primary.replace(/[.!?]$/g, "")}.${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 280 : 240);
+  }
+
+  function buildVideoSearchUrl(platform, query) {
+    const nextQuery = encodeURIComponent(normalizeSummaryText(query));
+
+    if (platform === "bilibili") {
+      return `https://search.bilibili.com/all?keyword=${nextQuery}`;
+    }
+
+    return `https://www.youtube.com/results?search_query=${nextQuery}`;
+  }
+
+  function getStoryVideoLinks(story, language) {
+    const nextLanguage = language || getLanguage();
+    const storyTitleZh = normalizeSummaryText(localize(story && story.title, "zh"));
+    const storyTitleEn = normalizeSummaryText(localize(story && story.title, "en"));
+    const sourceName = normalizeSummaryText(story && (story.sourceName || story.source));
+    const tags = uniqueStrings((story && story.tags) || []).slice(0, 3);
+    const englishTopic = uniqueStrings([sourceName, storyTitleEn, ...tags]).join(" ");
+    const chineseTopic = uniqueStrings([storyTitleZh, sourceName, ...tags]).join(" ");
+    const displayZh = nextLanguage === "zh";
+
+    return [
+      {
+        id: `${story.id}-yt-official`,
+        platform: "YouTube",
+        title: displayZh ? "官方原视频" : "Official video",
+        note: displayZh ? "优先找发布会、演示、访谈或官方直播回放。" : "Start with the keynote, demo, interview, or official upload.",
+        url: buildVideoSearchUrl("youtube", `${englishTopic} official keynote demo launch`)
+      },
+      {
+        id: `${story.id}-yt-analysis`,
+        platform: "YouTube",
+        title: displayZh ? "英文深度解读" : "English analysis",
+        note: displayZh ? "适合补上下文、体验评价和产业判断。" : "Useful for context, product evaluation, and industry framing.",
+        url: buildVideoSearchUrl("youtube", `${englishTopic} analysis breakdown review`)
+      },
+      {
+        id: `${story.id}-bili-official`,
+        platform: "Bilibili",
+        title: displayZh ? "B站原视频入口" : "Bilibili primary route",
+        note: displayZh ? "优先看中文搬运、直播切片或同步上传。" : "Good for Chinese reposts, clips, or mirrored official uploads.",
+        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 官方 原视频`)
+      },
+      {
+        id: `${story.id}-bili-analysis`,
+        platform: "Bilibili",
+        title: displayZh ? "B站解读视频" : "Bilibili explainers",
+        note: displayZh ? "适合先看中文讲解，再决定是否阅读全文。" : "Good for Chinese explainers before committing to the full read.",
+        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 解读 测评`)
+      }
+    ];
+  }
+
+  function createVideoLinkCard(link, language) {
+    return `
+      <article class="video-link-card page-fade">
+        <div class="story-meta">
+          <span class="ghost-badge">${escapeHtml(link.platform)}</span>
+          <span class="ghost-badge">${escapeHtml(language === "zh" ? "视频入口" : "Watch route")}</span>
+        </div>
+        <h3>${escapeHtml(link.title)}</h3>
+        <p class="panel-text">${escapeHtml(link.note)}</p>
+        <a class="story-link" href="${escapeHtml(link.url)}"${getExternalLinkAttributes()}>${escapeHtml(language === "zh" ? "打开链接" : "Open link")}</a>
+      </article>
+    `;
   }
 
   async function summarizeStory(options) {
@@ -2596,7 +2696,11 @@
             sourceUrl: story.sourceUrl,
             sourceName: story.sourceName,
             date: story.date,
-            category: story.category
+            category: story.category,
+            editorialSummary: localize(story.editorialSummary, language),
+            insight: localize(story.insight, language),
+            who: localize(story.who, language),
+            watchpoint: localize(story.watchpoint, language)
           }
         })
       });
@@ -2672,6 +2776,8 @@
     isLiveItem,
     isMicroStory,
     getPrimarySummary,
+    getStoryQuickRead,
+    getStoryVideoLinks,
     filterNews,
     getTopTags,
     getStoriesByCategory,
@@ -2712,6 +2818,7 @@
     createTagButtons,
     createProviderCards,
     createJournalCard,
+    createVideoLinkCard,
     createStoryCard,
     createSignalCard,
     createRefreshStatusCard,
