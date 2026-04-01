@@ -34,7 +34,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         hiddenParagraphs: (count) => `还有 ${count} 段未展开`,
         localSummaryLabel: "本地快读",
         generatedSummaryLabel: "模型视角",
-        proContextTitle: "专业版观察"
+        proContextTitle: "专业版观察",
+        quickNav: {
+          brief: "快读",
+          watch: "视频",
+          full: "全文",
+          ai: "摘要"
+        }
       },
       en: {
         summaryTitle: "Key signals",
@@ -54,7 +60,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         hiddenParagraphs: (count) => `${count} more paragraphs hidden`,
         localSummaryLabel: "Local brief",
         generatedSummaryLabel: "Model lens",
-        proContextTitle: "Pro context"
+        proContextTitle: "Pro context",
+        quickNav: {
+          brief: "Brief",
+          watch: "Watch",
+          full: "Full read",
+          ai: "AI"
+        }
       }
     }[language];
   }
@@ -199,8 +211,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
+        <section class="detail-quick-nav page-fade">
+          <a class="chip" href="#quick-read">${AIInsight.escapeHtml(pageCopy.quickNav.brief)}</a>
+          <a class="chip" href="#media-desk">${AIInsight.escapeHtml(pageCopy.quickNav.watch)}</a>
+          <a class="chip" href="#full-read">${AIInsight.escapeHtml(pageCopy.quickNav.full)}</a>
+          <a class="chip" href="#ai-studio">${AIInsight.escapeHtml(pageCopy.quickNav.ai)}</a>
+        </section>
+
         <section class="section article-fast-grid">
-          <article class="article-block quick-read-card page-fade">
+          <article class="article-block quick-read-card page-fade" id="quick-read">
             <div class="summary-headline">
               <span class="meta-label">${AIInsight.escapeHtml(pageCopy.quickReadTitle)}</span>
               <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.localSummaryLabel)}</span>
@@ -234,7 +253,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
           </article>
 
-          <article class="article-block media-desk-card page-fade">
+          <article class="article-block media-desk-card page-fade" id="media-desk">
             <div class="summary-headline">
               <span class="meta-label">${AIInsight.escapeHtml(pageCopy.mediaTitle)}</span>
               <span class="ghost-badge">${AIInsight.escapeHtml(article.sourceName || "AI Insight")}</span>
@@ -284,7 +303,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               </article>
             </div>
 
-            <article class="article-block article-body page-fade">
+            <article class="article-block article-body page-fade" id="full-read">
               <div class="summary-headline">
                 <span class="meta-label">${AIInsight.escapeHtml(pageCopy.bodyTitle)}</span>
                 <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.bodyHint)}</span>
@@ -304,7 +323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
 
           <aside class="article-sidebar">
-            <article class="article-block page-fade">
+            <article class="article-block page-fade" id="ai-studio">
               <h3>${AIInsight.escapeHtml(pageCopy.engineTitle)}</h3>
               <div class="provider-form">
                 <div class="field-grid">

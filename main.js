@@ -131,10 +131,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         routesNote: isPro
           ? "专业用户优先进入稳定工作台；普通用户优先进入低负担的浏览路径。"
           : "先决定你现在是想追头条、找工具，还是系统理解，再进入对应视图。",
-        nowTitle: isPro ? "主线监测" : "现在最值得先看的",
+        nowTitle: isPro ? "主线监测" : "大新闻",
         nowNote: isPro
           ? "这里保留高信号主线，不让工具和研究消息打散第一层注意力。"
           : "先用少量主线卡片建立今天的行业轮廓，再决定要不要深挖。",
+        smallTitle: "小新闻",
+        smallNote: "把公司更新、区域变化和次级动态压成一层更轻的跟进流，适合快速补齐上下文。",
         boardroomTitle: "公司与平台动向",
         boardroomNote: "优先看会改变平台入口、企业采用和资源分配的消息。",
         chinaTitle: "中国与区域观察",
@@ -196,10 +198,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         routesNote: isPro
           ? "Expert readers can enter the workbench; broader readers can enter through lower-friction browsing paths."
           : "Choose whether you want breaking news, tools, or deeper context before you dive in.",
-        nowTitle: isPro ? "Lead monitor" : "What to read first",
+        nowTitle: isPro ? "Lead monitor" : "Big stories",
         nowNote: isPro
           ? "The first layer keeps the core signal intact instead of letting tools and research fragment attention."
           : "Use a small set of lead cards to build today’s map before deciding whether to go deeper.",
+        smallTitle: "Small stories",
+        smallNote: "Compress company movement, regional shifts, and secondary developments into a lighter follow-up lane.",
         boardroomTitle: "Company and platform movement",
         boardroomNote: "Focus on stories that change platform control, enterprise adoption, and resource positioning.",
         chinaTitle: "China and regional watch",
@@ -346,6 +350,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       profile.researchLimit
     );
     const featured = uniqueById([...boardroomStories, ...allLiveStories, ...briefStories, ...headlineStories])[0] || news[0];
+    const liveIds = new Set(liveStories.map((item) => String(item.id)));
+    const featuredId = String(featured.id);
+    const smallStories = uniqueById([
+      ...boardroomStories,
+      ...chinaStories,
+      ...headlineStories.filter((item) => !AIInsight.isMicroStory(item))
+    ])
+      .filter((item) => String(item.id) !== featuredId && !liveIds.has(String(item.id)))
+      .slice(0, compactViewport ? 4 : 6);
     const watchStories = uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).slice(0, compactViewport ? Math.min(profile.videoLimit, 2) : profile.videoLimit);
     const latestDate = AIInsight.formatDateTime(meta.refreshedAt || news[0].date, language);
     const counts = {
@@ -572,9 +585,14 @@ document.addEventListener("DOMContentLoaded", async () => {
               </section>
 
               <section class="section">
-                <div class="monitor-grid">
-                  ${createMonitorCard(pageCopy.boardroomTitle, pageCopy.boardroomNote, boardroomStories, language, "search.html?q=Microsoft")}
-                  ${createMonitorCard(pageCopy.chinaTitle, pageCopy.chinaNote, chinaStories, language, "search.html?region=china")}
+                <div class="section-head">
+                  <div>
+                    <h2>${AIInsight.escapeHtml(pageCopy.smallTitle)}</h2>
+                    <p class="section-note">${AIInsight.escapeHtml(pageCopy.smallNote)}</p>
+                  </div>
+                </div>
+                <div class="story-grid feed-grid">
+                  ${smallStories.map((item) => AIInsight.createStoryCard(item, { language, compact: true })).join("")}
                 </div>
               </section>
             `

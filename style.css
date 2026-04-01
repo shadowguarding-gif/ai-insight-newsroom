@@ -1085,6 +1085,14 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+.detail-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 22px 0 0;
+}
+
 .article-meta {
   margin-top: 20px;
   color: var(--muted);
@@ -2160,6 +2168,16 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     padding: 24px;
   }
 
+  .detail-quick-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+  }
+
+  .detail-quick-nav .chip {
+    flex: 0 0 auto;
+  }
+
   .hero h1,
   .article-title {
     max-width: none;
@@ -2232,7 +2250,8 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .search-toolbar,
   .story-footer,
   .story-links,
-  .top-nav {
+  .top-nav,
+  .detail-quick-nav {
     width: 100%;
   }
 
