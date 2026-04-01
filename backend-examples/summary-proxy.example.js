@@ -86,7 +86,9 @@ function clampSummaryText(value, maxLength) {
   }
 
   const shortened = text.slice(0, Math.max(0, maxLength - 1)).trim();
-  const trimmed = shortened.replace(/[,:;，；、\s]+$/g, "");
+  const withoutTrailingWord = shortened.replace(/\s+\S*$/g, "").trim();
+  const safeText = withoutTrailingWord.length > Math.floor(maxLength * 0.55) ? withoutTrailingWord : shortened;
+  const trimmed = safeText.replace(/[,:;，；、\s]+$/g, "");
   return `${trimmed}...`;
 }
 

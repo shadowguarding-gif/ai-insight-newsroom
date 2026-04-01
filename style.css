@@ -2007,6 +2007,11 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     position: static;
   }
 
+  .header-inner {
+    gap: 12px;
+    padding: 14px 0;
+  }
+
   .header-inner,
   .footer-inner {
     flex-direction: column;
@@ -2097,6 +2102,21 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     width: calc(100% - 20px);
   }
 
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .brand-name {
+    font-size: 0.98rem;
+  }
+
+  .brand-copy small {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
   main {
     padding: 22px 0 56px;
   }
@@ -2156,6 +2176,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .mode-btn {
     width: auto;
     flex: 0 0 auto;
+    padding: 9px 11px;
   }
 
   .scan-rail {
@@ -2170,13 +2191,14 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   }
 
   .hero h1 {
-    font-size: clamp(2.25rem, 10vw, 3.05rem);
-    line-height: 1.02;
+    font-size: clamp(1.95rem, 8.8vw, 2.55rem);
+    line-height: 1.04;
   }
 
   .featured-panel h2,
   .article-title {
-    font-size: clamp(1.48rem, 7vw, 2.1rem);
+    font-size: clamp(1.32rem, 6.2vw, 1.78rem);
+    line-height: 1.12;
   }
 
   .lead,
@@ -2186,8 +2208,19 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     line-height: 1.62;
   }
 
-  .article-meta {
+  .article-hero .lead,
+  .featured-panel .lead {
+    font-size: 0.98rem;
+  }
+
+  .article-badges,
+  .article-meta,
+  .detail-breadcrumb {
     gap: 8px;
+  }
+
+  .article-meta {
+    font-size: 0.94rem;
   }
 
   .detail-actions,
@@ -2198,5 +2231,15 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .detail-actions .button,
   .media-actions .button {
     width: 100%;
+  }
+
+  .quick-read-item,
+  .video-link-card,
+  .video-launch-card {
+    padding: 18px;
+  }
+
+  .body-toggle-btn {
+    min-width: 0;
   }
 }
