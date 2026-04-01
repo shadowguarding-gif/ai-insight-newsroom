@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "把当前搜索主题加入 Radar，之后这个站会持续帮你追它的相关新闻。",
         radarAction: tracked ? AIInsight.t("common.trackedTopic", language) : AIInsight.t("common.trackTopic", language),
         radarLink: "打开 Radar",
+        watchLink: "打开视频页",
         emptyTitle: "暂时没有匹配结果",
         emptyBody: "试试更宽泛的关键词，或者先取消赛道限制。"
       },
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "Add the current search theme to your Radar so the site keeps following it for you.",
         radarAction: tracked ? AIInsight.t("common.trackedTopic", language) : AIInsight.t("common.trackTopic", language),
         radarLink: "Open Radar",
+        watchLink: "Open watch desk",
         emptyTitle: "No matching results yet",
         emptyBody: "Try a broader keyword, or remove the lane filter first."
       }
@@ -104,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.title = "AI Insight";
       app.innerHTML = `
         <div class="page-shell">
-          ${AIInsight.createRefreshStatusCard(meta, language)}
+          ${AIInsight.createRefreshStatusCard(meta, language, { compact: true })}
           ${AIInsight.createEmptyState(
             language === "zh" ? "搜索内容准备中" : "Search is waiting for content",
             language === "zh"
@@ -150,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
-        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead })}
+        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}
 
         ${
           state.query.trim()
@@ -173,6 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     >
                       ${AIInsight.escapeHtml(pageCopy.radarAction)}
                     </button>
+                    <a class="button button-secondary" href="watch.html?q=${encodeURIComponent(state.query)}">${AIInsight.escapeHtml(pageCopy.watchLink)}</a>
                     <a class="button button-secondary" href="radar.html">${AIInsight.escapeHtml(pageCopy.radarLink)}</a>
                   </div>
                 </div>

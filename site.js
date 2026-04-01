@@ -95,6 +95,7 @@
         home: "首页",
         feed: "资讯",
         search: "搜索",
+        watch: "视频",
         radar: "雷达",
         sources: "期刊",
         briefing: "我的简报",
@@ -168,6 +169,7 @@
         home: "Home",
         feed: "Feed",
         search: "Search",
+        watch: "Watch",
         radar: "Radar",
         sources: "Sources",
         briefing: "My Briefing",
@@ -1604,6 +1606,7 @@
     const nextLanguage = language || getLanguage();
     const nextMeta = meta || getNewsMeta();
     const nextOptions = options || {};
+    const compact = Boolean(nextOptions.compact);
     const detailLine = nextLanguage === "en"
       ? nextMeta.remoteError
         ? "Remote feed returned an error, so the page is currently falling back to local coverage."
@@ -1648,8 +1651,44 @@
           button: nextMeta.status === "loading" || nextMeta.status === "refreshing" ? t("common.refreshingNow", nextLanguage) : t("common.refreshNow", nextLanguage),
           remoteBadge: nextMeta.remoteConnected ? "远端已开启" : nextMeta.remoteEnabled ? "回退模式" : "种子模式"
         };
+    const compactLine = nextLanguage === "en"
+      ? nextMeta.remoteConnected
+        ? "Remote and curated coverage are being merged now."
+        : nextMeta.remoteEnabled
+          ? "Remote is configured, but the page is currently using fallback coverage."
+          : "The site is still running on embedded seed coverage."
+      : nextMeta.remoteConnected
+        ? "当前正在混合远端 live 和站内整理内容。"
+        : nextMeta.remoteEnabled
+          ? "远端已配置，但页面当前仍在使用回退内容。"
+          : "当前仍是站内种子内容模式。";
     const refreshDisabled = nextMeta.status === "loading" || nextMeta.status === "refreshing" ? " disabled" : "";
     const refreshClass = nextMeta.status === "loading" || nextMeta.status === "refreshing" ? " is-loading" : "";
+
+    if (compact) {
+      return `
+        <section class="panel live-status live-status-compact page-fade">
+          <div class="live-status-strip">
+            <div class="live-status-summary">
+              <span class="meta-label">${escapeHtml(text.eyebrow)}</span>
+              <h3>${escapeHtml(text.title)}</h3>
+            </div>
+
+            <div class="live-status-inline">
+              <span class="ghost-badge">${escapeHtml(text.lastRefresh)}: ${escapeHtml(formatDateTime(nextMeta.refreshedAt, nextLanguage) || (nextLanguage === "en" ? "Not refreshed yet" : "还没有刷新"))}</span>
+              <span class="ghost-badge">${escapeHtml(text.totalStories)}: ${escapeHtml(String(nextMeta.totalCount || 0))}</span>
+              <span class="ghost-badge">${escapeHtml(text.remoteStories)}: ${escapeHtml(String(nextMeta.remoteCount || 0))}</span>
+            </div>
+
+            <div class="live-status-actions">
+              <span class="ghost-badge">${escapeHtml(text.remoteBadge)}</span>
+              <button class="button button-secondary refresh-btn${refreshClass}" type="button" data-refresh-news="true"${refreshDisabled}>${escapeHtml(text.button)}</button>
+            </div>
+          </div>
+          <p class="panel-text live-status-note">${escapeHtml(nextOptions.lead || compactLine)}</p>
+        </section>
+      `;
+    }
 
     return `
       <section class="panel live-status page-fade">
@@ -2066,6 +2105,7 @@
       { key: "home", href: "index.html" },
       { key: "feed", href: "list.html" },
       { key: "search", href: "search.html" },
+      { key: "watch", href: "watch.html" },
       { key: "radar", href: "radar.html" },
       { key: "sources", href: "sources.html", visible: viewMode === "pro" },
       { key: "briefing", href: "briefing.html" },

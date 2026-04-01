@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.title = "AI Insight";
       app.innerHTML = `
         <div class="page-shell">
-          ${AIInsight.createRefreshStatusCard(meta, language)}
+          ${AIInsight.createRefreshStatusCard(meta, language, { compact: true })}
           ${AIInsight.createEmptyState(
             language === "zh" ? "内容准备中" : "Coverage is loading",
             language === "zh"
@@ -226,7 +226,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
-        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead })}
+        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}
 
         <section class="section">
           <div class="stats-grid">

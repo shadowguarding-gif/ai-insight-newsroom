@@ -1606,6 +1606,17 @@ body[data-ui-mode="pro"] .account-status-pill.is-warning {
   background: rgba(255, 122, 89, 0.12);
 }
 
+body[data-ui-mode="light"] .watch-note,
+body[data-ui-mode="pro"] .watch-note {
+  background: rgba(255, 250, 242, 0.92);
+  border-color: rgba(18, 36, 50, 0.08);
+}
+
+body[data-ui-mode="light"] .watch-note p,
+body[data-ui-mode="pro"] .watch-note p {
+  color: #334956;
+}
+
 body[data-ui-mode="pro"] .section-head {
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(15, 31, 44, 0.1);
@@ -1706,6 +1717,10 @@ body[data-ui-mode="pro"] .radar-card:hover {
   padding: 24px 28px;
 }
 
+.live-status-compact {
+  padding: 18px 20px;
+}
+
 .live-status-head {
   display: flex;
   align-items: flex-start;
@@ -1759,6 +1774,32 @@ body[data-ui-mode="pro"] .radar-card:hover {
   margin: 16px 0 0;
 }
 
+.live-status-strip,
+.watch-story-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.live-status-summary h3 {
+  margin: 8px 0 0;
+  font-size: 1rem;
+}
+
+.live-status-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-status-compact .live-status-note {
+  margin-top: 12px;
+  font-size: 0.92rem;
+}
+
 .refresh-btn.is-loading,
 .refresh-btn:disabled {
   opacity: 0.7;
@@ -1794,6 +1835,40 @@ body[data-ui-mode="pro"] .live-status-cell span {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+}
+
+.watch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.watch-story-card {
+  padding: 22px;
+}
+
+.watch-note-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 0;
+}
+
+.watch-note {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(173, 197, 209, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.watch-note p {
+  margin: 8px 0 0;
+  color: #d4e5ec;
+  line-height: 1.58;
+}
+
+.watch-highlight-list {
+  margin-top: 18px;
 }
 
 .account-grid .account-scope-card {
@@ -1987,6 +2062,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .story-grid,
   .story-grid.feed-grid,
   .signal-grid,
+  .watch-grid,
   .video-link-grid,
   .video-launch-grid,
   .radar-grid,
@@ -2059,6 +2135,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .story-grid,
   .story-grid.feed-grid,
   .signal-grid,
+  .watch-grid,
   .video-link-grid,
   .video-launch-grid,
   .radar-grid,
@@ -2095,11 +2172,21 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .pro-desk-card {
     width: 100%;
   }
+
+  .live-status-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 560px) {
   .page-shell {
     width: calc(100% - 20px);
+  }
+
+  .top-nav a {
+    padding: 8px 10px;
+    font-size: 0.92rem;
   }
 
   .brand-mark {
@@ -2154,6 +2241,12 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     width: 100%;
   }
 
+  .account-status-pill {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+
   .header-actions {
     grid-template-columns: 1fr 1fr;
   }
@@ -2185,6 +2278,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
 
   .hero-note-row,
   .monitor-card-head,
+  .live-status-strip,
   .body-toggle-row {
     flex-direction: column;
     align-items: flex-start;
@@ -2199,6 +2293,16 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .article-title {
     font-size: clamp(1.32rem, 6.2vw, 1.78rem);
     line-height: 1.12;
+  }
+
+  .search-hero h1 {
+    font-size: clamp(1.72rem, 7.8vw, 2.12rem);
+    line-height: 1.08;
+  }
+
+  .search-command,
+  .live-status-compact {
+    padding: 18px;
   }
 
   .lead,
@@ -2234,9 +2338,18 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   }
 
   .quick-read-item,
+  .watch-note,
   .video-link-card,
   .video-launch-card {
     padding: 18px;
+  }
+
+  .watch-note-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .live-status-inline {
+    width: 100%;
   }
 
   .body-toggle-btn {

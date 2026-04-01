@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.title = "AI Insight";
       app.innerHTML = `
         <div class="page-shell">
-          ${AIInsight.createRefreshStatusCard(meta, language)}
+        ${AIInsight.createRefreshStatusCard(meta, language, { compact: true })}
           ${AIInsight.createEmptyState(
             language === "zh" ? "内容准备中" : "Coverage is loading",
             language === "zh"
@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       {
         title: language === "zh" ? "视频与解读" : "Watch routes",
         note: language === "zh" ? "直接跳到原始视频、英文分析和中文解读入口。" : "Jump to original videos, English analysis, and Chinese explainers.",
-        href: "#watch-desk"
+        href: "watch.html"
       }
     ];
 
@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </section>
 
-        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead })}
+        ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}
 
         <section class="section">
           <div class="scan-rail">

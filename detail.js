@@ -246,6 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                   ? `<a class="button button-primary" href="${AIInsight.escapeHtml(article.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.t("common.openSource", language))}</a>`
                   : ""
               }
+              <a class="button button-secondary" href="watch.html?q=${encodeURIComponent(AIInsight.localize(article.title, language))}">${AIInsight.escapeHtml(language === "zh" ? "打开视频页" : "Open watch desk")}</a>
               <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[0].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[0].title)}</a>
               <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[3].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[3].title)}</a>
             </div>
