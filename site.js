@@ -59,26 +59,26 @@
   ];
 
   const searchAliasMap = {
-    nvidia: ["英伟达", "nvidia", "rtx", "dgx"],
+    nvidia: ["英伟达", "英伟達", "nvidia", "nvda", "rtx", "dgx", "cuda", "n卡"],
     gpu: ["显卡", "gpu", "graphics", "rtx", "cuda", "算力卡"],
     cloud: ["云", "cloud", "infra", "infrastructure", "基础设施", "算力"],
     launch: ["发布", "发布会", "launch", "release", "introducing", "unveil", "unveils", "announce"],
     conference: ["会议", "峰会", "大会", "summit", "conference", "event", "gtc", "mwc"],
-    microsoft: ["微软", "microsoft", "copilot", "azure"],
+    microsoft: ["微软", "微軟", "microsoft", "msft", "copilot", "azure"],
     openai: ["openai", "chatgpt", "gpt"],
     anthropic: ["anthropic", "claude"],
-    google: ["谷歌", "google", "gemini", "alphabet"],
+    google: ["谷歌", "google", "google ai", "gemini", "alphabet"],
     meta: ["meta", "llama", "facebook", "脸书"],
     xai: ["xai", "x.ai", "马斯克", "musk", "grok"],
     musk: ["马斯克", "musk", "xai", "grok"],
     tesla: ["特斯拉", "tesla", "马斯克", "musk"],
-    alibaba: ["阿里", "阿里云", "阿里巴巴", "alibaba", "qwen", "通义"],
-    qwen: ["通义", "千问", "qwen", "阿里", "阿里云"],
-    tencent: ["腾讯", "tencent", "hunyuan", "混元"],
-    hunyuan: ["混元", "hunyuan", "腾讯", "tencent"],
+    alibaba: ["阿里", "阿里云", "阿里巴巴", "alibaba", "qwen", "通义", "通义千问"],
+    qwen: ["通义", "通义千问", "千问", "qwen", "阿里", "阿里云"],
+    tencent: ["腾讯", "腾讯云", "tencent", "hunyuan", "混元", "腾讯混元"],
+    hunyuan: ["混元", "腾讯混元", "hunyuan", "腾讯", "tencent"],
     baidu: ["百度", "baidu", "ernie", "文心"],
-    deepseek: ["deepseek", "深度求索", "深度搜索"],
-    bytedance: ["字节", "字节跳动", "bytedance", "doubao", "豆包"],
+    deepseek: ["deepseek", "deep seek", "deepseek-r1", "深度求索", "深度搜索"],
+    bytedance: ["字节", "字节跳动", "bytedance", "doubao", "豆包", "火山引擎"],
     doubao: ["豆包", "doubao", "字节", "字节跳动"],
     minimax: ["minimax", "海螺", "abab"],
     ollama: ["ollama", "本地模型", "本地接口"],
@@ -425,32 +425,60 @@
       .map(([key]) => key);
   }
 
+  function collectSearchSegments(value) {
+    const segments = [];
+    const append = (entry) => {
+      if (!entry) {
+        return;
+      }
+
+      if (Array.isArray(entry)) {
+        entry.forEach(append);
+        return;
+      }
+
+      if (typeof entry === "object") {
+        if (Object.prototype.hasOwnProperty.call(entry, "zh") || Object.prototype.hasOwnProperty.call(entry, "en")) {
+          append(entry.zh);
+          append(entry.en);
+          return;
+        }
+
+        Object.values(entry).forEach(append);
+        return;
+      }
+
+      const text = String(entry).trim();
+      if (text) {
+        segments.push(text);
+      }
+    };
+
+    append(localize(value, "zh"));
+    append(localize(value, "en"));
+    append(value);
+
+    return uniqueStrings(segments);
+  }
+
   function createSearchHaystack(item) {
     const baseSegments = [
-      item.title.zh,
-      item.title.en,
-      item.deck.zh,
-      item.deck.en,
-      item.insight && item.insight.zh,
-      item.insight && item.insight.en,
-      item.watchpoint && item.watchpoint.zh,
-      item.watchpoint && item.watchpoint.en,
-      item.who && item.who.zh,
-      item.who && item.who.en,
-      item.editorialSummary && item.editorialSummary.zh,
-      item.editorialSummary && item.editorialSummary.en,
-      item.aiSummary && item.aiSummary.zh,
-      item.aiSummary && item.aiSummary.en,
-      item.briefType && item.briefType.zh,
-      item.briefType && item.briefType.en,
-      item.metricLabel && item.metricLabel.zh,
-      item.metricLabel && item.metricLabel.en,
+      ...collectSearchSegments(item.title),
+      ...collectSearchSegments(item.deck),
+      ...collectSearchSegments(item.insight),
+      ...collectSearchSegments(item.watchpoint),
+      ...collectSearchSegments(item.who),
+      ...collectSearchSegments(item.editorialSummary),
+      ...collectSearchSegments(item.aiSummary),
+      ...collectSearchSegments(item.briefType),
+      ...collectSearchSegments(item.metricLabel),
       item.metricValue,
-      item.proNotes && item.proNotes.zh && item.proNotes.zh.join(" "),
-      item.proNotes && item.proNotes.en && item.proNotes.en.join(" "),
+      ...collectSearchSegments(item.proNotes),
       item.sourceName,
+      item.source,
       item.sourceType,
       item.sourceUrl,
+      item.slug,
       item.tags.join(" "),
       getCategoryLabel(item.category, "zh"),
       getCategoryLabel(item.category, "en"),
