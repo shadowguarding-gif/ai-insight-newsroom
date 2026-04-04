@@ -311,7 +311,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const leadStory = desk.story;
     const leadQuickRead = AIInsight.getStoryQuickRead(leadStory, language);
     const secondaryStories = (desk.stories || []).slice(1, 2);
+    const deskHref = desk.href || AIInsight.getCompanyDeskHref(desk.key);
     const searchHref = `search.html?q=${encodeURIComponent(AIInsight.localize(desk.query, language))}`;
+    const archiveLabel = language === "zh"
+      ? `近几个月 ${desk.totalStories || desk.stories.length} 条归档`
+      : `${desk.totalStories || desk.stories.length} stories in archive`;
 
     return `
       <article class="company-desk-card panel page-fade">
@@ -321,11 +325,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h3>${AIInsight.escapeHtml(AIInsight.localize(desk.label, language))}</h3>
             <p class="panel-text">${AIInsight.escapeHtml(AIInsight.localize(desk.focus, language))}</p>
           </div>
-          <a class="story-link" href="${AIInsight.escapeHtml(searchHref)}">${AIInsight.escapeHtml(language === "zh" ? "打开专栏" : "Open desk")}</a>
+          <a class="story-link" href="${AIInsight.escapeHtml(deskHref)}">${AIInsight.escapeHtml(language === "zh" ? "打开专栏" : "Open desk")}</a>
         </div>
 
         <div class="company-desk-story">
-          <span class="ghost-badge">${AIInsight.escapeHtml(leadStory.sourceName || "AI Insight")}</span>
+          <div class="story-meta">
+            <span class="ghost-badge">${AIInsight.escapeHtml(leadStory.sourceName || "AI Insight")}</span>
+            <span class="ghost-badge">${AIInsight.escapeHtml(archiveLabel)}</span>
+          </div>
           <strong>${AIInsight.escapeHtml(AIInsight.localize(leadStory.title, language))}</strong>
           <p>${AIInsight.escapeHtml(leadQuickRead.oneLine)}</p>
         </div>
@@ -351,7 +358,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="story-footer">
           <div class="story-links">
             <a class="story-link" href="detail.html?id=${leadStory.id}">${AIInsight.escapeHtml(AIInsight.t("common.viewDetail", language))}</a>
-            <a class="story-link" href="${AIInsight.escapeHtml(searchHref)}">${AIInsight.escapeHtml(language === "zh" ? "看全部相关" : "See related")}</a>
+            <a class="story-link" href="${AIInsight.escapeHtml(deskHref)}">${AIInsight.escapeHtml(language === "zh" ? "看专栏归档" : "Browse archive")}</a>
+            <a class="story-link" href="${AIInsight.escapeHtml(searchHref)}">${AIInsight.escapeHtml(language === "zh" ? "搜索相关" : "Search mentions")}</a>
           </div>
         </div>
       </article>
@@ -427,7 +435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).filter((item) => AIInsight.getStoryVideoLinks(item, language).length),
       { maxPerCompany: 1, maxFallback: 1 }
     ).slice(0, compactViewport ? Math.min(profile.videoLimit, 2) : profile.videoLimit);
-    const companyDesks = AIInsight.getCompanyDeskStories(rawHeadlineStories).slice(0, compactViewport ? 4 : 6);
+    const companyDesks = AIInsight.getCompanyDeskStories(news).slice(0, compactViewport ? 4 : 6);
     const latestDate = AIInsight.formatDateTime(meta.refreshedAt || news[0].date, language);
     const counts = {
       live: allLiveStories.length,
@@ -453,6 +461,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         title: language === "zh" ? "主题搜索" : "Theme search",
         note: language === "zh" ? "按公司、赛道、产品和地区切入。" : "Search by company, lane, product, or region.",
         href: "search.html"
+      },
+      {
+        title: language === "zh" ? "公司专栏" : "Company desks",
+        note: language === "zh" ? "把英伟达、微软、OpenAI 这类公司按时间线单独追踪，不和主流混在一起。" : "Follow NVIDIA, Microsoft, OpenAI, and other major companies in dedicated archives instead of mixing them into the main flow.",
+        href: "desks.html"
       },
       {
         title: language === "zh" ? "视频与解读" : "Watch routes",

@@ -590,6 +590,92 @@ button:disabled {
   color: var(--text);
 }
 
+.desk-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.desk-switch-group {
+  margin-top: 26px;
+}
+
+.desk-company-switches {
+  gap: 10px;
+}
+
+.desk-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.desk-switch.is-muted {
+  opacity: 0.68;
+}
+
+.desk-chip-count {
+  display: inline-flex;
+  min-width: 28px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+}
+
+.desk-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.desk-side-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.desk-summary-rail {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.desk-summary-rail .scan-card {
+  padding: 14px 16px;
+}
+
+.desk-archive-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.desk-month {
+  padding: 20px 22px;
+}
+
+.desk-month-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.desk-month-head h3 {
+  margin: 10px 0 0;
+  font-size: 1.14rem;
+}
+
+.desk-archive-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .monitor-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1560,6 +1646,11 @@ body[data-ui-mode="light"] .video-link-pill {
   border-color: rgba(18, 36, 50, 0.08);
 }
 
+body[data-ui-mode="light"] .desk-chip-count,
+body[data-ui-mode="pro"] .desk-chip-count {
+  background: rgba(18, 36, 50, 0.08);
+}
+
 body[data-ui-mode="pro"] {
   color: #0f1f2c;
   background: #f6f3ea;
@@ -2140,7 +2231,8 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .hero-grid,
   .feed-layout,
   .article-wrap,
-  .article-fast-grid {
+  .article-fast-grid,
+  .desk-hero-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2287,6 +2379,11 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .live-status-strip {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .desk-summary-rail,
+  .desk-archive-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2444,8 +2541,19 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     align-items: stretch;
   }
 
+  .desk-hero-actions {
+    align-items: stretch;
+  }
+
+  .desk-month,
+  .desk-side-panel,
+  .company-desk-card {
+    padding: 18px;
+  }
+
   .detail-actions .button,
-  .media-actions .button {
+  .media-actions .button,
+  .desk-hero-actions .button {
     width: 100%;
   }
 

@@ -140,6 +140,7 @@
         home: "首页",
         feed: "资讯",
         search: "搜索",
+        desks: "专栏",
         watch: "视频",
         radar: "雷达",
         sources: "期刊",
@@ -214,6 +215,7 @@
         home: "Home",
         feed: "Feed",
         search: "Search",
+        desks: "Desks",
         watch: "Watch",
         radar: "Radar",
         sources: "Sources",
@@ -1976,6 +1978,14 @@
     return companyDeskDefinitions.find((item) => item.key === key) || null;
   }
 
+  function getCompanyDeskDefinitions() {
+    return companyDeskDefinitions.map((item) => ({ ...item }));
+  }
+
+  function getCompanyDeskHref(companyKey) {
+    return `desks.html?company=${encodeURIComponent(String(companyKey || ""))}`;
+  }
+
   function hasNormalizedKeyword(haystack, keyword) {
     const nextHaystack = normalizeSearchToken(haystack);
     const term = normalizeSearchToken(keyword);
@@ -2059,13 +2069,89 @@
     });
   }
 
+  function dedupeStories(items) {
+    const seenUrls = new Set();
+    const seenTitles = new Set();
+
+    return (Array.isArray(items) ? items : []).filter((item) => {
+      if (!item) {
+        return false;
+      }
+
+      const sourceUrlKey = normalizeSearchToken(item.sourceUrl || "");
+      const titleKey = normalizeSearchToken(`${localize(item.title, "zh")} ${localize(item.title, "en")}`);
+
+      if ((sourceUrlKey && seenUrls.has(sourceUrlKey)) || (titleKey && seenTitles.has(titleKey))) {
+        return false;
+      }
+
+      if (sourceUrlKey) {
+        seenUrls.add(sourceUrlKey);
+      }
+
+      if (titleKey) {
+        seenTitles.add(titleKey);
+      }
+
+      return true;
+    });
+  }
+
+  function sortStoriesByDate(items) {
+    return [...(Array.isArray(items) ? items : [])].sort((left, right) => {
+      const byDate = String(right && right.date || "").localeCompare(String(left && left.date || ""));
+
+      if (byDate !== 0) {
+        return byDate;
+      }
+
+      if (isMicroStory(left) !== isMicroStory(right)) {
+        return isMicroStory(left) ? 1 : -1;
+      }
+
+      return String(localize(right && right.title, "en") || "").localeCompare(String(localize(left && left.title, "en") || ""));
+    });
+  }
+
+  function getCompanyDeskArchive(news, companyKey) {
+    const desk = getCompanyDeskDefinition(companyKey);
+
+    if (!desk) {
+      return {
+        desk: null,
+        stories: [],
+        featureStories: [],
+        archiveStories: [],
+        latestDate: "",
+        totalStories: 0
+      };
+    }
+
+    const storyPool = dedupeStories(
+      sortStoriesByDate(
+        (Array.isArray(news) ? news : []).filter((item) => getStoryCompanyKeys(item).includes(desk.key))
+      )
+    );
+    const featurePool = storyPool.filter((item) => !isMicroStory(item));
+    const featureStories = (featurePool.length ? featurePool : storyPool).slice(0, 3);
+    const featuredIds = new Set(featureStories.map((item) => String(item.id)));
+    const archiveStories = storyPool.filter((item) => !featuredIds.has(String(item.id)));
+
+    return {
+      desk,
+      stories: storyPool,
+      featureStories,
+      archiveStories,
+      latestDate: storyPool[0] ? storyPool[0].date : "",
+      totalStories: storyPool.length
+    };
+  }
+
   function getCompanyDeskStories(news) {
     return companyDeskDefinitions
       .map((desk) => {
-        const baseNews = Array.isArray(news) ? news : [];
-        const primaryPool = baseNews.filter((item) => !isMicroStory(item) && getStoryCompanyKeys(item).includes(desk.key));
-        const fallbackPool = baseNews.filter((item) => getStoryCompanyKeys(item).includes(desk.key));
-        const stories = limitStoriesPerCompany(primaryPool.length ? primaryPool : fallbackPool, { maxPerCompany: 2, maxFallback: 2 }).slice(0, 2);
+        const archive = getCompanyDeskArchive(news, desk.key);
+        const stories = archive.featureStories.slice(0, 2);
 
         if (!stories.length) {
           return null;
@@ -2075,7 +2161,9 @@
           ...desk,
           story: stories[0],
           stories,
-          href: `search.html?q=${encodeURIComponent(localize(desk.query, getLanguage()))}`
+          totalStories: archive.totalStories,
+          latestDate: archive.latestDate,
+          href: getCompanyDeskHref(desk.key)
         };
       })
       .filter(Boolean);
@@ -2303,6 +2391,7 @@
       { key: "home", href: "index.html" },
       { key: "feed", href: "list.html" },
       { key: "search", href: "search.html" },
+      { key: "desks", href: "desks.html" },
       { key: "watch", href: "watch.html" },
       { key: "radar", href: "radar.html" },
       { key: "sources", href: "sources.html", visible: viewMode === "pro" },
@@ -2359,6 +2448,7 @@
       { key: "home", href: "index.html" },
       { key: "feed", href: "list.html" },
       { key: "search", href: "search.html" },
+      { key: "desks", href: "desks.html" },
       { key: "radar", href: "radar.html" },
       { key: "sources", href: "sources.html", visible: viewMode === "pro" },
       { key: "briefing", href: "briefing.html" },
@@ -3135,7 +3225,11 @@
     getStoryCompanyKeys,
     getPrimaryCompanyKey,
     getStoryCompanyLabel,
+    getCompanyDeskDefinition,
+    getCompanyDeskDefinitions,
     getCompanyDeskStories,
+    getCompanyDeskArchive,
+    getCompanyDeskHref,
     limitStoriesPerCompany,
     filterNews,
     getTopTags,
