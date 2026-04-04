@@ -127,10 +127,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         statusLead: meta.remoteConnected
           ? "首页当前会把远端 live 源、站内精选和工具雷达合并展示。"
           : "当前首页仍会优先使用站内高信号内容，远端接口连通后会自动继续扩容。",
-        routesTitle: "阅读路径",
+        routesTitle: "先从这里开始",
         routesNote: isPro
-          ? "专业用户优先进入稳定工作台；普通用户优先进入低负担的浏览路径。"
-          : "先决定你现在是想追头条、找工具，还是系统理解，再进入对应视图。",
+          ? "把最常用的几条入口压成服务台，先帮用户做对第一步，再进入更密的专业工作台。"
+          : "先帮用户选对入口，而不是一上来面对整页内容。主线、公司、工具和视频各走一条清楚路径。",
+        servicePeekLabel: "当前先看",
+        serviceOpenLabel: "进入这个入口",
+        serviceLeadLabel: "直接读这条",
         nowTitle: isPro ? "主线监测" : "大新闻",
         nowNote: isPro
           ? "这里保留高信号主线，不让工具和研究消息打散第一层注意力。"
@@ -196,10 +199,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         statusLead: meta.remoteConnected
           ? "The homepage is now blending remote live updates, in-house curation, and the tooling radar."
           : "The homepage still leans on in-house high-signal coverage first and expands naturally once the remote endpoint responds.",
-        routesTitle: "Reading paths",
+        routesTitle: "Start here",
         routesNote: isPro
-          ? "Expert readers can enter the workbench; broader readers can enter through lower-friction browsing paths."
-          : "Choose whether you want breaking news, tools, or deeper context before you dive in.",
+          ? "Turn the most-used actions into a service desk first, then let expert readers go deeper into the workbench."
+          : "Help readers choose the right door first instead of facing the whole site at once. Big news, company desks, tools, and watch routes each get a clear lane.",
+        servicePeekLabel: "Start with",
+        serviceOpenLabel: "Open this lane",
+        serviceLeadLabel: "Read this now",
         nowTitle: isPro ? "Lead monitor" : "Big stories",
         nowNote: isPro
           ? "The first layer keeps the core signal intact instead of letting tools and research fragment attention."
@@ -366,6 +372,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  function createServiceLaneCard(route, pageCopy, language) {
+    const leadTitle = route.story
+      ? AIInsight.localize(route.story.title, language)
+      : route.peekTitle;
+    const leadPreview = route.story
+      ? (AIInsight.getStoryLeadPreview(route.story, language, true) || AIInsight.getStoryQuickRead(route.story, language).oneLine)
+      : route.peekNote;
+
+    return `
+      <article class="service-lane-card panel page-fade">
+        <div class="service-lane-top">
+          <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "服务入口" : "Service lane")}</span>
+          <span class="ghost-badge">${AIInsight.escapeHtml(route.metric)}</span>
+        </div>
+        <h3>${AIInsight.escapeHtml(route.title)}</h3>
+        <p class="panel-text">${AIInsight.escapeHtml(route.note)}</p>
+
+        <div class="service-peek">
+          <span class="mini-label">${AIInsight.escapeHtml(pageCopy.servicePeekLabel)}</span>
+          <strong>${AIInsight.escapeHtml(leadTitle || route.title)}</strong>
+          ${leadPreview ? `<p>${AIInsight.escapeHtml(leadPreview)}</p>` : ""}
+        </div>
+
+        <div class="story-footer">
+          <div class="story-links">
+            <a class="story-link" href="${AIInsight.escapeHtml(route.href)}">${AIInsight.escapeHtml(pageCopy.serviceOpenLabel)}</a>
+            ${
+              route.story
+                ? `<a class="story-link" href="detail.html?id=${route.story.id}">${AIInsight.escapeHtml(pageCopy.serviceLeadLabel)}</a>`
+                : ""
+            }
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
   function render() {
     const language = AIInsight.getLanguage();
     const viewMode = AIInsight.getViewMode();
@@ -446,39 +489,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
     const pageCopy = getCopy(language, meta, counts, viewMode);
     const featuredSummary = AIInsight.getStoryCardSummary(featured, language);
-    const quickRoutes = [
+    const serviceLanes = [
       {
         title: language === "zh" ? "实时新闻" : "Live news",
         note: language === "zh" ? "先扫一遍高时效新闻，再决定要不要深入。" : "Scan the highest-tempo coverage before going deeper.",
-        href: "list.html?format=live"
-      },
-      {
-        title: language === "zh" ? "工具与开源" : "Tools & OSS",
-        note: language === "zh" ? "看最近值得试的新工具、接口和 GitHub 动向。" : "Track the newest tools, interfaces, and GitHub movement.",
-        href: "list.html?format=tools"
-      },
-      {
-        title: language === "zh" ? "主题搜索" : "Theme search",
-        note: language === "zh" ? "按公司、赛道、产品和地区切入。" : "Search by company, lane, product, or region.",
-        href: "search.html"
+        href: "list.html?format=live",
+        metric: language === "zh" ? `${counts.live} 条主线` : `${counts.live} lead items`,
+        story: liveStories[0] || featured
       },
       {
         title: language === "zh" ? "公司专栏" : "Company desks",
-        note: language === "zh" ? "把英伟达、微软、OpenAI 这类公司按时间线单独追踪，不和主流混在一起。" : "Follow NVIDIA, Microsoft, OpenAI, and other major companies in dedicated archives instead of mixing them into the main flow.",
-        href: "desks.html"
+        note: language === "zh" ? "把英伟达、微软、OpenAI 这类大公司拆成长期档案，不和每日流混在一起。" : "Separate major companies such as NVIDIA, Microsoft, and OpenAI into standing archives instead of mixing them into the daily stream.",
+        href: "desks.html",
+        metric: language === "zh" ? `${companyDesks.length} 个重点公司` : `${companyDesks.length} tracked companies`,
+        story: companyDesks[0] ? companyDesks[0].story : null,
+        peekTitle: companyDesks[0] ? AIInsight.localize(companyDesks[0].label, language) : (language === "zh" ? "重点公司档案" : "Priority company archive"),
+        peekNote: companyDesks[0] ? AIInsight.localize(companyDesks[0].focus, language) : ""
+      },
+      {
+        title: language === "zh" ? "工具与开源" : "Tools & OSS",
+        note: language === "zh" ? "先看最近值得试的新工具、接口和 GitHub 动向，再决定要不要深读。" : "Start with the newest tools, interfaces, and GitHub movement before committing to deeper reading.",
+        href: "list.html?format=tools",
+        metric: language === "zh" ? `${counts.tools} 条工具信号` : `${counts.tools} tool signals`,
+        story: microStories[0] || allMicroStories[0]
       },
       {
         title: language === "zh" ? "视频与解读" : "Watch routes",
         note: language === "zh" ? "直接跳到原始视频、英文分析和中文解读入口。" : "Jump to original videos, English analysis, and Chinese explainers.",
-        href: "watch.html"
+        href: "watch.html",
+        metric: language === "zh" ? `${watchStories.length} 条观看路线` : `${watchStories.length} watch routes`,
+        story: watchStories[0] || null,
+        peekTitle: watchStories[0] ? AIInsight.localize(watchStories[0].title, language) : (language === "zh" ? "原视频与解读入口" : "Video and explainer routes"),
+        peekNote: watchStories[0] ? AIInsight.getStoryLeadPreview(watchStories[0], language, true) : ""
       }
     ];
 
-    if (profile.showQuickResearchRoute) {
-      quickRoutes.push({
+    if (profile.showQuickResearchRoute && (researchStories[0] || researchSources[0])) {
+      serviceLanes.push({
         title: language === "zh" ? "期刊与来源" : "Journals & sources",
         note: language === "zh" ? "在专业模式里直接进入期刊、会议和预印本入口。" : "Jump straight into journals, conferences, and preprints in Pro mode.",
-        href: "sources.html"
+        href: "sources.html",
+        metric: language === "zh" ? `${researchSources.length} 个专业来源` : `${researchSources.length} research sources`,
+        story: researchStories[0] || null,
+        peekTitle: researchStories[0]
+          ? AIInsight.localize(researchStories[0].title, language)
+          : AIInsight.localize(researchSources[0].title, language),
+        peekNote: researchStories[0]
+          ? AIInsight.getStoryLeadPreview(researchStories[0], language, true)
+          : AIInsight.localize(researchSources[0].summary, language)
       });
     }
 
@@ -571,18 +629,9 @@ document.addEventListener("DOMContentLoaded", async () => {
               <p class="section-note">${AIInsight.escapeHtml(pageCopy.routesNote)}</p>
             </div>
           </div>
-          <div class="promise-grid home-route-grid">
-            ${quickRoutes
-              .map(
-                (route) => `
-                  <article class="promise-card page-fade">
-                    <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "阅读路径" : "Reading path")}</span>
-                    <h3>${AIInsight.escapeHtml(route.title)}</h3>
-                    <p>${AIInsight.escapeHtml(route.note)}</p>
-                    <a class="button button-secondary" href="${AIInsight.escapeHtml(route.href)}">${AIInsight.escapeHtml(language === "zh" ? "直接打开" : "Open now")}</a>
-                  </article>
-                `
-              )
+          <div class="promise-grid home-service-grid">
+            ${serviceLanes
+              .map((route) => createServiceLaneCard(route, pageCopy, language))
               .join("")}
           </div>
         </section>
