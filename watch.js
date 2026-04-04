@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       zh: {
         eyebrow: "Watch The Signal",
         title: "把原视频、英文分析和中文解读收进一个更省时间的观看入口",
-        lead: "这个页面不做昂贵的视频转写，而是先把每条新闻对应的原始视频路线和高质量解读入口整理好。适合先看视频，再决定要不要读长文。",
+        lead: "这个页面不做昂贵的视频转写，而是只在更有把握的话题上给出视频搜索路线。适合先看原始材料，再决定要不要读长文。",
         statusLead: meta.remoteConnected
           ? "视频页会跟着远端 live 条目一起更新，所以更适合追发布会、演示和产品讲解。"
           : "当前视频页优先用站内高信号条目生成观看路线，接上 live backend 后会跟着实时新闻扩充。",
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       en: {
         eyebrow: "Watch The Signal",
         title: "Collect original videos, English analysis, and Chinese explainers into one lower-friction watch desk",
-        lead: "This page avoids expensive transcript pipelines and instead organizes original video routes plus high-signal explainers around each story. Watch first, then decide whether the full article is worth your time.",
+        lead: "This page avoids expensive transcript pipelines and only surfaces watch routes when the topic is likely to have real video value. Watch first, then decide whether the full article is worth your time.",
         statusLead: meta.remoteConnected
           ? "The watch desk refreshes with the remote live feed, so it works well for launches, demos, and conference coverage."
           : "The watch desk currently builds routes from high-signal in-house coverage first and expands naturally once the live backend is connected.",
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function createWatchCard(item, language) {
     const quickRead = AIInsight.getStoryQuickRead(item, language);
-    const links = getFilteredLinks(item, language);
+    const links = getFilteredLinks(item, language).slice(0, 2);
 
     if (!links.length) {
       return "";
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
 
         <h3>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</h3>
-        <p class="panel-text">${AIInsight.escapeHtml(quickRead.oneLine)}</p>
+        <p class="panel-text">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(item, language, true) || quickRead.oneLine)}</p>
 
         <div class="watch-note-grid">
           <div class="watch-note">

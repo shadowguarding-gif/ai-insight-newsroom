@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         nextTitle: "下一步看什么",
         mediaTitle: "原始材料与视频入口",
         mediaLead: "先看官方原文或原视频，再看解读，会比一上来读长文更省时间。",
+        mediaEmpty: "这条内容当前不强推视频路线，直接看原文通常更有效。",
         bodyHint: "默认只展示前几段，先帮你判断这条值不值得继续往下读。",
         expandBody: "展开全文",
         collapseBody: "收起全文",
@@ -54,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         nextTitle: "What to watch next",
         mediaTitle: "Source and video routes",
         mediaLead: "Start with the official source or original video, then move to explainers if the topic deserves more time.",
+        mediaEmpty: "This story does not currently force a watch route. Going straight to the source is usually the better use of time.",
         bodyHint: "The article opens in a shorter preview first so you can decide whether the full read is worth it.",
         expandBody: "Expand full article",
         collapseBody: "Collapse article",
@@ -97,10 +99,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function getLocalPreview(article, language, quickRead) {
     if (language === "zh") {
-      return `一句话：${quickRead.oneLine} 为什么重要：${quickRead.why}`;
+      return `先看：${quickRead.oneLine} 更重要的是：${quickRead.why}`;
     }
 
-    return `In one line: ${quickRead.oneLine} Why it matters: ${quickRead.why}`;
+    return `First take: ${quickRead.oneLine} Why this matters: ${quickRead.why}`;
   }
 
   function getPreviewParagraphCount() {
@@ -118,16 +120,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const pageCopy = getCopy(language);
-    const related = news
-      .filter((item) => item.id !== article.id && item.category === article.category)
-      .slice(0, 3);
+    const companyKey = AIInsight.getPrimaryCompanyKey(article);
+    const relatedPool = companyKey
+      ? news.filter((item) => item.id !== article.id && AIInsight.getPrimaryCompanyKey(item) === companyKey)
+      : news.filter((item) => item.id !== article.id && item.category === article.category);
+    const related = AIInsight.limitStoriesPerCompany(relatedPool, { maxPerCompany: 1, maxFallback: 1 }).slice(0, 3);
     const paragraphs = AIInsight.localize(article.content, language);
     const summary = AIInsight.localize(article.summaryPoints, language);
     const quickRead = AIInsight.getStoryQuickRead(article, language);
-    const editorialSummary = AIInsight.localize(article.editorialSummary, language) || AIInsight.localize(article.insight, language) || quickRead.why;
+    const editorialSummary = AIInsight.getStoryCardSummary(article, language).text || AIInsight.localize(article.insight, language) || quickRead.why;
     const localPreview = getLocalPreview(article, language, quickRead);
     const aiSummary = state.summaryText
-      || (state.provider === "local" ? localPreview : AIInsight.localize(article.aiSummary, language))
+      || (state.provider === "local" ? getLocalPreview(article, language, quickRead) : AIInsight.getStoryCardSummary(article, language).text)
       || localPreview;
     const providerMeta = AIInsight.getProviderMeta(state.provider);
     const models = providerMeta.models;
@@ -154,6 +158,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .slice(0, 3);
     const videoLinks = AIInsight.getStoryVideoLinks(article, language);
+    const primaryVideoLinks = videoLinks.slice(0, 2);
+    const heroLead = AIInsight.getStoryLeadPreview(article, language);
     const previewCount = getPreviewParagraphCount();
     const previewParagraphs = state.bodyExpanded ? paragraphs : paragraphs.slice(0, previewCount);
     const hiddenParagraphCount = Math.max(0, paragraphs.length - previewParagraphs.length);
@@ -184,7 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
 
           <h1 class="article-title">${AIInsight.escapeHtml(AIInsight.localize(article.title, language))}</h1>
-          <p class="lead">${AIInsight.escapeHtml(AIInsight.localize(article.deck, language))}</p>
+          <p class="lead">${AIInsight.escapeHtml(heroLead)}</p>
 
           <div class="article-meta">
             <span>${AIInsight.escapeHtml(AIInsight.formatDate(article.date, language))}</span>
@@ -266,12 +272,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                   : ""
               }
               <a class="button button-secondary" href="watch.html?q=${encodeURIComponent(AIInsight.localize(article.title, language))}">${AIInsight.escapeHtml(language === "zh" ? "打开视频页" : "Open watch desk")}</a>
-              <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[0].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[0].title)}</a>
-              <a class="button button-secondary" href="${AIInsight.escapeHtml(videoLinks[3].url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(videoLinks[3].title)}</a>
+              ${primaryVideoLinks
+                .map(
+                  (link) => `<a class="button button-secondary" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(link.title)}</a>`
+                )
+                .join("")}
             </div>
-            <div class="video-link-grid">
-              ${videoLinks.map((link) => AIInsight.createVideoLinkCard(link, language)).join("")}
-            </div>
+            ${
+              videoLinks.length
+                ? `
+                  <div class="video-link-grid">
+                    ${videoLinks.map((link) => AIInsight.createVideoLinkCard(link, language)).join("")}
+                  </div>
+                `
+                : `<p class="panel-text media-empty-note">${AIInsight.escapeHtml(pageCopy.mediaEmpty)}</p>`
+            }
           </article>
         </section>
 

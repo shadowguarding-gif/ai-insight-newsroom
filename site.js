@@ -66,8 +66,9 @@
     conference: ["会议", "峰会", "大会", "summit", "conference", "event", "gtc", "mwc"],
     microsoft: ["微软", "微軟", "microsoft", "msft", "copilot", "azure"],
     openai: ["openai", "chatgpt", "gpt"],
-    anthropic: ["anthropic", "claude"],
+    anthropic: ["anthropic", "claude", "cloude"],
     google: ["谷歌", "google", "google ai", "gemini", "alphabet"],
+    apple: ["苹果", "apple", "apple intelligence", "siri", "wwdc"],
     meta: ["meta", "llama", "facebook", "脸书"],
     xai: ["xai", "x.ai", "马斯克", "musk", "grok"],
     musk: ["马斯克", "musk", "xai", "grok"],
@@ -86,6 +87,50 @@
     "open webui": ["open webui", "open-webui", "ai 工作台", "本地界面"]
   };
   const genericSearchBuckets = new Set(["gpu", "cloud", "launch", "conference"]);
+  const companyDeskDefinitions = [
+    {
+      key: "nvidia",
+      label: { zh: "英伟达", en: "NVIDIA" },
+      query: { zh: "英伟达", en: "NVIDIA" },
+      focus: { zh: "芯片、算力与 AI 工厂", en: "chips, compute, and AI factories" },
+      keywords: ["英伟达", "nvidia", "nvda", "rtx", "cuda", "dgx", "blackwell", "gb200"]
+    },
+    {
+      key: "microsoft",
+      label: { zh: "微软", en: "Microsoft" },
+      query: { zh: "微软", en: "Microsoft" },
+      focus: { zh: "Copilot、Azure 与企业工作流", en: "Copilot, Azure, and enterprise workflow" },
+      keywords: ["微软", "microsoft", "azure", "copilot", "msft", "build"]
+    },
+    {
+      key: "openai",
+      label: { zh: "OpenAI", en: "OpenAI" },
+      query: { zh: "OpenAI", en: "OpenAI" },
+      focus: { zh: "模型、平台与商业化节奏", en: "models, platform strategy, and commercialization" },
+      keywords: ["openai", "chatgpt", "sora", "operator", "sam altman"]
+    },
+    {
+      key: "anthropic",
+      label: { zh: "Claude / Anthropic", en: "Claude / Anthropic" },
+      query: { zh: "Claude", en: "Claude" },
+      focus: { zh: "Claude、Agent 与企业交付", en: "Claude, agents, and enterprise delivery" },
+      keywords: ["anthropic", "claude", "cloude", "computer use"]
+    },
+    {
+      key: "apple",
+      label: { zh: "苹果", en: "Apple" },
+      query: { zh: "苹果 AI", en: "Apple AI" },
+      focus: { zh: "设备端 AI、芯片与入口控制", en: "on-device AI, chips, and platform control" },
+      keywords: ["苹果", "apple", "apple intelligence", "siri", "wwdc", "a18", "m4"]
+    },
+    {
+      key: "meta",
+      label: { zh: "Meta", en: "Meta" },
+      query: { zh: "Meta", en: "Meta" },
+      focus: { zh: "Llama、开放生态与消费入口", en: "Llama, open ecosystem, and consumer reach" },
+      keywords: ["meta", "llama", "facebook", "meta ai", "ray-ban"]
+    }
+  ];
 
   const copy = {
     zh: {
@@ -1850,11 +1895,7 @@
   }
 
   function getPrimarySummary(item, language) {
-    return (
-      localize(item.aiSummary, language) ||
-      localize(item.editorialSummary, language) ||
-      localize(item.insight, language)
-    );
+    return getStoryCardSummary(item, language).text;
   }
 
   function matchesFormat(item, formatKey) {
@@ -1921,6 +1962,135 @@
         return String(right.item.date || "").localeCompare(String(left.item.date || ""));
       })
       .map(({ item }) => item);
+  }
+
+  function containsChinese(value) {
+    return /[\u4e00-\u9fff]/.test(String(value || ""));
+  }
+
+  function stripTerminalPunctuation(value) {
+    return normalizeSummaryText(value).replace(/[。！？.!?；;，,\s]+$/g, "").trim();
+  }
+
+  function getCompanyDeskDefinition(key) {
+    return companyDeskDefinitions.find((item) => item.key === key) || null;
+  }
+
+  function hasNormalizedKeyword(haystack, keyword) {
+    const nextHaystack = normalizeSearchToken(haystack);
+    const term = normalizeSearchToken(keyword);
+
+    if (!term) {
+      return false;
+    }
+
+    if (/^[a-z0-9 .-]+$/.test(term)) {
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+      return new RegExp(`(?:^|\\s)${escaped}(?:$|\\s)`).test(nextHaystack);
+    }
+
+    return nextHaystack.includes(term);
+  }
+
+  function getStoryCompanyKeys(story) {
+    const haystack = normalizeSearchToken([
+      localize(story && story.title, "zh"),
+      localize(story && story.title, "en"),
+      localize(story && story.deck, "zh"),
+      localize(story && story.deck, "en"),
+      story && (story.sourceName || story.source),
+      ((story && story.tags) || []).join(" ")
+    ].join(" "));
+
+    return companyDeskDefinitions
+      .filter((item) => item.keywords.some((keyword) => hasNormalizedKeyword(haystack, keyword)))
+      .map((item) => item.key);
+  }
+
+  function getPrimaryCompanyKey(story) {
+    return getStoryCompanyKeys(story)[0] || "";
+  }
+
+  function getStoryCompanyLabel(story, language) {
+    const company = getCompanyDeskDefinition(getPrimaryCompanyKey(story));
+
+    if (company) {
+      return localize(company.label, language);
+    }
+
+    return normalizeSummaryText(story && (story.sourceName || story.source));
+  }
+
+  function limitStoriesPerCompany(items, options) {
+    const settings = options || {};
+    const maxPerCompany = clampNumber(settings.maxPerCompany, 1, 4, 1);
+    const maxFallback = clampNumber(settings.maxFallback, 1, 4, 1);
+    const companyCounts = new Map();
+    const seenUrls = new Set();
+    const seenTitles = new Set();
+
+    return (Array.isArray(items) ? items : []).filter((item) => {
+      if (!item) {
+        return false;
+      }
+
+      const sourceUrlKey = normalizeSearchToken(item.sourceUrl || "");
+      const titleKey = normalizeSearchToken(`${localize(item.title, "zh")} ${localize(item.title, "en")}`);
+      const companyKey = getPrimaryCompanyKey(item);
+      const bucketKey = companyKey || `source:${normalizeSearchToken(item.sourceName || item.source || item.id)}`;
+      const limit = companyKey ? maxPerCompany : maxFallback;
+      const count = companyCounts.get(bucketKey) || 0;
+
+      if ((sourceUrlKey && seenUrls.has(sourceUrlKey)) || (titleKey && seenTitles.has(titleKey)) || count >= limit) {
+        return false;
+      }
+
+      companyCounts.set(bucketKey, count + 1);
+
+      if (sourceUrlKey) {
+        seenUrls.add(sourceUrlKey);
+      }
+
+      if (titleKey) {
+        seenTitles.add(titleKey);
+      }
+
+      return true;
+    });
+  }
+
+  function getCompanyDeskStories(news) {
+    return companyDeskDefinitions
+      .map((desk) => {
+        const baseNews = Array.isArray(news) ? news : [];
+        const primaryPool = baseNews.filter((item) => !isMicroStory(item) && getStoryCompanyKeys(item).includes(desk.key));
+        const fallbackPool = baseNews.filter((item) => getStoryCompanyKeys(item).includes(desk.key));
+        const stories = limitStoriesPerCompany(primaryPool.length ? primaryPool : fallbackPool, { maxPerCompany: 2, maxFallback: 2 }).slice(0, 2);
+
+        if (!stories.length) {
+          return null;
+        }
+
+        return {
+          ...desk,
+          story: stories[0],
+          stories,
+          href: `search.html?q=${encodeURIComponent(localize(desk.query, getLanguage()))}`
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function getStructuredChineseFallback(story) {
+    const company = getStoryCompanyLabel(story, "zh") || "相关公司";
+    const category = getCategoryLabel(story && story.category, "zh") || "AI";
+    const tags = uniqueStrings((story && story.tags) || []).slice(0, 2);
+    const topic = tags.length ? tags.join("、") : "产品、能力或平台动作";
+
+    return {
+      oneLine: `这条${category}动态主要围绕${company}展开，重点涉及${topic}。`,
+      why: `如果你在跟踪${company}与 AI 产业链，这条更适合先看原文，再判断后续产品、芯片或平台影响。`
+    };
   }
 
   function getTopTags(news, limit) {
@@ -2407,15 +2577,15 @@
     const language = options && options.language ? options.language : getLanguage();
     const compact = options && options.compact;
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(localize(item.deck, language));
-    const insight = escapeHtml(localize(item.insight, language));
+    const deck = escapeHtml(getStoryLeadPreview(item, language, compact));
+    const insight = escapeHtml(clampSummaryText(localize(item.insight, language), language === "zh" ? 86 : 190));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || `${item.readingTime} ${t("common.readingTimeSuffix", language)}`);
     const summary = localize(item.summaryPoints, language).slice(0, compact ? 2 : 3);
     const tags = item.tags.slice(0, compact ? 2 : 3);
     const wrapperClass = compact ? "compact-card" : "story-card";
-    const preferredSummary = getPrimarySummary(item, language);
+    const preferredSummary = getStoryCardSummary(item, language, compact);
     const liveBadge = isLiveItem(item)
       ? `<span class="badge badge-live">${escapeHtml(t("common.live", language))}</span>`
       : "";
@@ -2454,11 +2624,11 @@
         <p class="story-deck">${deck}</p>
 
         ${
-          preferredSummary && !compact
+          preferredSummary.text && !compact
             ? `
               <div class="story-summary">
-                <span>${escapeHtml(t(item.aiSummary ? "common.aiSummary" : "common.editorialSummary", language))}</span>
-                <p>${escapeHtml(preferredSummary)}</p>
+                <span>${escapeHtml(t(preferredSummary.labelKey, language))}</span>
+                <p>${escapeHtml(preferredSummary.text)}</p>
               </div>
             `
             : ""
@@ -2495,7 +2665,7 @@
   function createSignalCard(item, options) {
     const language = options && options.language ? options.language : getLanguage();
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(localize(item.deck, language));
+    const deck = escapeHtml(getStoryLeadPreview(item, language, true));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || formatDate(item.date, language));
@@ -2596,6 +2766,17 @@
     };
   }
 
+  function getStoryLeadPreview(story, language, compact) {
+    const nextLanguage = language || getLanguage();
+    const fallback = normalizeSummaryText(localize(story && story.deck, nextLanguage));
+    const quickRead = getStoryQuickRead(story, nextLanguage);
+    const maxLength = compact
+      ? (nextLanguage === "zh" ? 42 : 98)
+      : (nextLanguage === "zh" ? 70 : 168);
+
+    return clampSummaryText(fallback || quickRead.oneLine || quickRead.why, maxLength);
+  }
+
   function getStoryQuickRead(story, language) {
     const nextLanguage = language || getLanguage();
     const isChinese = nextLanguage === "zh";
@@ -2613,21 +2794,85 @@
     const next = watchpoint || (isChinese
       ? "先看原文和官方发布，再决定是否继续追后续信号。"
       : "Check the original source and official release first, then decide whether to keep tracking follow-up signals.");
-    const bullets = uniqueStrings([...points, ...paragraphs])
+    let bullets = uniqueStrings([...points, ...paragraphs])
       .filter((item) => item && item !== oneLine && item !== why)
       .slice(0, 3);
 
+    let nextOneLine = clampSummaryText(oneLine, isChinese ? 52 : 120);
+    let nextWhy = clampSummaryText(why, isChinese ? 82 : 180);
+    let nextWho = clampSummaryText(who, isChinese ? 68 : 140);
+    let nextNext = clampSummaryText(next, isChinese ? 68 : 140);
+
+    if (isChinese) {
+      const fallback = getStructuredChineseFallback(story);
+
+      if (!containsChinese(nextOneLine)) {
+        nextOneLine = clampSummaryText(fallback.oneLine, 52);
+      }
+
+      if (!containsChinese(nextWhy) || nextWhy === nextOneLine) {
+        nextWhy = clampSummaryText(fallback.why, 82);
+      }
+
+      if (!containsChinese(nextWho)) {
+        nextWho = "适合想先抓主线，再决定要不要深读这家公司或这条产品线的人。";
+      }
+
+      if (!containsChinese(nextNext)) {
+        nextNext = "先看原文，再根据产品、芯片、模型或合作线继续追后续信号。";
+      }
+
+      bullets = bullets.filter((item) => containsChinese(item));
+    }
+
     return {
-      oneLine: clampSummaryText(oneLine, isChinese ? 52 : 120),
-      why: clampSummaryText(why, isChinese ? 82 : 180),
-      who: clampSummaryText(who, isChinese ? 68 : 140),
-      next: clampSummaryText(next, isChinese ? 68 : 140),
+      oneLine: nextOneLine,
+      why: nextWhy,
+      who: nextWho,
+      next: nextNext,
       bullets
     };
   }
 
+  function getStoryCardSummary(story, language, compact) {
+    const nextLanguage = language || getLanguage();
+    const maxLength = compact
+      ? (nextLanguage === "zh" ? 56 : 128)
+      : (nextLanguage === "zh" ? 90 : 210);
+    const editorial = normalizeSummaryText(localize(story && story.editorialSummary, nextLanguage));
+    const ai = normalizeSummaryText(localize(story && story.aiSummary, nextLanguage));
+    const insight = normalizeSummaryText(localize(story && story.insight, nextLanguage));
+    const quickRead = getStoryQuickRead(story, nextLanguage);
+
+    if (editorial) {
+      return {
+        text: clampSummaryText(editorial, maxLength),
+        labelKey: "common.editorialSummary"
+      };
+    }
+
+    if (ai && ai !== editorial) {
+      return {
+        text: clampSummaryText(ai, maxLength),
+        labelKey: "common.aiSummary"
+      };
+    }
+
+    if (insight) {
+      return {
+        text: clampSummaryText(insight, maxLength),
+        labelKey: "common.insight"
+      };
+    }
+
+    return {
+      text: clampSummaryText(quickRead.why, maxLength),
+      labelKey: "common.insight"
+    };
+  }
+
   function buildLocalSummary(story, language, model, fallback) {
-    const sourceName = normalizeSummaryText(story && story.sourceName);
+    const sourceName = normalizeSummaryText(getStoryCompanyLabel(story, language) || (story && story.sourceName));
     const isChinese = language === "zh";
     const maxPoints = model === "local-expanded" ? 2 : 1;
     const quickRead = getStoryQuickRead(story, language);
@@ -2641,15 +2886,15 @@
     }
 
     if (isChinese) {
-      const lead = sourceName ? `${sourceName}这次的核心变化是：` : "这条更新的核心变化是：";
-      const whyLine = why ? `为什么重要：${why.replace(/[。！？]$/g, "")}。` : "";
+      const lead = sourceName ? `${sourceName}这条更新先看这句：` : "这条更新先看这句：";
+      const whyLine = why ? `更重要的是：${why.replace(/[。！？]$/g, "")}。` : "";
       const focusLine = secondaryItems.length ? `补充看点：${secondaryItems.map((item) => item.replace(/[。！？]$/g, "")).join("；")}。` : "";
-      const nextLine = !focusLine && next ? `下一步关注：${next.replace(/[。！？]$/g, "")}。` : "";
+      const nextLine = !focusLine && next ? `接下来更该留意：${next.replace(/[。！？]$/g, "")}。` : "";
       return clampSummaryText(`${lead}${primary.replace(/[。！？]$/g, "")}。${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 170 : 148);
     }
 
-    const lead = sourceName ? `${sourceName} in one line: ` : "In one line: ";
-    const whyLine = why ? ` Why it matters: ${why.replace(/[.!?]$/g, "")}.` : "";
+    const lead = sourceName ? `${sourceName} first take: ` : "First take: ";
+    const whyLine = why ? ` Why this matters: ${why.replace(/[.!?]$/g, "")}.` : "";
     const focusLine = secondaryItems.length ? ` Extra signal: ${secondaryItems.map((item) => item.replace(/[.!?]$/g, "")).join("; ")}.` : "";
     const nextLine = !focusLine && next ? ` What to watch next: ${next.replace(/[.!?]$/g, "")}.` : "";
     return clampSummaryText(`${lead}${primary.replace(/[.!?]$/g, "")}.${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 280 : 240);
@@ -2671,40 +2916,77 @@
     const storyTitleEn = normalizeSummaryText(localize(story && story.title, "en"));
     const sourceName = normalizeSummaryText(story && (story.sourceName || story.source));
     const tags = uniqueStrings((story && story.tags) || []).slice(0, 3);
+    const companyKeys = getStoryCompanyKeys(story);
     const englishTopic = uniqueStrings([sourceName, storyTitleEn, ...tags]).join(" ");
     const chineseTopic = uniqueStrings([storyTitleZh, sourceName, ...tags]).join(" ");
     const displayZh = nextLanguage === "zh";
+    const signalText = normalizeSearchToken([storyTitleZh, storyTitleEn, sourceName, ...tags, story && story.category, story && story.region].join(" "));
+    const launchTerms = ["发布", "发布会", "大会", "峰会", "演示", "keynote", "demo", "launch", "release", "announce", "introducing", "conference", "summit", "event", "gtc", "build", "wwdc", "connect", "io"];
+    const hasLaunchSignal = launchTerms.some((term) => signalText.includes(normalizeSearchToken(term)));
+    const majorCompany = Boolean(companyKeys.length);
+    const officialEligible = Boolean(story && story.sourceUrl) && (
+      story.sourceType === "official" ||
+      (hasLaunchSignal && story.sourceType !== "github") ||
+      (["chips", "products", "models", "robotics"].includes(story.category) && story.sourceType !== "github") ||
+      companyKeys.includes("apple")
+    );
+    const englishAnalysisEligible = majorCompany || hasLaunchSignal || ["chips", "products", "models", "tooling", "robotics"].includes(story.category);
+    const chineseAnalysisEligible = story.region === "china" || hasLaunchSignal || companyKeys.some((key) => ["nvidia", "microsoft", "openai", "anthropic", "apple", "meta"].includes(key));
+    const routes = [];
 
-    return [
-      {
+    if (officialEligible) {
+      routes.push({
         id: `${story.id}-yt-official`,
         platform: "YouTube",
-        title: displayZh ? "官方原视频" : "Official video",
-        note: displayZh ? "优先找发布会、演示、访谈或官方直播回放。" : "Start with the keynote, demo, interview, or official upload.",
-        url: buildVideoSearchUrl("youtube", `${englishTopic} official keynote demo launch`)
-      },
-      {
+        title: displayZh ? "YouTube 原视频搜索" : "Search original video",
+        note: displayZh
+          ? "更适合查 keynote、演示或官方上传；如果没有公开视频，就直接回原文。"
+          : "Best for keynotes, demos, or official uploads; if no public video exists, go back to the source.",
+        url: buildVideoSearchUrl("youtube", `${englishTopic} official keynote demo launch`),
+        priority: 3
+      });
+    }
+
+    if (englishAnalysisEligible) {
+      routes.push({
         id: `${story.id}-yt-analysis`,
         platform: "YouTube",
-        title: displayZh ? "英文深度解读" : "English analysis",
-        note: displayZh ? "适合补上下文、体验评价和产业判断。" : "Useful for context, product evaluation, and industry framing.",
-        url: buildVideoSearchUrl("youtube", `${englishTopic} analysis breakdown review`)
-      },
-      {
-        id: `${story.id}-bili-official`,
-        platform: "Bilibili",
-        title: displayZh ? "B站原视频入口" : "Bilibili primary route",
-        note: displayZh ? "优先看中文搬运、直播切片或同步上传。" : "Good for Chinese reposts, clips, or mirrored official uploads.",
-        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 官方 原视频`)
-      },
-      {
+        title: displayZh ? "YouTube 英文解读搜索" : "Search English explainers",
+        note: displayZh
+          ? "只在更可能有英文解析价值的话题上给这条路线。"
+          : "Only shown when the topic is likely to have useful English explainers.",
+        url: buildVideoSearchUrl("youtube", `${englishTopic} analysis breakdown review`),
+        priority: 2
+      });
+    }
+
+    if (chineseAnalysisEligible) {
+      routes.push({
         id: `${story.id}-bili-analysis`,
         platform: "Bilibili",
-        title: displayZh ? "B站解读视频" : "Bilibili explainers",
-        note: displayZh ? "适合先看中文讲解，再决定是否阅读全文。" : "Good for Chinese explainers before committing to the full read.",
-        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 解读 测评`)
-      }
-    ];
+        title: displayZh ? "B站中文解读搜索" : "Search Chinese explainers",
+        note: displayZh
+          ? "只在更可能出现中文讲解的话题上给这条路线，不再默认硬塞。"
+          : "Only shown when Chinese explainers are more plausible instead of forcing a weak route.",
+        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 解读 测评`),
+        priority: 2
+      });
+    }
+
+    if (chineseAnalysisEligible && hasLaunchSignal && story.sourceType !== "github") {
+      routes.push({
+        id: `${story.id}-bili-official`,
+        platform: "Bilibili",
+        title: displayZh ? "B站发布会搜索" : "Search launch clips on Bilibili",
+        note: displayZh
+          ? "更适合找搬运、切片或同步上传的发布会片段。"
+          : "Useful for mirrored launch clips, reposts, or conference cut-downs.",
+        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 发布会 演示`),
+        priority: 1
+      });
+    }
+
+    return routes.sort((left, right) => (right.priority || 0) - (left.priority || 0));
   }
 
   function createVideoLinkCard(link, language) {
@@ -2712,7 +2994,7 @@
       <article class="video-link-card page-fade">
         <div class="story-meta">
           <span class="ghost-badge">${escapeHtml(link.platform)}</span>
-          <span class="ghost-badge">${escapeHtml(language === "zh" ? "视频入口" : "Watch route")}</span>
+          <span class="ghost-badge">${escapeHtml(language === "zh" ? "搜索路线" : "Search route")}</span>
         </div>
         <h3>${escapeHtml(link.title)}</h3>
         <p class="panel-text">${escapeHtml(link.note)}</p>
@@ -2847,7 +3129,14 @@
     isMicroStory,
     getPrimarySummary,
     getStoryQuickRead,
+    getStoryLeadPreview,
+    getStoryCardSummary,
     getStoryVideoLinks,
+    getStoryCompanyKeys,
+    getPrimaryCompanyKey,
+    getStoryCompanyLabel,
+    getCompanyDeskStories,
+    limitStoriesPerCompany,
     filterNews,
     getTopTags,
     getStoriesByCategory,

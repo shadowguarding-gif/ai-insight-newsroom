@@ -405,6 +405,33 @@ button:disabled {
   line-height: 1.72;
 }
 
+.story-deck,
+.featured-panel .lead,
+.article-hero .lead,
+.watch-story-card .panel-text,
+.video-launch-card .panel-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-deck {
+  -webkit-line-clamp: 3;
+}
+
+.compact-card .story-deck,
+.signal-card .story-deck,
+.watch-story-card .panel-text,
+.video-launch-card .panel-text {
+  -webkit-line-clamp: 2;
+}
+
+.featured-panel .lead,
+.article-hero .lead {
+  max-width: 60ch;
+  -webkit-line-clamp: 3;
+}
+
 .hero-actions,
 .control-actions,
 .chip-row,
@@ -501,6 +528,66 @@ button:disabled {
 
 .home-route-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.company-desk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.company-desk-card {
+  padding: 20px 22px;
+}
+
+.company-desk-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.company-desk-head h3 {
+  margin: 10px 0 8px;
+  font-size: 1.2rem;
+}
+
+.company-desk-story {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(173, 197, 209, 0.12);
+}
+
+.company-desk-story strong {
+  line-height: 1.42;
+}
+
+.company-desk-story p,
+.media-empty-note {
+  margin: 0;
+  color: #c8d7df;
+  line-height: 1.64;
+}
+
+.company-mini-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.company-mini-link {
+  padding-top: 10px;
+  border-top: 1px solid rgba(173, 197, 209, 0.12);
+  color: var(--muted);
+  line-height: 1.45;
+  transition: color 0.2s ease;
+}
+
+.company-mini-link:hover {
+  color: var(--text);
 }
 
 .monitor-grid {
@@ -2061,6 +2148,10 @@ body[data-ui-mode="pro"] .account-flash.is-error {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .company-desk-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .monitor-grid,
   .pro-home-grid {
     grid-template-columns: 1fr;
@@ -2073,6 +2164,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .watch-grid,
   .video-link-grid,
   .video-launch-grid,
+  .company-desk-grid,
   .radar-grid,
   .auth-grid,
   .account-grid,
@@ -2146,6 +2238,7 @@ body[data-ui-mode="pro"] .account-flash.is-error {
   .watch-grid,
   .video-link-grid,
   .video-launch-grid,
+  .company-desk-grid,
   .radar-grid,
   .auth-grid,
   .account-grid,

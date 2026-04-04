@@ -141,10 +141,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         boardroomNote: "优先看会改变平台入口、企业采用和资源分配的消息。",
         chinaTitle: "中国与区域观察",
         chinaNote: "补足国内厂商和亚洲市场，不让整站只剩美国公司视角。",
+        companyDeskTitle: "核心公司专栏",
+        companyDeskNote: "把英伟达、微软、OpenAI、Claude、苹果、Meta 单独拉出来，适合持续跟踪芯片、产品、模型和平台入口。",
         toolsTitle: "工具与开源 Radar",
         toolsNote: "专门放高信号小新闻、热门工具、GitHub 项目和本地模型接口路线。",
         watchDeskTitle: "视频与解读入口",
-        watchDeskNote: "先看原始视频，再看中文或英文解读，比一上来读长文更高效。",
+        watchDeskNote: "只在更可能真有视频价值的话题上给搜索路线，弱信号时就别硬塞 YouTube 或 B 站。",
         briefsTitle: "深度简报",
         briefsNote: "把热点之外更值得慢读的判断放在第二层，适合从“知道发生了什么”进入“理解为什么重要”。",
         providersTitle: "摘要引擎与开源接口",
@@ -208,10 +210,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         boardroomNote: "Focus on stories that change platform control, enterprise adoption, and resource positioning.",
         chinaTitle: "China and regional watch",
         chinaNote: "Balance the product so it does not default to a U.S.-only worldview.",
+        companyDeskTitle: "Priority company desks",
+        companyDeskNote: "Pull NVIDIA, Microsoft, OpenAI, Claude, Apple, and Meta into a standing lane for chips, products, models, and platform control.",
         toolsTitle: "Launches & OSS Radar",
         toolsNote: "A dedicated lane for high-signal small news, hot tools, GitHub projects, and local-model interface routes.",
         watchDeskTitle: "Video and explainer routes",
-        watchDeskNote: "Start with original video, then move to Chinese or English explainers if the topic deserves more time.",
+        watchDeskNote: "Only show watch routes when the topic is likely to have real video value instead of forcing weak YouTube or Bilibili links.",
         briefsTitle: "Deep briefs",
         briefsNote: "The second layer is reserved for slower, more interpretive reading after the headlines.",
         providersTitle: "Summary engines and OSS routes",
@@ -273,8 +277,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function createWatchCard(item, language) {
     const quickRead = AIInsight.getStoryQuickRead(item, language);
-    const videoLinks = AIInsight.getStoryVideoLinks(item, language);
-    const featuredLinks = [videoLinks[0], videoLinks[1], videoLinks[3]].filter(Boolean);
+    const featuredLinks = AIInsight.getStoryVideoLinks(item, language).slice(0, 2);
+
+    if (!featuredLinks.length) {
+      return "";
+    }
 
     return `
       <article class="video-launch-card panel page-fade">
@@ -283,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="ghost-badge">${AIInsight.escapeHtml(AIInsight.getCategoryLabel(item.category, language))}</span>
         </div>
         <h3>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</h3>
-        <p class="panel-text">${AIInsight.escapeHtml(quickRead.oneLine)}</p>
+        <p class="panel-text">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(item, language, true) || quickRead.oneLine)}</p>
         <div class="video-link-list">
           ${featuredLinks
             .map(
@@ -295,6 +302,57 @@ document.addEventListener("DOMContentLoaded", async () => {
               `
             )
             .join("")}
+        </div>
+      </article>
+    `;
+  }
+
+  function createCompanyDeskCard(desk, language) {
+    const leadStory = desk.story;
+    const leadQuickRead = AIInsight.getStoryQuickRead(leadStory, language);
+    const secondaryStories = (desk.stories || []).slice(1, 2);
+    const searchHref = `search.html?q=${encodeURIComponent(AIInsight.localize(desk.query, language))}`;
+
+    return `
+      <article class="company-desk-card panel page-fade">
+        <div class="company-desk-head">
+          <div>
+            <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "重点公司" : "Priority desk")}</span>
+            <h3>${AIInsight.escapeHtml(AIInsight.localize(desk.label, language))}</h3>
+            <p class="panel-text">${AIInsight.escapeHtml(AIInsight.localize(desk.focus, language))}</p>
+          </div>
+          <a class="story-link" href="${AIInsight.escapeHtml(searchHref)}">${AIInsight.escapeHtml(language === "zh" ? "打开专栏" : "Open desk")}</a>
+        </div>
+
+        <div class="company-desk-story">
+          <span class="ghost-badge">${AIInsight.escapeHtml(leadStory.sourceName || "AI Insight")}</span>
+          <strong>${AIInsight.escapeHtml(AIInsight.localize(leadStory.title, language))}</strong>
+          <p>${AIInsight.escapeHtml(leadQuickRead.oneLine)}</p>
+        </div>
+
+        ${
+          secondaryStories.length
+            ? `
+              <div class="company-mini-list">
+                ${secondaryStories
+                  .map(
+                    (story) => `
+                      <a class="company-mini-link" href="detail.html?id=${story.id}">
+                        ${AIInsight.escapeHtml(AIInsight.localize(story.title, language))}
+                      </a>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+
+        <div class="story-footer">
+          <div class="story-links">
+            <a class="story-link" href="detail.html?id=${leadStory.id}">${AIInsight.escapeHtml(AIInsight.t("common.viewDetail", language))}</a>
+            <a class="story-link" href="${AIInsight.escapeHtml(searchHref)}">${AIInsight.escapeHtml(language === "zh" ? "看全部相关" : "See related")}</a>
+          </div>
         </div>
       </article>
     `;
@@ -326,40 +384,50 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const headlineStories = AIInsight.getHeadlineStories(news);
-    const allLiveStories = AIInsight.getLiveStories(news).filter((item) => !AIInsight.isMicroStory(item));
-    const allMicroStories = AIInsight.getMicroStories(news);
+    const rawHeadlineStories = AIInsight.getHeadlineStories(news);
+    const rawLiveStories = AIInsight.getLiveStories(news).filter((item) => !AIInsight.isMicroStory(item));
+    const rawMicroStories = AIInsight.getMicroStories(news);
+    const headlineStories = AIInsight.limitStoriesPerCompany(rawHeadlineStories, { maxPerCompany: 2, maxFallback: 2 });
+    const allLiveStories = AIInsight.limitStoriesPerCompany(rawLiveStories, { maxPerCompany: 1, maxFallback: 2 });
+    const allMicroStories = AIInsight.limitStoriesPerCompany(rawMicroStories, { maxPerCompany: 1, maxFallback: 2 });
     const editorialStories = headlineStories.filter((item) => !AIInsight.isLiveItem(item));
     const researchSources = AIInsight.getJournalSources();
     const liveStories = allLiveStories.slice(0, compactViewport ? Math.min(profile.liveLimit, 3) : profile.liveLimit);
     const microStories = allMicroStories.slice(0, compactViewport ? Math.min(profile.microLimit, 3) : profile.microLimit);
-    const briefStories = (editorialStories.length ? editorialStories : headlineStories.filter((item) => !AIInsight.isMicroStory(item))).slice(0, compactViewport ? Math.min(profile.briefLimit, 2) : profile.briefLimit);
-    const boardroomStories = pickStories(
+    const briefStories = AIInsight.limitStoriesPerCompany(
+      (editorialStories.length ? editorialStories : headlineStories.filter((item) => !AIInsight.isMicroStory(item))),
+      { maxPerCompany: 1, maxFallback: 2 }
+    ).slice(0, compactViewport ? Math.min(profile.briefLimit, 2) : profile.briefLimit);
+    const boardroomStories = AIInsight.limitStoriesPerCompany(pickStories(
       headlineStories.filter((item) => !AIInsight.isMicroStory(item) && matchesKeywords(item, profile.boardroomKeywords)),
       headlineStories.filter((item) => !AIInsight.isMicroStory(item)),
       profile.boardroomLimit
-    );
-    const chinaStories = pickStories(
+    ), { maxPerCompany: 1, maxFallback: 2 });
+    const chinaStories = AIInsight.limitStoriesPerCompany(pickStories(
       headlineStories.filter((item) => !AIInsight.isMicroStory(item) && (item.region === "china" || matchesKeywords(item, profile.chinaKeywords))),
       headlineStories.filter((item) => !AIInsight.isMicroStory(item) && item.region !== "global"),
       profile.chinaLimit
-    );
-    const researchStories = pickStories(
+    ), { maxPerCompany: 1, maxFallback: 2 });
+    const researchStories = AIInsight.limitStoriesPerCompany(pickStories(
       headlineStories.filter((item) => !AIInsight.isMicroStory(item) && (item.category === "research" || matchesKeywords(item, profile.researchKeywords))),
       editorialStories,
       profile.researchLimit
-    );
+    ), { maxPerCompany: 1, maxFallback: 2 });
     const featured = uniqueById([...boardroomStories, ...allLiveStories, ...briefStories, ...headlineStories])[0] || news[0];
     const liveIds = new Set(liveStories.map((item) => String(item.id)));
     const featuredId = String(featured.id);
-    const smallStories = uniqueById([
+    const smallStories = AIInsight.limitStoriesPerCompany(uniqueById([
       ...boardroomStories,
       ...chinaStories,
       ...headlineStories.filter((item) => !AIInsight.isMicroStory(item))
-    ])
+    ]), { maxPerCompany: 1, maxFallback: 2 })
       .filter((item) => String(item.id) !== featuredId && !liveIds.has(String(item.id)))
       .slice(0, compactViewport ? 4 : 6);
-    const watchStories = uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).slice(0, compactViewport ? Math.min(profile.videoLimit, 2) : profile.videoLimit);
+    const watchStories = AIInsight.limitStoriesPerCompany(
+      uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).filter((item) => AIInsight.getStoryVideoLinks(item, language).length),
+      { maxPerCompany: 1, maxFallback: 1 }
+    ).slice(0, compactViewport ? Math.min(profile.videoLimit, 2) : profile.videoLimit);
+    const companyDesks = AIInsight.getCompanyDeskStories(rawHeadlineStories).slice(0, compactViewport ? 4 : 6);
     const latestDate = AIInsight.formatDateTime(meta.refreshedAt || news[0].date, language);
     const counts = {
       live: allLiveStories.length,
@@ -369,6 +437,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       total: news.length
     };
     const pageCopy = getCopy(language, meta, counts, viewMode);
+    const featuredSummary = AIInsight.getStoryCardSummary(featured, language);
     const quickRoutes = [
       {
         title: language === "zh" ? "实时新闻" : "Live news",
@@ -429,7 +498,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                   <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.featuredLabel)}</span>
                 </div>
                 <h2>${AIInsight.escapeHtml(AIInsight.localize(featured.title, language))}</h2>
-                <p class="lead">${AIInsight.escapeHtml(AIInsight.localize(featured.deck, language))}</p>
+                <p class="lead">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(featured, language))}</p>
                 <div class="story-source">
                   <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
                   <strong>${AIInsight.escapeHtml(featured.sourceName || "AI Insight")}</strong>
@@ -440,9 +509,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
               <div class="featured-stack">
                 ${AIInsight.createMiniInsightCard(
-                  language === "zh" ? "AI 摘要" : "AI summary",
+                  AIInsight.t(featuredSummary.labelKey, language),
                   AIInsight.isLiveItem(featured) ? AIInsight.t("common.sourceBacked", language) : AIInsight.t("common.summarySeed", language),
-                  AIInsight.getPrimarySummary(featured, language)
+                  featuredSummary.text
                 )}
                 ${AIInsight.createMiniInsightCard(
                   language === "zh" ? "下一观察点" : "Next watchpoint",
@@ -502,6 +571,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `
               )
               .join("")}
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>${AIInsight.escapeHtml(pageCopy.companyDeskTitle)}</h2>
+              <p class="section-note">${AIInsight.escapeHtml(pageCopy.companyDeskNote)}</p>
+            </div>
+          </div>
+          <div class="company-desk-grid">
+            ${companyDesks.length
+              ? companyDesks.map((desk) => createCompanyDeskCard(desk, language)).join("")
+              : AIInsight.createEmptyState(pageCopy.companyDeskTitle, pageCopy.companyDeskNote)
+            }
           </div>
         </section>
 
