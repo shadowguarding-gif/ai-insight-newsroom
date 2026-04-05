@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     category: AIInsight.categories.some((item) => item.key === params.get("category")) ? params.get("category") : "all",
     format: AIInsight.formats.some((item) => item.key === params.get("format")) ? params.get("format") : "all"
   };
+  let queryCommitTimer = null;
+  let isComposingQuery = false;
 
   await AIInsight.initShell("search");
   AIInsight.startAutoRefresh();
@@ -178,6 +180,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       region: "all",
       format: state.format
     });
+    const visibleResults = state.query.trim()
+      ? AIInsight.limitStoriesPerCompany(filtered, { maxPerCompany: 2, maxFallback: 2 })
+      : filtered;
     const pageCopy = getCopy(language, meta, filtered.length, AIInsight.getLiveStories(filtered).length, tracked);
     pageCopy.formatLabel = language === "en" ? "Reading view" : "阅读视图";
 
@@ -262,7 +267,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                       >
                         ${AIInsight.escapeHtml(pageCopy.radarAction)}
                       </button>
-                      <a class="button button-secondary" href="watch.html?q=${encodeURIComponent(state.query)}">${AIInsight.escapeHtml(pageCopy.watchLink)}</a>
+                      ${
+                        matchedDesk
+                          ? `<a class="button button-secondary" href="watch.html?q=${encodeURIComponent(state.query)}">${AIInsight.escapeHtml(pageCopy.watchLink)}</a>`
+                          : ""
+                      }
                       <a class="button button-secondary" href="radar.html">${AIInsight.escapeHtml(pageCopy.radarLink)}</a>
                       ${
                         matchedDesk
@@ -299,10 +308,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         <section class="section">
           ${
-            filtered.length
+            visibleResults.length
               ? `
                 <div class="story-grid feed-grid">
-                  ${filtered.map((item) => AIInsight.createStoryCard(item, { language })).join("")}
+                  ${visibleResults.map((item) => AIInsight.createStoryCard(item, { language })).join("")}
                 </div>
               `
               : AIInsight.createEmptyState(pageCopy.emptyTitle, pageCopy.emptyBody)
@@ -327,9 +336,46 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    document.getElementById("search-input").addEventListener("input", (event) => {
-      state.query = event.target.value;
-      render({ focusSearch: true });
+    const searchInput = document.getElementById("search-input");
+    const commitQuery = (nextValue, immediate) => {
+      const apply = () => {
+        state.query = nextValue;
+        render({ focusSearch: true });
+      };
+
+      window.clearTimeout(queryCommitTimer);
+
+      if (immediate) {
+        apply();
+        return;
+      }
+
+      queryCommitTimer = window.setTimeout(apply, 220);
+    };
+
+    searchInput.addEventListener("compositionstart", () => {
+      isComposingQuery = true;
+      window.clearTimeout(queryCommitTimer);
+    });
+
+    searchInput.addEventListener("compositionend", (event) => {
+      isComposingQuery = false;
+      commitQuery(event.target.value, true);
+    });
+
+    searchInput.addEventListener("input", (event) => {
+      if (event.isComposing || isComposingQuery) {
+        return;
+      }
+
+      commitQuery(event.target.value, false);
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        commitQuery(event.currentTarget.value, true);
+      }
     });
 
     AIInsight.bindChoiceButtons(app, (group, value) => {

@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     region: AIInsight.regions.some((item) => item.key === params.get("region")) ? params.get("region") : "all",
     format: AIInsight.formats.some((item) => item.key === params.get("format")) ? params.get("format") : "all"
   };
+  let queryCommitTimer = null;
+  let isComposingQuery = false;
 
   await AIInsight.initShell("feed");
   AIInsight.startAutoRefresh();
@@ -182,10 +184,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const filtered = AIInsight.filterNews(news, state);
+    const focusedResults = state.query.trim()
+      ? AIInsight.limitStoriesPerCompany(filtered, { maxPerCompany: 2, maxFallback: 2 })
+      : filtered;
     const liveCount = AIInsight.getLiveStories(filtered).length;
-    const mainResults = filtered.filter((item) => !AIInsight.isMicroStory(item));
+    const mainResults = focusedResults.filter((item) => !AIInsight.isMicroStory(item));
     const microMatches = AIInsight.getMicroStories(filtered).slice(0, 6);
-    const displayResults = mainResults.length ? mainResults : filtered;
+    const displayResults = mainResults.length ? mainResults : focusedResults;
     const featured = mainResults[0] || filtered[0] || news[0];
     const pageCopy = getCopy(language, meta, filtered.length, liveCount, news.length);
     pageCopy.formatLabel = language === "en" ? "Reading view" : "阅读视图";
@@ -400,9 +405,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchInput = document.getElementById("feed-search");
     const resetButton = document.getElementById("reset-filters");
 
+    const commitQuery = (nextValue, immediate) => {
+      const apply = () => {
+        state.query = nextValue;
+        render({ focusSearch: true });
+      };
+
+      window.clearTimeout(queryCommitTimer);
+
+      if (immediate) {
+        apply();
+        return;
+      }
+
+      queryCommitTimer = window.setTimeout(apply, 220);
+    };
+
+    searchInput.addEventListener("compositionstart", () => {
+      isComposingQuery = true;
+      window.clearTimeout(queryCommitTimer);
+    });
+
+    searchInput.addEventListener("compositionend", (event) => {
+      isComposingQuery = false;
+      commitQuery(event.target.value, true);
+    });
+
     searchInput.addEventListener("input", (event) => {
-      state.query = event.target.value;
-      render({ focusSearch: true });
+      if (event.isComposing || isComposingQuery) {
+        return;
+      }
+
+      commitQuery(event.target.value, false);
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        commitQuery(event.currentTarget.value, true);
+      }
     });
 
     resetButton.addEventListener("click", () => {

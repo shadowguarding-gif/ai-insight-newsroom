@@ -1897,7 +1897,7 @@
   }
 
   function getPrimarySummary(item, language) {
-    return getStoryCardSummary(item, language).text;
+    return getPracticalStorySummary(item, language, { includeNext: true });
   }
 
   function matchesFormat(item, formatKey) {
@@ -2667,15 +2667,15 @@
     const language = options && options.language ? options.language : getLanguage();
     const compact = options && options.compact;
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(getStoryLeadPreview(item, language, compact));
-    const insight = escapeHtml(clampSummaryText(localize(item.insight, language), language === "zh" ? 86 : 190));
+    const deck = escapeHtml(getStoryLeadPreview(item, language, true));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || `${item.readingTime} ${t("common.readingTimeSuffix", language)}`);
-    const summary = localize(item.summaryPoints, language).slice(0, compact ? 2 : 3);
+    const storySnapshot = getStoryCardSnapshot(item, language, compact);
+    const quickRead = getStoryQuickRead(item, language);
+    const summary = (quickRead.bullets.length ? quickRead.bullets : localize(item.summaryPoints, language)).slice(0, compact ? 1 : 2);
     const tags = item.tags.slice(0, compact ? 2 : 3);
     const wrapperClass = compact ? "compact-card" : "story-card";
-    const preferredSummary = getStoryCardSummary(item, language, compact);
     const liveBadge = isLiveItem(item)
       ? `<span class="badge badge-live">${escapeHtml(t("common.live", language))}</span>`
       : "";
@@ -2712,31 +2712,27 @@
           <span>${escapeHtml(formatDate(item.date, language))}</span>
         </div>
         <p class="story-deck">${deck}</p>
+        <div class="story-brief-grid${compact ? " is-compact" : ""}">
+          ${storySnapshot
+            .map(
+              (entry) => `
+                <article class="story-brief-item">
+                  <span class="mini-label">${escapeHtml(entry.label)}</span>
+                  <p>${escapeHtml(entry.value)}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
 
         ${
-          preferredSummary.text && !compact
+          summary.length && !compact
             ? `
-              <div class="story-summary">
-                <span>${escapeHtml(t(preferredSummary.labelKey, language))}</span>
-                <p>${escapeHtml(preferredSummary.text)}</p>
-              </div>
+              <ul class="story-points story-points-tight">
+                ${summary.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
+              </ul>
             `
             : ""
-        }
-
-        <ul class="story-points">
-          ${summary.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
-        </ul>
-
-        ${
-          compact
-            ? ""
-            : `
-              <div class="story-insight">
-                <span>${escapeHtml(t("common.insight", language))}</span>
-                <p>${insight}</p>
-              </div>
-            `
         }
 
         <div class="story-footer">
@@ -2961,6 +2957,71 @@
     };
   }
 
+  function getPracticalStorySummary(story, language, options) {
+    const nextLanguage = language || getLanguage();
+    const nextOptions = options || {};
+    const compact = Boolean(nextOptions.compact);
+    const includeNext = Boolean(nextOptions.includeNext) && !compact;
+    const quickRead = getStoryQuickRead(story, nextLanguage);
+    const oneLine = stripTerminalPunctuation(quickRead.oneLine);
+    const why = stripTerminalPunctuation(quickRead.why);
+    const next = stripTerminalPunctuation(quickRead.next);
+    const maxLength = compact
+      ? (nextLanguage === "zh" ? 58 : 136)
+      : (nextLanguage === "zh" ? 124 : 260);
+
+    if (nextLanguage === "zh") {
+      const pieces = [`发生了什么：${oneLine || why}`];
+
+      if (why && why !== oneLine) {
+        pieces.push(`为什么重要：${why}`);
+      }
+
+      if (includeNext && next && next !== why) {
+        pieces.push(`下一步看什么：${next}`);
+      }
+
+      return clampSummaryText(pieces.join(" "), maxLength);
+    }
+
+    const pieces = [`What changed: ${oneLine || why}`];
+
+    if (why && why !== oneLine) {
+      pieces.push(`Why it matters: ${why}`);
+    }
+
+    if (includeNext && next && next !== why) {
+      pieces.push(`What to watch next: ${next}`);
+    }
+
+    return clampSummaryText(pieces.join(" "), maxLength);
+  }
+
+  function getStoryCardSnapshot(story, language, compact) {
+    const nextLanguage = language || getLanguage();
+    const quickRead = getStoryQuickRead(story, nextLanguage);
+    const isChinese = nextLanguage === "zh";
+    const items = [
+      {
+        label: isChinese ? "发生了什么" : "What changed",
+        value: clampSummaryText(quickRead.oneLine, isChinese ? 44 : 104)
+      },
+      {
+        label: isChinese ? "为什么重要" : "Why it matters",
+        value: clampSummaryText(quickRead.why, isChinese ? 56 : 132)
+      }
+    ];
+
+    if (!compact) {
+      items.push({
+        label: isChinese ? "下一步看什么" : "What to watch",
+        value: clampSummaryText(quickRead.next, isChinese ? 52 : 124)
+      });
+    }
+
+    return items.filter((item) => item.value);
+  }
+
   function buildLocalSummary(story, language, model, fallback) {
     const sourceName = normalizeSummaryText(getStoryCompanyLabel(story, language) || (story && story.sourceName));
     const isChinese = language === "zh";
@@ -2976,15 +3037,15 @@
     }
 
     if (isChinese) {
-      const lead = sourceName ? `${sourceName}这条更新先看这句：` : "这条更新先看这句：";
-      const whyLine = why ? `更重要的是：${why.replace(/[。！？]$/g, "")}。` : "";
+      const lead = sourceName ? `${sourceName}这条最该先看的是：` : "这条最该先看的是：";
+      const whyLine = why ? `真正重要的是：${why.replace(/[。！？]$/g, "")}。` : "";
       const focusLine = secondaryItems.length ? `补充看点：${secondaryItems.map((item) => item.replace(/[。！？]$/g, "")).join("；")}。` : "";
-      const nextLine = !focusLine && next ? `接下来更该留意：${next.replace(/[。！？]$/g, "")}。` : "";
-      return clampSummaryText(`${lead}${primary.replace(/[。！？]$/g, "")}。${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 170 : 148);
+      const nextLine = !focusLine && next ? `下一步更值得留意：${next.replace(/[。！？]$/g, "")}。` : "";
+      return clampSummaryText(`${lead}${primary.replace(/[。！？]$/g, "")}。${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 178 : 154);
     }
 
     const lead = sourceName ? `${sourceName} first take: ` : "First take: ";
-    const whyLine = why ? ` Why this matters: ${why.replace(/[.!?]$/g, "")}.` : "";
+    const whyLine = why ? ` What actually matters: ${why.replace(/[.!?]$/g, "")}.` : "";
     const focusLine = secondaryItems.length ? ` Extra signal: ${secondaryItems.map((item) => item.replace(/[.!?]$/g, "")).join("; ")}.` : "";
     const nextLine = !focusLine && next ? ` What to watch next: ${next.replace(/[.!?]$/g, "")}.` : "";
     return clampSummaryText(`${lead}${primary.replace(/[.!?]$/g, "")}.${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 280 : 240);
@@ -3221,6 +3282,8 @@
     getStoryQuickRead,
     getStoryLeadPreview,
     getStoryCardSummary,
+    getPracticalStorySummary,
+    getLocalSummaryPreview: (story, language, model) => buildLocalSummary(story, language || getLanguage(), model || "local-brief", getPracticalStorySummary(story, language || getLanguage(), { includeNext: true })),
     getStoryVideoLinks,
     getStoryCompanyKeys,
     getPrimaryCompanyKey,

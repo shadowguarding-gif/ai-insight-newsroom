@@ -1082,6 +1082,30 @@ button:disabled {
   background: rgba(24, 208, 194, 0.06);
 }
 
+.story-brief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.story-brief-grid.is-compact {
+  grid-template-columns: 1fr;
+}
+
+.story-brief-item {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(173, 197, 209, 0.12);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.story-brief-item p {
+  margin: 8px 0 0;
+  color: #d4e5ec;
+  line-height: 1.62;
+}
+
 .story-pro-meta {
   display: none;
   align-items: center;
@@ -1160,6 +1184,11 @@ button:disabled {
 .story-footer {
   justify-content: space-between;
   margin-top: 22px;
+}
+
+.story-points-tight {
+  margin-top: 14px;
+  gap: 10px;
 }
 
 .story-links {
@@ -2566,6 +2595,10 @@ body[data-ui-mode="pro"] .account-flash.is-error {
 
   .compact-summary-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .story-brief-grid {
+    grid-template-columns: 1fr;
   }
 
   .service-shortcuts .story-links,

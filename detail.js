@@ -123,12 +123,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return AIInsight.t("common.configureBackend", language);
   }
 
-  function getLocalPreview(article, language, quickRead) {
-    if (language === "zh") {
-      return `先看：${quickRead.oneLine} 更重要的是：${quickRead.why}`;
-    }
-
-    return `First take: ${quickRead.oneLine} Why this matters: ${quickRead.why}`;
+  function getLocalPreview(article, language) {
+    return AIInsight.getLocalSummaryPreview(article, language, "local-brief");
   }
 
   function getPreviewParagraphCount() {
@@ -173,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const summary = AIInsight.localize(article.summaryPoints, language);
     const quickRead = AIInsight.getStoryQuickRead(article, language);
     const editorialSummary = AIInsight.getStoryCardSummary(article, language).text || AIInsight.localize(article.insight, language) || quickRead.why;
-    const localPreview = getLocalPreview(article, language, quickRead);
+    const localPreview = getLocalPreview(article, language);
     const aiSummary = state.summaryText
       || (state.provider === "local" ? getLocalPreview(article, language, quickRead) : AIInsight.getStoryCardSummary(article, language).text)
       || localPreview;
