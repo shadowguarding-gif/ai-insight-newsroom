@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getCopy(language) {
     return {
       zh: {
+        decisionTitle: "先做判断",
+        decisionLead: "这页先帮你决定更适合看原文、看视频，还是继续在站内深读。",
         summaryTitle: "关键信号",
         bodyTitle: "全文精读",
         relatedTitle: "延伸阅读",
@@ -36,7 +38,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         localSummaryLabel: "本地快读",
         generatedSummaryLabel: "模型视角",
         proContextTitle: "专业版观察",
+        decisionSourceTitle: "先看原文",
+        decisionSourceNote: "如果这条是发布、产品或会议消息，优先看官方原始材料通常最快。",
+        decisionWatchTitle: "看视频入口",
+        decisionWatchNote: "只有更像发布会、演示或解读型话题时，这条路线才值得先点。",
+        decisionReadTitle: "继续读这页",
+        decisionReadNote: "如果你已经知道来源，只想快速抓重点，就继续看站内精读版。",
+        decisionSourceAction: "打开原文",
+        decisionWatchAction: "看视频路线",
+        decisionReadAction: "继续快读",
+        decisionFallbackWatch: "这条不建议先找视频，原文通常更有效。",
         quickNav: {
+          decide: "先看",
           brief: "快读",
           watch: "视频",
           full: "全文",
@@ -44,6 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       },
       en: {
+        decisionTitle: "Decide first",
+        decisionLead: "This page helps you decide whether the fastest next step is the original source, a watch route, or reading on here.",
         summaryTitle: "Key signals",
         bodyTitle: "Full read",
         relatedTitle: "Related briefs",
@@ -63,7 +78,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         localSummaryLabel: "Local brief",
         generatedSummaryLabel: "Model lens",
         proContextTitle: "Pro context",
+        decisionSourceTitle: "Open the source first",
+        decisionSourceNote: "If this is a launch, product, or conference story, the official source is usually the fastest route.",
+        decisionWatchTitle: "Try watch routes",
+        decisionWatchNote: "This route only deserves priority when the topic is likely to have launch clips, demos, or good explainers.",
+        decisionReadTitle: "Keep reading here",
+        decisionReadNote: "If you already trust the source and only need the key takeaway, stay in the on-site brief.",
+        decisionSourceAction: "Open source",
+        decisionWatchAction: "Open watch routes",
+        decisionReadAction: "Keep skimming",
+        decisionFallbackWatch: "This story is usually better handled by going straight to the source instead of hunting for video first.",
         quickNav: {
+          decide: "First",
           brief: "Brief",
           watch: "Watch",
           full: "Full read",
@@ -107,6 +133,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function getPreviewParagraphCount() {
     return window.matchMedia("(max-width: 640px)").matches ? 2 : 3;
+  }
+
+  function createDecisionCard(title, note, actionLabel, href, extraClass) {
+    const mutedClass = extraClass ? ` ${extraClass}` : "";
+    const externalAttrs = /^https?:/i.test(String(href || "")) ? AIInsight.getExternalLinkAttributes() : "";
+    const actionMarkup = href
+      ? `<a class="button button-secondary" href="${AIInsight.escapeHtml(href)}"${externalAttrs}>${AIInsight.escapeHtml(actionLabel)}</a>`
+      : `<span class="ghost-badge">${AIInsight.escapeHtml(actionLabel)}</span>`;
+
+    return `
+      <article class="decision-card page-fade${mutedClass}">
+        <h3>${AIInsight.escapeHtml(title)}</h3>
+        <p>${AIInsight.escapeHtml(note)}</p>
+        <div class="decision-card-action">
+          ${actionMarkup}
+        </div>
+      </article>
+    `;
   }
 
   function render() {
@@ -163,6 +207,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     const previewCount = getPreviewParagraphCount();
     const previewParagraphs = state.bodyExpanded ? paragraphs : paragraphs.slice(0, previewCount);
     const hiddenParagraphCount = Math.max(0, paragraphs.length - previewParagraphs.length);
+    const sourceHref = article.sourceUrl || "";
+    const watchHref = videoLinks.length ? `watch.html?q=${encodeURIComponent(AIInsight.localize(article.title, language))}` : "";
+    const readHref = "#quick-read";
+    const decisionCards = [
+      createDecisionCard(
+        pageCopy.decisionSourceTitle,
+        pageCopy.decisionSourceNote,
+        pageCopy.decisionSourceAction,
+        sourceHref
+      ),
+      createDecisionCard(
+        pageCopy.decisionWatchTitle,
+        videoLinks.length ? pageCopy.decisionWatchNote : pageCopy.decisionFallbackWatch,
+        videoLinks.length ? pageCopy.decisionWatchAction : (language === "zh" ? "直接看原文" : "Use the source instead"),
+        watchHref || sourceHref,
+        videoLinks.length ? "" : " is-muted"
+      ),
+      createDecisionCard(
+        pageCopy.decisionReadTitle,
+        hiddenParagraphCount
+          ? `${pageCopy.decisionReadNote} ${pageCopy.hiddenParagraphs(hiddenParagraphCount)}。`
+          : pageCopy.decisionReadNote,
+        pageCopy.decisionReadAction,
+        readHref
+      )
+    ];
 
     if (!models.includes(state.model)) {
       state.model = models[0];
@@ -218,10 +288,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         </section>
 
         <section class="detail-quick-nav page-fade">
+          <a class="chip" href="#decide-fast">${AIInsight.escapeHtml(pageCopy.quickNav.decide)}</a>
           <a class="chip" href="#quick-read">${AIInsight.escapeHtml(pageCopy.quickNav.brief)}</a>
           <a class="chip" href="#media-desk">${AIInsight.escapeHtml(pageCopy.quickNav.watch)}</a>
           <a class="chip" href="#full-read">${AIInsight.escapeHtml(pageCopy.quickNav.full)}</a>
           <a class="chip" href="#ai-studio">${AIInsight.escapeHtml(pageCopy.quickNav.ai)}</a>
+        </section>
+
+        <section class="section page-fade" id="decide-fast">
+          <article class="article-block detail-decision-panel">
+            <div class="summary-headline">
+              <span class="meta-label">${AIInsight.escapeHtml(pageCopy.decisionTitle)}</span>
+              <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "先省时间" : "Save time first")}</span>
+            </div>
+            <p class="panel-text detail-decision-lead">${AIInsight.escapeHtml(pageCopy.decisionLead)}</p>
+            <div class="detail-decision-grid">
+              ${decisionCards.join("")}
+            </div>
+          </article>
         </section>
 
         <section class="section article-fast-grid">
