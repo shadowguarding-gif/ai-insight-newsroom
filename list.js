@@ -17,16 +17,28 @@ document.addEventListener("DOMContentLoaded", async () => {
       zh: {
         eyebrow: "Live + Curated Feed",
         title: "全球 AI 资讯总览",
-        lead: "这里把时事新闻、原文网址、编辑判断和 AI 摘要入口统一在一个资讯流里。你可以先看实时信号，再用搜索、分类和地区筛选把视野收窄到自己最关心的主题。",
+        lead: "这里把时事新闻、原文网址、编辑判断和 AI 摘要入口统一放在一个资讯流里。你可以先看实时信号，再用搜索、分类和区域筛选把视野收窄到自己最关心的主题。",
         statusLead: meta.remoteConnected
-          ? "当前资讯流已经接到了远端 live 源，所以它会自动把远端时事和站内精选合并。"
-          : "当前资讯流仍以站内内容和内置官方快讯为主，接上远端接口后会自动扩成真正的实时总览。",
+          ? "当前资讯流已经接到远端 live 源，所以会自动把远端时事和站内精选合并。"
+          : "当前资讯流仍以内置内容和站内精选为主，接上远端接口后会变成真正的实时总览。",
         searchLabel: "关键词搜索",
         categoryLabel: "按赛道筛选",
         regionLabel: "按区域筛选",
         featuredTitle: "主编精选",
         resultsTitle: "综合资讯流",
+        resultsLead: "先把结果和筛选看到，再决定要不要回头看统计、工具层和摘要说明。",
         resultsMeta: `当前展示 ${resultsCount} 条内容，其中 ${liveCount} 条带原文链接；全站共 ${totalCount} 条`,
+        quickSummary: [
+          { label: "结果数", value: `${resultsCount}` },
+          { label: "原文链接", value: `${liveCount}` },
+          { label: "当前地区", value: AIInsight.getRegionLabel(state.region, language) }
+        ],
+        serviceTitle: "快捷入口",
+        serviceLinks: [
+          { label: "公司专栏", href: "desks.html" },
+          { label: "视频入口", href: "watch.html" },
+          { label: "主题搜索", href: "search.html" }
+        ],
         asideTitle: "摘要引擎支持",
         asideBody: "站点现在支持 OpenAI / ChatGPT、DeepSeek，以及兼容 Ollama / vLLM 的开源本地接口路线，方便在质量、成本和私有化之间切换。",
         suggestionTitle: "热门关键词",
@@ -35,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           {
             label: "实时新闻",
             value: `${meta.liveCount}`,
-            copy: "带原文地址的时事条目，适合快速追踪行业动向。"
+            copy: "带原文链接的时事条目，适合快速追踪行业动向。"
           },
           {
             label: "综合条目",
@@ -50,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           {
             label: "远端新增",
             value: `${meta.remoteCount}`,
-            copy: "如果接入 live backend，这里会直观看到远端补进来的条目量。"
+            copy: "如果接入 live backend，这里会直接看到远端并入的条目数量。"
           }
         ],
         emptyTitle: "没有匹配到结果",
@@ -68,7 +80,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         regionLabel: "Filter by region",
         featuredTitle: "Editor's pick",
         resultsTitle: "Unified feed",
+        resultsLead: "See the filtered result set first, then move back into stats, tool signals, and summary support only if you need them.",
         resultsMeta: `Showing ${resultsCount} briefs, including ${liveCount} source-backed updates, out of ${totalCount} total`,
+        quickSummary: [
+          { label: "Results", value: `${resultsCount}` },
+          { label: "Source-backed", value: `${liveCount}` },
+          { label: "Region", value: AIInsight.getRegionLabel(state.region, language) }
+        ],
+        serviceTitle: "Quick routes",
+        serviceLinks: [
+          { label: "Company desks", href: "desks.html" },
+          { label: "Watch desk", href: "watch.html" },
+          { label: "Search", href: "search.html" }
+        ],
         asideTitle: "Summary engine support",
         asideBody: "The site now supports OpenAI / ChatGPT, DeepSeek, and OSS-compatible local endpoints such as Ollama or vLLM, so quality, cost, and privacy can be balanced more deliberately.",
         suggestionTitle: "Popular topics",
@@ -95,8 +119,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             copy: "Once a live backend is connected, you can see how much remote coverage is being merged in."
           }
         ],
-        emptyTitle: "No results matched",
-        emptyBody: "Try another keyword, or clear the filters to return to the broader signal view."
+        emptyTitle: "No matching results yet",
+        emptyBody: "Try a broader keyword, or clear the filters to restore the full view."
       }
     }[language];
   }
@@ -194,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                   <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.featuredTitle)}</span>
                 </div>
                 <h2>${AIInsight.escapeHtml(AIInsight.localize(featured.title, language))}</h2>
-                <p class="lead">${AIInsight.escapeHtml(AIInsight.localize(featured.deck, language))}</p>
+                <p class="lead">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(featured, language))}</p>
                 <div class="story-source">
                   <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
                   <strong>${AIInsight.escapeHtml(featured.sourceName || featured.source || "AI Insight")}</strong>
@@ -227,22 +251,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         </section>
 
         ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}
-
-        <section class="section">
-          <div class="stats-grid">
-            ${pageCopy.metrics
-              .map(
-                (metric) => `
-                  <article class="stat-card page-fade">
-                    <span class="stat-label">${AIInsight.escapeHtml(metric.label)}</span>
-                    <div class="stat-value">${AIInsight.escapeHtml(metric.value)}</div>
-                    <p class="stat-copy">${AIInsight.escapeHtml(metric.copy)}</p>
-                  </article>
-                `
-              )
-              .join("")}
-          </div>
-        </section>
 
         <section class="panel control-panel page-fade">
           <div class="control-group">
@@ -280,31 +288,36 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="control-actions">
             <button class="button button-secondary" type="button" id="reset-filters">${AIInsight.escapeHtml(pageCopy.reset)}</button>
           </div>
-        </section>
 
-        ${
-          microMatches.length && mainResults.length
-            ? `
-              <section class="section">
-                <div class="section-head">
-                  <div>
-                    <h2>${AIInsight.escapeHtml(toolRadarTitle)}</h2>
-                    <p class="section-note">${AIInsight.escapeHtml(toolRadarNote)}</p>
-                  </div>
-                </div>
-                <div class="signal-grid">
-                  ${microMatches.map((item) => AIInsight.createSignalCard(item, { language })).join("")}
-                </div>
-              </section>
-            `
-            : ""
-        }
+          <div class="compact-summary-row">
+            ${pageCopy.quickSummary
+              .map(
+                (metric) => `
+                  <article class="compact-summary-card">
+                    <span class="mini-label">${AIInsight.escapeHtml(metric.label)}</span>
+                    <strong>${AIInsight.escapeHtml(metric.value)}</strong>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+
+          <div class="service-shortcuts">
+            <span class="mini-label">${AIInsight.escapeHtml(pageCopy.serviceTitle)}</span>
+            <div class="story-links">
+              ${pageCopy.serviceLinks
+                .map((item) => `<a class="story-link" href="${AIInsight.escapeHtml(item.href)}">${AIInsight.escapeHtml(item.label)}</a>`)
+                .join("")}
+            </div>
+          </div>
+        </section>
 
         <section class="section feed-layout">
           <div>
             <div class="section-head">
               <div>
                 <h2>${AIInsight.escapeHtml(pageCopy.resultsTitle)}</h2>
+                <p class="section-note">${AIInsight.escapeHtml(pageCopy.resultsLead)}</p>
                 <p class="results-meta">${AIInsight.escapeHtml(pageCopy.resultsMeta)}</p>
               </div>
             </div>
@@ -346,6 +359,40 @@ document.addEventListener("DOMContentLoaded", async () => {
               </div>
             </article>
           </aside>
+        </section>
+
+        ${
+          microMatches.length && mainResults.length
+            ? `
+              <section class="section">
+                <div class="section-head">
+                  <div>
+                    <h2>${AIInsight.escapeHtml(toolRadarTitle)}</h2>
+                    <p class="section-note">${AIInsight.escapeHtml(toolRadarNote)}</p>
+                  </div>
+                </div>
+                <div class="signal-grid">
+                  ${microMatches.map((item) => AIInsight.createSignalCard(item, { language })).join("")}
+                </div>
+              </section>
+            `
+            : ""
+        }
+
+        <section class="section">
+          <div class="stats-grid">
+            ${pageCopy.metrics
+              .map(
+                (metric) => `
+                  <article class="stat-card page-fade">
+                    <span class="stat-label">${AIInsight.escapeHtml(metric.label)}</span>
+                    <div class="stat-value">${AIInsight.escapeHtml(metric.value)}</div>
+                    <p class="stat-copy">${AIInsight.escapeHtml(metric.copy)}</p>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
         </section>
       </div>
     `;
