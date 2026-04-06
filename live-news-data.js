@@ -1150,5 +1150,453 @@ window.AIInsightLiveData = [
         "Not every Tencent story needs the very top slot, but it should appear consistently in a dedicated watch lane so the site’s global perspective feels complete."
       ]
     }
+  },
+  {
+    "id": 1019,
+    "slug": "apple-intelligence-expands-to-simplified-chinese",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "global",
+    "signal": "breakout",
+    "date": "2025-03-31",
+    "sourceName": "Apple",
+    "sourceType": "official",
+    "sourceUrl": "https://www.apple.com/cm/newsroom/2025/03/apple-intelligence-features-expand-to-new-languages-and-regions-today/",
+    "tags": ["Apple", "Apple Intelligence", "On-device AI", "Simplified Chinese"],
+    "title": {
+      "zh": "Apple Intelligence 扩到更多语言和地区，中文用户终于进入主线叙事",
+      "en": "Apple Intelligence expands to more languages and regions, pulling Chinese users into the core rollout story"
+    },
+    "deck": {
+      "zh": "真正值得看的是语言与区域支持终于补齐，它决定苹果端侧 AI 什么时候能从发布会概念变成真实入口。",
+      "en": "The key shift is not a feature list but broader language and regional support, which determines when Apple’s on-device AI becomes a real entry point."
+    },
+    "summaryPoints": {
+      "zh": [
+        "苹果的 AI 进展不能只看模型能力，更要看哪些市场真正能用起来。",
+        "语言扩展意味着端侧 AI 开始从英语优先的展示阶段走向全球分发阶段。",
+        "对中文用户来说，这类进展比单纯追模型榜单更接近真实使用。"
+      ],
+      "en": [
+        "Apple’s AI progress has to be judged by real market availability, not just model capability.",
+        "Language expansion signals a move from English-first showcase mode to broader global distribution.",
+        "For Chinese readers, this is closer to real usage than another benchmark headline."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "苹果的 AI 价值从来不只在模型，而在入口控制。语言和地区一旦补齐，端侧 AI 才会真正改变全球用户的默认使用路径。",
+      "en": "Apple’s AI leverage has never been only about the model. Once language and region support catch up, on-device AI can begin changing default user behavior at scale."
+    },
+    "aiSummary": {
+      "zh": "Apple Intelligence 扩展到更多语言与地区，意味着苹果正在把端侧 AI 从局部试点推向更完整的全球用户入口。",
+      "en": "Apple Intelligence reaching more languages and regions means Apple is moving on-device AI from a limited pilot into a broader global entry layer."
+    },
+    "insight": {
+      "zh": "苹果的 AI 节奏看起来慢，但一旦它完成入口铺设，影响往往是系统级而不是单功能级。",
+      "en": "Apple’s pace may look slower, but once it completes the distribution layer, the impact is usually systemic rather than feature-level."
+    },
+    "who": {
+      "zh": "关注端侧 AI、平台入口、消费电子和中文用户体验的人",
+      "en": "Readers tracking on-device AI, platform control, consumer devices, and Chinese-language UX"
+    },
+    "watchpoint": {
+      "zh": "接下来重点看苹果会不会继续把 Apple Intelligence 深挖到系统应用、开发者接口和硬件更新节奏里。",
+      "en": "Watch whether Apple pushes Apple Intelligence deeper into system apps, developer hooks, and hardware refresh cycles."
+    },
+    "content": {
+      "zh": [
+        "很多人讨论苹果 AI 时，会先问它模型强不强，但苹果真正能改变市场的地方，往往是系统入口和默认使用场景。语言与区域覆盖补齐之后，这条线才真正具备全球扩张能力。",
+        "对你的网站来说，这类新闻适合长期放在苹果专栏里，因为它不是一天热度，而是一个阶段的入口变化。"
+      ],
+      "en": [
+        "When people discuss Apple’s AI, they often start with model strength. But Apple’s market power usually comes from system entry points and default use cases. Broader language and region coverage is what gives this strategy real global reach.",
+        "For your site, this belongs in a standing Apple desk because it marks a phase change in distribution rather than a one-day feature spike."
+      ]
+    }
+  },
+  {
+    "id": 1020,
+    "slug": "apple-mac-studio-ai-local-workstation",
+    "live": true,
+    "featured": false,
+    "category": "chips",
+    "region": "global",
+    "signal": "watch",
+    "date": "2025-03-05",
+    "sourceName": "Apple",
+    "sourceType": "official",
+    "sourceUrl": "https://www.apple.com/in/newsroom/2025/03/apple-unveils-new-mac-studio-the-most-powerful-mac-ever/",
+    "tags": ["Apple", "Mac Studio", "Local AI", "M4 Max"],
+    "title": {
+      "zh": "Apple 用新 Mac Studio 强化本地 AI 工作站叙事",
+      "en": "Apple reinforces the local AI workstation story with the new Mac Studio"
+    },
+    "deck": {
+      "zh": "这不只是硬件更新，而是在告诉开发者和创作者：设备端 AI 也可以是高性能生产力路线。",
+      "en": "This is more than a hardware refresh; it is Apple telling developers and creators that local AI can also be a serious productivity route."
+    },
+    "summaryPoints": {
+      "zh": [
+        "设备端 AI 不只是手机功能，也在进入桌面级创作和开发工作流。",
+        "苹果的芯片路线正在把本地推理变成平台体验的一部分。",
+        "这类新闻更适合放在芯片与端侧 AI 观察线，而不是只当硬件快讯。"
+      ],
+      "en": [
+        "On-device AI is not only about phones; it is moving into desktop creative and developer workflows.",
+        "Apple’s silicon strategy is turning local inference into part of the platform experience.",
+        "This belongs in a chips and edge-AI lane rather than being treated as a generic hardware headline."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "苹果的端侧 AI 路线真正有价值的地方，在于它把芯片、系统和默认应用绑成一套体验，而不是把 AI 单独卖成一个 API。",
+      "en": "What makes Apple’s edge-AI route strategically interesting is that it ties chips, the operating system, and default apps into one experience instead of selling AI as a standalone API."
+    },
+    "aiSummary": {
+      "zh": "新 Mac Studio 把苹果的设备端 AI 路线往专业工作站进一步推进，重点不是跑分，而是本地高性能工作流的可行性。",
+      "en": "The new Mac Studio pushes Apple’s on-device AI strategy further into workstation territory, with the real story being the viability of local high-performance workflows."
+    },
+    "insight": {
+      "zh": "如果 AI 进入设备端工作站，平台控制权会更强，因为模型、芯片和工作流不再轻易拆开。",
+      "en": "If AI moves into device-side workstations, platform control gets stronger because the model, chip, and workflow become harder to separate."
+    },
+    "who": {
+      "zh": "开发者、创作者、端侧 AI 团队、关注苹果芯片路线的人",
+      "en": "Developers, creators, edge-AI teams, and readers following Apple silicon"
+    },
+    "watchpoint": {
+      "zh": "继续看苹果会不会把更多开发者工具、模型优化和创作应用绑定到这条设备端 AI 路线上。",
+      "en": "Watch whether Apple binds more developer tooling, model optimization, and creative software to this local AI route."
+    },
+    "content": {
+      "zh": [
+        "Apple 的 AI 路线不能只看 Siri 或 Apple Intelligence，还要看它有没有把端侧性能真正变成创作者和开发者的工作能力。Mac Studio 这类产品，就是这条路线的重要证据。",
+        "这类内容也会让苹果专栏不只是消费新闻，而是进入芯片、设备和 AI 生产力的长期观察。"
+      ],
+      "en": [
+        "Apple’s AI path cannot be understood only through Siri or Apple Intelligence. It also depends on whether the company turns local performance into real working capability for creators and developers. Mac Studio is an important proof point for that route.",
+        "This also helps your Apple desk feel less like consumer gadget coverage and more like a long-term view on chips, devices, and AI productivity."
+      ]
+    }
+  },
+  {
+    "id": 1021,
+    "slug": "meta-ai-support-assistant-fb-instagram",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "global",
+    "signal": "breakout",
+    "date": "2026-03-19",
+    "sourceName": "Meta",
+    "sourceType": "official",
+    "sourceUrl": "https://about.fb.com/news/2026/03/meta-ai-support-assistant-expands-across-facebook-and-instagram/",
+    "tags": ["Meta", "Meta AI", "Consumer AI", "Instagram"],
+    "title": {
+      "zh": "Meta 把 AI 支持助手继续压进 Facebook 和 Instagram 的原生入口",
+      "en": "Meta pushes its AI support assistant deeper into native entry points across Facebook and Instagram"
+    },
+    "deck": {
+      "zh": "关键不是再多一个聊天框，而是 Meta 正在把 AI 变成内容平台里的默认支持层。",
+      "en": "The real signal is not another chat box, but Meta turning AI into a default support layer inside consumer platforms."
+    },
+    "summaryPoints": {
+      "zh": [
+        "消费级 AI 的竞争越来越取决于谁掌握现成分发入口，而不是谁单独做了一个助手。",
+        "Meta 的优势在于社交平台原生流量，而不是把用户单独导到一个新产品。",
+        "这类新闻很适合做成面向普通用户的高时效条目。"
+      ],
+      "en": [
+        "Consumer AI competition increasingly depends on who owns default distribution rather than who launched a standalone assistant.",
+        "Meta’s edge is native social traffic, not sending users into a separate app.",
+        "This makes for a high-utility story for general readers, not just AI specialists."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "Meta 的 AI 进展要看它怎么把助手嵌进现有内容和社交流量里，而不是只盯模型开源路线。",
+      "en": "Meta’s AI progress should be read through how it embeds assistants into existing social traffic, not only through its model release story."
+    },
+    "aiSummary": {
+      "zh": "Meta AI 支持助手扩展到 Facebook 和 Instagram，说明其重点仍是把 AI 融进现有用户入口，而不是孤立成单独产品。",
+      "en": "Meta AI’s support assistant expansion across Facebook and Instagram shows the company is still prioritizing embedded usage over isolated products."
+    },
+    "insight": {
+      "zh": "消费级 AI 最终拼的是默认入口，而 Meta 恰好最不缺的就是现成入口。",
+      "en": "Consumer AI ultimately becomes a contest over default entry points, and Meta has no shortage of them."
+    },
+    "who": {
+      "zh": "产品经理、平台策略团队、关注消费级 AI 入口的人",
+      "en": "Product managers, platform strategy teams, and readers following consumer AI distribution"
+    },
+    "watchpoint": {
+      "zh": "继续看 Meta 会不会把这层助手能力和广告、创作者工具、客服链路进一步打通。",
+      "en": "Watch whether Meta connects this assistant layer more tightly to ads, creator tools, and support workflows."
+    },
+    "content": {
+      "zh": [
+        "Meta 这类新闻的价值，在于它不只是产品更新，而是平台分发能力的证据。Facebook 和 Instagram 这种现成入口，决定了 Meta 可以让 AI 直接抵达大众用户，而不需要重新教育用户去安装一个新产品。",
+        "如果你的站点想兼顾大众用户和专业用户，这种内容就是很好的中间层。"
+      ],
+      "en": [
+        "The value of this Meta story is that it is not just a product update; it is evidence of distribution power. With Facebook and Instagram as default surfaces, Meta can push AI to mainstream users without retraining them into a separate product.",
+        "For your site, this works well as a middle layer that speaks to both general and professional readers."
+      ]
+    }
+  },
+  {
+    "id": 1022,
+    "slug": "meta-amd-6gw-ai-infrastructure",
+    "live": true,
+    "featured": false,
+    "category": "chips",
+    "region": "us",
+    "signal": "frontier",
+    "date": "2026-02-24",
+    "sourceName": "Meta",
+    "sourceType": "official",
+    "sourceUrl": "https://about.fb.com/news/2026/02/meta-and-amd-partner-to-build-6gw-of-ai-infrastructure-in-the-united-states/",
+    "tags": ["Meta", "AMD", "AI infrastructure", "Compute"],
+    "title": {
+      "zh": "Meta 与 AMD 合作推进 6GW 级 AI 基础设施，把算力叙事拉到能源与资本开支层",
+      "en": "Meta and AMD push a 6GW AI infrastructure plan, pulling the compute story into power and capex territory"
+    },
+    "deck": {
+      "zh": "这一类消息真正重要的不是合作字面，而是 AI 基础设施已经进入电力、土地和长期资本配置层面。",
+      "en": "The important signal is not the partnership headline itself, but that AI infrastructure now lives at the level of power, land, and long-horizon capital allocation."
+    },
+    "summaryPoints": {
+      "zh": [
+        "算力竞争正在从 GPU 采购升级为电力、园区和供应链协同竞争。",
+        "Meta 的 AI 战略不能只看 Llama，也要看它愿意为基础设施押多大的长期赌注。",
+        "这类故事适合放在芯片和基础设施主线，而不是埋进小新闻。"
+      ],
+      "en": [
+        "Compute competition is moving beyond GPU procurement into power, campus buildout, and supply-chain coordination.",
+        "Meta’s AI strategy should be read not only through Llama, but through the size of its infrastructure bets.",
+        "This belongs in the chips and infrastructure lead lane rather than a throwaway brief."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "AI 公司之间真正拉开差距的，正在从模型能力延伸到谁能长期锁定更大规模的基础设施和供电能力。",
+      "en": "The real separation between AI companies is extending from model capability into who can lock in large-scale infrastructure and power over time."
+    },
+    "aiSummary": {
+      "zh": "Meta 与 AMD 的 6GW 基础设施合作说明，AI 竞争正越来越像一场重资产、长周期的工业配置战。",
+      "en": "Meta and AMD’s 6GW infrastructure push shows AI competition increasingly resembles a long-cycle industrial allocation battle."
+    },
+    "insight": {
+      "zh": "当 AI 进入 GW 级建设周期时，内容产品也要把“芯片新闻”升级成“工业能力新闻”。",
+      "en": "Once AI enters gigawatt-scale build cycles, editorial products need to treat chip news as industrial-capacity news."
+    },
+    "who": {
+      "zh": "基础设施投资人、芯片观察者、云平台团队、产业研究者",
+      "en": "Infrastructure investors, chip watchers, cloud teams, and industry researchers"
+    },
+    "watchpoint": {
+      "zh": "继续看合作是否进一步落到数据中心节奏、供电方案和具体芯片部署节点上。",
+      "en": "Watch whether this turns into visible data-center milestones, power plans, and concrete chip deployment timelines."
+    },
+    "content": {
+      "zh": [
+        "这类新闻会让用户明白，AI 竞争已经远远超出模型榜单。只要一个公司开始围绕 GW 级电力去组织合作，它就在进入更重的工业竞争层。",
+        "你的站点如果能持续解释这种变化，就会显得比普通 AI 热点站更有产业视角。"
+      ],
+      "en": [
+        "Stories like this make it clear that AI competition has moved well beyond benchmark tables. Once a company starts organizing around gigawatt-scale power, it is entering a much heavier industrial layer of competition.",
+        "If your site keeps translating these signals well, it will feel more industrially literate than a generic AI headline site."
+      ]
+    }
+  },
+  {
+    "id": 1023,
+    "slug": "baidu-q4-2025-ai-cloud-infra-growth",
+    "live": true,
+    "featured": false,
+    "category": "products",
+    "region": "china",
+    "signal": "breakout",
+    "date": "2026-02-26",
+    "sourceName": "Baidu",
+    "sourceType": "official",
+    "sourceUrl": "https://ir.baidu.com/news-releases/news-release-details/baidu-announces-fourth-quarter-and-fiscal-year-2025-results/",
+    "tags": ["Baidu", "AI Cloud", "ERNIE", "China AI"],
+    "title": {
+      "zh": "Baidu 把 AI 云基础设施、文心助手和应用收入一起抬进主叙事",
+      "en": "Baidu pulls AI cloud infrastructure, ERNIE assistants, and application revenue into one core narrative"
+    },
+    "deck": {
+      "zh": "这不只是财报新闻，而是百度开始更明确地把 AI 云、AI 应用和助手产品打成一套收入结构。",
+      "en": "This is more than an earnings release; it shows Baidu packaging AI cloud, applications, and assistants as one revenue structure."
+    },
+    "summaryPoints": {
+      "zh": [
+        "百度的 AI 叙事越来越像“基础设施 + 应用 + 分发”的组合，而不只是模型单点更新。",
+        "中国大厂的 AI 竞争重点，正在转向哪家公司能把收入结构真正改写。",
+        "这类新闻适合放在中国观察主线，而不该只出现在财报角落。"
+      ],
+      "en": [
+        "Baidu’s AI story is increasingly a combined infrastructure, applications, and distribution play rather than isolated model updates.",
+        "For Chinese majors, the real question is which company can visibly reshape its revenue mix through AI.",
+        "This belongs in the China watch lead lane, not buried in finance-only coverage."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "中国 AI 公司真正值得长期跟踪的，不只是模型谁更强，而是谁已经把 AI 变成更清晰的业务结构。",
+      "en": "The most durable question for Chinese AI companies is not only whose model is stronger, but who has already turned AI into a clearer business structure."
+    },
+    "aiSummary": {
+      "zh": "Baidu 的最新财报把 AI 云基础设施、AI 应用和 ERNIE 助手规模一起摆到台前，显示其 AI-first 结构正在变得更清晰。",
+      "en": "Baidu’s latest results surface AI cloud infrastructure, application revenue, and ERNIE assistant scale together, making its AI-first structure more visible."
+    },
+    "insight": {
+      "zh": "如果说美国公司在拼模型和算力，中国大厂更值得盯的是谁先把 AI 写进收入与平台结构里。",
+      "en": "If U.S. companies are often framed through models and compute, Chinese platform groups are especially worth tracking through revenue structure and platform integration."
+    },
+    "who": {
+      "zh": "中国科技观察者、企业 AI 决策者、关注收入质量的人",
+      "en": "China-tech watchers, enterprise AI decision-makers, and readers focused on business quality"
+    },
+    "watchpoint": {
+      "zh": "接下来继续看百度 AI 云、Miaoda、文心助手和 Apollo Go 在同一套经营叙事里会不会继续加速。",
+      "en": "Watch whether Baidu keeps accelerating AI cloud, Miaoda, ERNIE assistants, and Apollo Go inside one operating narrative."
+    },
+    "content": {
+      "zh": [
+        "很多中国 AI 新闻容易只停留在“发布了什么模型”，但百度这类财报型信息更能告诉用户：AI 到底有没有进入真实业务结构。对专业用户来说，这类条目反而更有判断价值。",
+        "它也能让中国观察位不只讲叙事，还能讲经营与收入质量。"
+      ],
+      "en": [
+        "A lot of China AI coverage gets stuck at 'which model launched.' A results-driven item like this is more useful because it shows whether AI is entering a real business structure. For expert readers, that can be much more valuable.",
+        "It also helps your China lane talk about operating quality rather than narrative alone."
+      ]
+    }
+  },
+  {
+    "id": 1024,
+    "slug": "microsoft-japan-ai-infrastructure-10b",
+    "live": true,
+    "featured": false,
+    "category": "policy",
+    "region": "apac",
+    "signal": "frontier",
+    "date": "2026-04-03",
+    "sourceName": "Microsoft",
+    "sourceType": "official",
+    "sourceUrl": "https://news.microsoft.com/source/asia/2026/04/03/microsoft-deepens-its-commitment-to-japan-with-10-billion-investment-in-ai-infrastructure-cybersecurity-workforce/",
+    "tags": ["Microsoft", "Japan", "AI infrastructure", "Copilot"],
+    "title": {
+      "zh": "Microsoft 在日本追加 100 亿美元 AI 基础设施与人才投入，APAC 进入更重的落地阶段",
+      "en": "Microsoft commits another $10 billion to AI infrastructure and talent in Japan as APAC enters a heavier execution phase"
+    },
+    "deck": {
+      "zh": "这类新闻说明微软在亚洲不是只卖 Copilot，而是在用基础设施、人才和信任框架一起推进区域落地。",
+      "en": "This shows Microsoft is not just selling Copilot in Asia, but pushing regional execution through infrastructure, talent, and trust architecture."
+    },
+    "summaryPoints": {
+      "zh": [
+        "区域 AI 竞争已经不只是模型和产品，而是基础设施、合规和人才三线并进。",
+        "日本这类高要求市场的投入，对微软是平台位置而不只是单个订单。",
+        "这也会影响亚洲企业如何选择云与 AI 合作方。"
+      ],
+      "en": [
+        "Regional AI competition now spans infrastructure, compliance, and talent, not just models and products.",
+        "In a demanding market like Japan, this is about platform position rather than a single sales cycle.",
+        "It also shapes how Asian enterprises choose long-term cloud and AI partners."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "微软的亚洲 AI 策略越来越像长期基础设施布局，而不是短期 SaaS 销售，这会强化它在企业市场的默认地位。",
+      "en": "Microsoft’s Asian AI strategy increasingly looks like long-term infrastructure positioning rather than short-term SaaS selling, which can strengthen its default role in enterprise markets."
+    },
+    "aiSummary": {
+      "zh": "微软宣布在日本追加 100 亿美元投入 AI 基础设施、网络安全和人才培养，显示其在 APAC 的 AI 竞争进入更重执行层。",
+      "en": "Microsoft’s new $10 billion Japan commitment across AI infrastructure, cybersecurity, and workforce development shows a heavier execution phase in APAC."
+    },
+    "insight": {
+      "zh": "区域市场一旦开始按十亿美元级别配置 AI，资讯站就不能只停留在产品发布层。",
+      "en": "Once regional markets start allocating AI at multibillion-dollar scale, editorial products cannot stay at the level of product launches alone."
+    },
+    "who": {
+      "zh": "APAC 企业客户、云平台团队、区域政策与基础设施观察者",
+      "en": "APAC enterprise buyers, cloud teams, and readers tracking regional policy and infrastructure"
+    },
+    "watchpoint": {
+      "zh": "继续看微软是否把这类投入进一步转化为本地数据中心、Copilot 渗透和行业合作案例。",
+      "en": "Watch whether Microsoft turns this into more local data-center capacity, Copilot penetration, and vertical customer wins."
+    },
+    "content": {
+      "zh": [
+        "这类区域投资新闻非常适合你的网站长期保留，因为它不是一天热度，而是决定未来几年平台地位的动作。尤其是日本这种高信任、高制造业权重市场，能帮助用户理解 APAC 的 AI 落地节奏。",
+        "它也能补足你网站当前对美国主线之外区域执行层的覆盖。"
+      ],
+      "en": [
+        "This kind of regional investment deserves a long shelf life on your site because it is not a one-day headline; it affects platform position for years. In a high-trust, industrially important market like Japan, it helps readers understand APAC execution more clearly.",
+        "It also strengthens your coverage beyond U.S.-centric lead stories."
+      ]
+    }
+  },
+  {
+    "id": 1025,
+    "slug": "deepseek-v31-agent-era-release",
+    "live": true,
+    "featured": false,
+    "category": "models",
+    "region": "china",
+    "signal": "breakout",
+    "date": "2025-08-21",
+    "sourceName": "DeepSeek",
+    "sourceType": "official",
+    "sourceUrl": "https://api-docs.deepseek.com/news/news250821",
+    "tags": ["DeepSeek", "Agents", "Reasoning", "China AI"],
+    "title": {
+      "zh": "DeepSeek-V3.1 把“Agent 时代第一步”讲清楚，也让中文搜索终于有值得看的主线内容",
+      "en": "DeepSeek-V3.1 frames itself as a first step toward the agent era and gives the site a real DeepSeek lead item"
+    },
+    "deck": {
+      "zh": "这条的价值不只是模型更新，而是 DeepSeek 把思考模式、非思考模式和 Agent 能力放进一套更清楚的产品说法里。",
+      "en": "The value here is not just another model update, but a clearer product framing around thinking mode, non-thinking mode, and agent capability."
+    },
+    "summaryPoints": {
+      "zh": [
+        "DeepSeek 正在把模型能力和 Agent 工作方式放进同一套 API 叙事。",
+        "这让中国模型公司不再只是追参数和榜单，而开始强调工具调用和任务链路。",
+        "对站内搜索来说，这类条目也能真正支撑 DeepSeek 关键词。"
+      ],
+      "en": [
+        "DeepSeek is packaging model capability and agent behavior inside one API story.",
+        "This helps Chinese model companies move beyond parameter talk into tool use and task-chain execution.",
+        "It also gives your on-site search a real DeepSeek anchor item instead of just aliases."
+      ]
+    },
+    "editorialSummary": {
+      "zh": "如果一个 AI 站点想对中国模型公司有真实覆盖，就不能只有公司名映射，还需要有能承接搜索的主线内容。",
+      "en": "If an AI newsroom wants real coverage of Chinese model companies, it cannot rely on aliases alone; it needs actual lead items that can anchor search and browsing."
+    },
+    "aiSummary": {
+      "zh": "DeepSeek-V3.1 把思考模式、非思考模式和更强 Agent 能力放进同一版本叙事里，说明它在往任务执行而不只是回答问题推进。",
+      "en": "DeepSeek-V3.1 combines thinking mode, non-thinking mode, and stronger agent capability in one release story, showing a push toward execution rather than response only."
+    },
+    "insight": {
+      "zh": "真正有竞争力的中国模型新闻，不该只讲便宜和开源，也要讲它具体把工作流往前推进了多少。",
+      "en": "Competitive coverage of Chinese models should not talk only about price or openness; it should explain how far they actually move workflows forward."
+    },
+    "who": {
+      "zh": "模型使用者、Agent 开发者、关注中国模型生态的人",
+      "en": "Model users, agent builders, and readers tracking the Chinese model ecosystem"
+    },
+    "watchpoint": {
+      "zh": "继续看 DeepSeek 后续是否把 Agent 能力进一步兑现到工具调用、搜索和前端生成质量上。",
+      "en": "Watch whether DeepSeek continues turning agent capability into stronger tool use, search, and front-end generation quality."
+    },
+    "content": {
+      "zh": [
+        "你前面提到中文搜索不该只有别名匹配，这类条目就是最直接的解决方式。DeepSeek 这种在中文用户里关注度很高的名字，站里必须有真正的内容承接。",
+        "从内容结构看，它适合放在中国模型与 Agent 主线里，而不只是工具雷达。"
+      ],
+      "en": [
+        "You pointed out that Chinese search should not rely on alias matching alone. This is exactly the kind of item that solves that problem: a real content anchor for a highly searched Chinese model name.",
+        "Structurally, it belongs in the China model and agent lead lane rather than only in tooling radar."
+      ]
+    }
   }
 ];

@@ -583,6 +583,48 @@ button:disabled {
   line-height: 1.56;
 }
 
+.digest-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px 20px;
+}
+
+.digest-line {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(173, 197, 209, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.digest-line:hover {
+  transform: translateY(-2px);
+  border-color: rgba(173, 197, 209, 0.24);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.digest-line-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.digest-line strong {
+  line-height: 1.44;
+}
+
+.digest-line p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .company-desk-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2721,6 +2763,11 @@ body[data-ui-mode="pro"] .account-flash.is-error {
 
   .scan-rail {
     grid-template-columns: 1fr;
+  }
+
+  .digest-board {
+    grid-template-columns: 1fr;
+    padding: 16px;
   }
 
   .hero-note-row,

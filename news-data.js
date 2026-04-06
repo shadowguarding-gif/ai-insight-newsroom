@@ -502,5 +502,173 @@ window.AIInsightData = [
         "That is why a strong AI news platform should explain infrastructure clearly. It helps readers understand the long-duration variables shaping the entire industry."
       ]
     }
+  },
+  {
+    "id": 10,
+    "slug": "device-ai-becomes-platform-battle",
+    "featured": false,
+    "category": "products",
+    "region": "global",
+    "signal": "breakout",
+    "date": "2026-04-04",
+    "source": "AI Insight Platform Brief",
+    "readingTime": 5,
+    "tags": ["Apple", "On-device AI", "Platform control"],
+    "title": {
+      "zh": "端侧 AI 正在从功能点升级为平台入口之争",
+      "en": "On-device AI is evolving from a feature race into a platform-entry battle"
+    },
+    "deck": {
+      "zh": "真正重要的不是谁先放出一个端侧功能，而是谁把芯片、系统、默认应用和开发者接口绑成一整套入口。",
+      "en": "The core question is no longer who ships one device-side feature first, but who ties chips, operating systems, default apps, and developer hooks into one entry layer."
+    },
+    "summaryPoints": {
+      "zh": [
+        "端侧 AI 会改变用户默认使用路径，因为它离设备、系统与应用入口更近。",
+        "苹果、微软和安卓阵营的竞争，都会越来越像平台控制权竞争。",
+        "这类变化值得长期看，不是一天热度。"
+      ],
+      "en": [
+        "Device-side AI can change default user behavior because it sits closer to the device, OS, and app entry points.",
+        "Competition across Apple, Microsoft, and the Android ecosystem increasingly resembles a contest over platform control.",
+        "This is a long-cycle shift rather than a one-day spike."
+      ]
+    },
+    "insight": {
+      "zh": "一旦 AI 从网页助手移到操作系统与设备层，平台公司的护城河会再次加深。",
+      "en": "Once AI moves from the web-assistant layer into the operating system and device layer, platform moats deepen again."
+    },
+    "who": {
+      "zh": "平台战略团队、消费电子观察者、端侧 AI 开发者",
+      "en": "Platform strategists, consumer-device watchers, and edge-AI builders"
+    },
+    "watchpoint": {
+      "zh": "重点看开发者接口、系统级权限、默认应用整合和端侧推理体验。",
+      "en": "Watch developer hooks, system permissions, default-app integration, and real on-device inference experience."
+    },
+    "content": {
+      "zh": [
+        "过去很多 AI 产品都寄居在网页和云端服务里，所以分发入口相对开放。但端侧 AI 一旦成熟，真正的决定权会重新回到操作系统、芯片与默认应用手中。",
+        "这意味着未来 AI 的一部分竞争不再是“谁的回答更好”，而是“谁先成为用户每天无感调用的默认能力”。",
+        "对一个 AI 资讯站来说，这类判断型内容能明显提高用户停留，因为它帮助用户建立产业地图，而不是只追单条新闻。"
+      ],
+      "en": [
+        "A large share of AI products initially lived in the web and cloud, which kept distribution relatively open. Once on-device AI matures, control shifts back toward operating systems, chips, and default apps.",
+        "That means part of AI competition will no longer be about who answers better, but about who becomes the invisible default capability people use every day.",
+        "For an AI newsroom, this kind of interpretive brief is valuable because it helps readers build an industry map instead of chasing isolated headlines."
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "slug": "ai-capex-becomes-industrial-race",
+    "featured": false,
+    "category": "chips",
+    "region": "global",
+    "signal": "frontier",
+    "date": "2026-04-03",
+    "source": "AI Insight Capital Brief",
+    "readingTime": 5,
+    "tags": ["Infrastructure", "Capex", "NVIDIA", "Meta"],
+    "title": {
+      "zh": "AI 资本开支正在从技术投入升级为工业级配置战争",
+      "en": "AI capital expenditure is turning from technical spend into an industrial allocation war"
+    },
+    "deck": {
+      "zh": "大公司现在比的不只是买卡速度，而是能不能锁住电力、园区、供应链和长期预算。",
+      "en": "The contest is no longer just about buying chips quickly, but about locking in power, campuses, supply chains, and long-horizon budgets."
+    },
+    "summaryPoints": {
+      "zh": [
+        "AI 的重资产化正在改变产业门槛，普通公司和头部平台的距离会被进一步拉大。",
+        "看 AI 产业不再只看模型新闻，还要看基础设施建设能力。",
+        "资本开支故事会越来越影响产品节奏和价格体系。"
+      ],
+      "en": [
+        "The heavy-capital turn in AI is raising the barrier between ordinary companies and leading platforms.",
+        "To understand AI, readers increasingly need infrastructure narratives alongside model narratives.",
+        "Capex stories will increasingly shape product cadence and pricing."
+      ]
+    },
+    "insight": {
+      "zh": "当 AI 走向重资本周期后，行业领先不再只是技术领先，也是一种工业组织能力领先。",
+      "en": "As AI moves into a heavy-capital cycle, industry leadership becomes not only technical leadership but industrial-organizational leadership."
+    },
+    "who": {
+      "zh": "投资人、云平台团队、芯片和基础设施观察者",
+      "en": "Investors, cloud teams, and readers tracking chips and infrastructure"
+    },
+    "watchpoint": {
+      "zh": "重点跟踪电力、冷却、园区建设和长期芯片供给协议。",
+      "en": "Track power, cooling, campus buildout, and long-term chip supply agreements."
+    },
+    "content": {
+      "zh": [
+        "AI 竞争早期看起来像一场技术演示战，但随着大模型和推理服务进入规模化部署，整个行业越来越像一场工业系统工程竞赛。现在真正决定速度的，不只是模型团队，而是电力、数据中心、冷却、网络和资本配置。",
+        "这会改变产品世界。谁能锁住更大的基础设施，谁就更容易承受更低价格、更高并发和更快扩张。",
+        "对读者来说，这类内容很重要，因为它能解释为什么有些公司看起来发布速度很快，而有些公司更像在布局未来三年的主导权。"
+      ],
+      "en": [
+        "Early AI competition looked like a technology demonstration race. As large-model and inference services scale, the industry increasingly resembles an industrial systems contest. Speed is now determined not only by model teams, but by power, data centers, cooling, networking, and capital allocation.",
+        "That changes the product layer too. The companies that lock in bigger infrastructure can tolerate lower prices, higher concurrency, and faster expansion.",
+        "For readers, this matters because it explains why some companies appear fast in releases while others are really positioning for dominance over the next several years."
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "slug": "china-ai-shifts-from-models-to-business-structure",
+    "featured": false,
+    "category": "policy",
+    "region": "china",
+    "signal": "breakout",
+    "date": "2026-04-02",
+    "source": "AI Insight China Desk",
+    "readingTime": 5,
+    "tags": ["China AI", "Baidu", "Tencent", "Alibaba", "DeepSeek"],
+    "title": {
+      "zh": "中国 AI 竞争正在从模型能力转向业务结构与平台兑现",
+      "en": "China’s AI competition is shifting from model capability toward business structure and platform realization"
+    },
+    "deck": {
+      "zh": "真正值得持续追踪的，不只是哪个中文模型更强，而是谁已经把模型、云、应用和分发串成业务结构。",
+      "en": "The more durable question is no longer only which Chinese model is stronger, but who has already connected models, cloud, applications, and distribution into a business structure."
+    },
+    "summaryPoints": {
+      "zh": [
+        "中国厂商的差异化常常不只在模型能力，而在平台分发与经营兑现速度。",
+        "Baidu、阿里、腾讯、DeepSeek 代表的是不同的路径，而不是同一条赛道的简单比较。",
+        "做中国 AI 内容时，不能只有模型榜单，也要解释商业结构。"
+      ],
+      "en": [
+        "Chinese players often differentiate not only through model capability, but through platform distribution and the speed of business conversion.",
+        "Baidu, Alibaba, Tencent, and DeepSeek represent different paths rather than a simple comparison inside one track.",
+        "Strong China coverage requires more than model rankings; it needs business-structure analysis."
+      ]
+    },
+    "insight": {
+      "zh": "中国 AI 的真正看点，很多时候不是谁发得最响，而是谁把 AI 写进收入、平台和用户路径里。",
+      "en": "The most important China AI signal is often not who announces the loudest, but who writes AI into revenue, platforms, and user paths."
+    },
+    "who": {
+      "zh": "中国科技观察者、出海团队、企业 AI 负责人",
+      "en": "China-tech watchers, international teams, and enterprise AI leads"
+    },
+    "watchpoint": {
+      "zh": "重点看云收入、应用渗透、企业案例和平台原生分发入口。",
+      "en": "Watch cloud revenue, application penetration, enterprise wins, and native distribution entry points."
+    },
+    "content": {
+      "zh": [
+        "很多关于中国 AI 的讨论容易停在模型名字和开源热度，但真正更难复制的差异，通常来自业务结构。百度更接近基础设施和应用兑现，阿里更靠近云与企业，腾讯更偏平台与场景，DeepSeek则更靠近模型与开发者关注度。",
+        "把这些公司都写成“又一个模型玩家”，会让读者失去判断力。更好的做法，是持续告诉用户它们各自在产业链里真正占据什么位置。",
+        "对你的网站来说，这类中国视角内容能明显提升全球性，因为它不会把整个 AI 世界压成单一叙事。"
+      ],
+      "en": [
+        "A lot of discussion around China AI gets stuck at model names and open-weight momentum. But the harder-to-copy differences often come from business structure. Baidu leans toward infrastructure and application monetization, Alibaba toward cloud and enterprise, Tencent toward platform and scenarios, while DeepSeek is closer to model and developer attention.",
+        "If all of them are written as just 'another model player,' readers lose the ability to judge the market. A better editorial approach is to keep explaining what position each one actually holds in the chain.",
+        "For your site, this kind of China-focused framing improves global credibility because it avoids collapsing the whole AI world into one narrative."
+      ]
+    }
   }
 ];

@@ -1018,5 +1018,345 @@ window.AIInsightMicroData = [
         "When projects like this appear consistently in the tool radar, the site feels more like a real AI discovery destination and less like a headline-only surface."
       ]
     }
+  },
+  {
+    id: 2013,
+    slug: "litellm-multi-provider-gateway-layer",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "watch",
+    date: "2026-03-30",
+    sourceName: "GitHub / LiteLLM",
+    sourceType: "github",
+    sourceUrl: "https://github.com/BerriAI/litellm",
+    readingTime: 2,
+    tags: ["LiteLLM", "Gateway", "Multi-model"],
+    briefType: {
+      zh: "模型网关",
+      en: "Model gateway"
+    },
+    metricLabel: {
+      zh: "工具角色",
+      en: "Tool role"
+    },
+    metricValue: "Gateway layer · routing · observability",
+    title: {
+      zh: "LiteLLM 这类网关层项目值得常驻，因为企业最终要管理的不是一个模型，而是一堆模型",
+      en: "Projects like LiteLLM deserve a standing slot because teams rarely manage one model forever"
+    },
+    deck: {
+      zh: "多模型时代真正缺的，往往不是再多一个模型，而是统一路由、鉴权、计费和观测层。",
+      en: "In a multi-model era, what teams often lack is not another model but unified routing, auth, billing, and observability."
+    },
+    summaryPoints: {
+      zh: [
+        "LiteLLM 适合放在工具雷达，因为它直接影响企业怎么接多家模型服务。",
+        "这类工具比“哪个模型又强了一点”更接近真实落地。",
+        "它也会让你的网站更像工作流入口，而不是 headline 看板。"
+      ],
+      en: [
+        "LiteLLM belongs in the tool radar because it affects how enterprises actually connect multiple model vendors.",
+        "This is closer to real deployment than another small change in model rankings.",
+        "It makes the site feel more like a workflow map than a headline board."
+      ]
+    },
+    editorialSummary: {
+      zh: "多模型竞争越激烈，网关层越重要，因为真正的成本、权限和稳定性控制大多发生在这里。",
+      en: "The more competitive the multi-model market becomes, the more important the gateway layer gets because cost, permissions, and stability are largely controlled there."
+    },
+    aiSummary: {
+      zh: "LiteLLM 代表的是多模型接入的控制层，它帮助团队统一路由、权限和观测，而不是被单一模型绑定。",
+      en: "LiteLLM represents the control layer for multi-model access, helping teams unify routing, permissions, and observability instead of being locked to one provider."
+    },
+    insight: {
+      zh: "真正长期有价值的 AI 工具，不一定是最会生成内容的，而是最会管理复杂性的。",
+      en: "Some of the most durable AI tools will not be the best at generation, but the best at managing complexity."
+    },
+    who: {
+      zh: "平台工程师、企业架构师、多模型团队",
+      en: "Platform engineers, enterprise architects, and multi-model teams"
+    },
+    watchpoint: {
+      zh: "继续看它在路由策略、可观测性和企业权限上的加强。",
+      en: "Watch how it improves routing policy, observability, and enterprise permissions."
+    },
+    proNotes: {
+      zh: [
+        "如果站点想让专业用户留下来，就要稳定覆盖这类“中间层”工具。",
+        "它能很好地补足大公司产品新闻和研究新闻之间的实用层空缺。"
+      ],
+      en: [
+        "If the site wants expert users to stay, it needs consistent coverage of tools like this middle layer.",
+        "It fills the practical gap between big-company product news and research coverage."
+      ]
+    },
+    content: {
+      zh: [
+        "LiteLLM 不是大众最熟悉的名字，但对真正接多模型服务的团队来说，它是高价值工具。它的意义在于把杂乱的模型接口统一成一层更容易管理的控制面。",
+        "这类项目放进工具雷达，能明显提高你网站的实用度。"
+      ],
+      en: [
+        "LiteLLM is not the most mainstream name, but it is a high-value tool for teams that actually connect multiple model services. Its importance lies in turning messy provider interfaces into a more manageable control plane.",
+        "Adding projects like this to the radar makes the site materially more useful."
+      ]
+    }
+  },
+  {
+    id: 2014,
+    slug: "lm-studio-local-model-desktop",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "breakout",
+    date: "2026-03-29",
+    sourceName: "LM Studio",
+    sourceType: "official",
+    sourceUrl: "https://lmstudio.ai/",
+    readingTime: 2,
+    tags: ["LM Studio", "Local models", "Desktop AI"],
+    briefType: {
+      zh: "本地模型",
+      en: "Local models"
+    },
+    metricLabel: {
+      zh: "工具角色",
+      en: "Tool role"
+    },
+    metricValue: "Desktop runtime · local inference · user-friendly",
+    title: {
+      zh: "LM Studio 这类桌面工具很重要，因为它让本地模型第一次对普通用户也像产品",
+      en: "LM Studio matters because it makes local models feel like a product even for non-expert users"
+    },
+    deck: {
+      zh: "本地模型真正出圈，不靠命令行，而靠这种把下载、运行和切换做成桌面体验的工具。",
+      en: "Local models break out not through terminal commands, but through tools that turn download, runtime, and switching into a desktop experience."
+    },
+    summaryPoints: {
+      zh: [
+        "普通用户真正接触本地模型，往往从 LM Studio 这种桌面入口开始。",
+        "它对你的站点很有价值，因为它比抽象框架更接近真实使用。",
+        "这类项目非常适合 Pulse 和 Light 的工具位。"
+      ],
+      en: [
+        "Many mainstream users meet local models through a desktop entry point like LM Studio.",
+        "It is valuable to your site because it sits closer to actual usage than abstract frameworks do.",
+        "This fits especially well into the tool lane in Pulse and Light."
+      ]
+    },
+    editorialSummary: {
+      zh: "本地模型要从爱好者走向大众，关键不是模型更多，而是工具足够顺手。",
+      en: "For local models to move from enthusiasts to mainstream users, the key is not only more models but better tooling."
+    },
+    aiSummary: {
+      zh: "LM Studio 代表的是本地模型体验层，它让普通用户也能更低门槛地下载、运行和切换模型。",
+      en: "LM Studio represents the experience layer for local models, lowering the barrier for mainstream users to download, run, and switch them."
+    },
+    insight: {
+      zh: "谁抓住本地模型的入口体验，谁就更容易抓住下一批对隐私和成本敏感的用户。",
+      en: "Whoever owns the entry experience for local models is better positioned to capture the next wave of privacy- and cost-sensitive users."
+    },
+    who: {
+      zh: "普通用户、本地模型爱好者、桌面 AI 使用者",
+      en: "General users, local-model enthusiasts, and desktop AI users"
+    },
+    watchpoint: {
+      zh: "继续看它在模型管理、推理性能和 API 兼容性上的进展。",
+      en: "Watch how it improves model management, inference performance, and API compatibility."
+    },
+    proNotes: {
+      zh: [
+        "这类工具会让网站更像真实使用入口，而不是只面向研究员。",
+        "它也能帮助视频页和工具页形成更清晰的产品发现逻辑。"
+      ],
+      en: [
+        "Tools like this make the site feel more like a real usage entry point instead of a surface only for researchers.",
+        "They also create a cleaner product-discovery logic across the watch and tool pages."
+      ]
+    },
+    content: {
+      zh: [
+        "LM Studio 的意义，在于它把本地模型这件本来有门槛的事，做成了更接近普通桌面软件的体验。对用户来说，这种工具比又一个模型榜单更容易转化成实际尝试。",
+        "如果你的站点想让用户留下来，像这种“看完就可能真的去试”的工具特别关键。"
+      ],
+      en: [
+        "LM Studio matters because it turns something previously quite technical into a more familiar desktop-software experience. For users, that is much more likely to trigger real experimentation than another benchmark chart.",
+        "If your site wants users to stay, tools that readers may actually try right after reading are especially valuable."
+      ]
+    }
+  },
+  {
+    id: 2015,
+    slug: "anythingllm-private-rag-workspace",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "watch",
+    date: "2026-03-28",
+    sourceName: "GitHub / AnythingLLM",
+    sourceType: "github",
+    sourceUrl: "https://github.com/Mintplex-Labs/anything-llm",
+    readingTime: 2,
+    tags: ["AnythingLLM", "Private AI", "RAG"],
+    briefType: {
+      zh: "私有工作台",
+      en: "Private workspace"
+    },
+    metricLabel: {
+      zh: "工具角色",
+      en: "Tool role"
+    },
+    metricValue: "Private AI · knowledge base · team workspace",
+    title: {
+      zh: "AnythingLLM 这类私有 AI 工作台值得追，因为很多团队真正想要的是可控而不是最前沿",
+      en: "AnythingLLM is worth tracking because many teams want controllability more than frontier hype"
+    },
+    deck: {
+      zh: "企业和团队在意的往往不是模型最强，而是知识库、权限和私有部署能不能一起顺下来。",
+      en: "What teams often care about is not frontier power alone, but whether knowledge bases, permissions, and private deployment actually work together."
+    },
+    summaryPoints: {
+      zh: [
+        "AnythingLLM 代表的是更务实的 AI 落地路线：把知识库、私有部署和工作台组合起来。",
+        "这类项目对企业用户的吸引力，往往比单条模型新闻更直接。",
+        "它能补强你站点的“真实可用”气质。"
+      ],
+      en: [
+        "AnythingLLM represents a more practical AI route: combine knowledge bases, private deployment, and a usable workspace.",
+        "For enterprise readers, that can be more compelling than a single model headline.",
+        "It strengthens the site’s practical credibility."
+      ]
+    },
+    editorialSummary: {
+      zh: "不是所有用户都想追最前沿模型，很多用户真正关心的是怎样把 AI 安全地装进自己的知识体系里。",
+      en: "Not every user wants the most frontier model. Many care more about how to fit AI safely into their own knowledge systems."
+    },
+    aiSummary: {
+      zh: "AnythingLLM 把私有知识库、团队工作台和模型接入组合成更可控的 AI 使用路径，适合想要实用而不是炫技的团队。",
+      en: "AnythingLLM combines private knowledge bases, team workspaces, and model access into a more controlled AI path for teams that value practicality over hype."
+    },
+    insight: {
+      zh: "用户长期留在一个 AI 信息产品里，靠的不是天天最大新闻，而是你能不能持续帮他发现真正用得上的东西。",
+      en: "Long-term retention in an AI information product comes not only from daily biggest headlines, but from repeatedly surfacing tools people can actually use."
+    },
+    who: {
+      zh: "团队管理员、企业知识库用户、私有部署团队",
+      en: "Team admins, enterprise knowledge-base users, and private-deployment teams"
+    },
+    watchpoint: {
+      zh: "继续看它在权限、团队协作、多模型和知识库导入体验上的进展。",
+      en: "Watch how it evolves in permissions, collaboration, multi-model support, and knowledge import experience."
+    },
+    proNotes: {
+      zh: [
+        "这类项目会让专业用户感觉站点不仅会追新闻，也会追工作流。",
+        "它也很适合和本地模型、LM Studio 这类内容形成组合阅读。"
+      ],
+      en: [
+        "Projects like this signal to professional readers that the site follows workflows, not only headlines.",
+        "It also pairs naturally with local-model and LM Studio coverage."
+      ]
+    },
+    content: {
+      zh: [
+        "AnythingLLM 这种项目看起来不如头部模型发布耀眼，但真正落地时，很多企业团队更需要它这种“能管知识、能控权限、能接模型”的组合产品。",
+        "对你的网站来说，这类条目很能提升实用度。"
+      ],
+      en: [
+        "AnythingLLM may not look as flashy as a frontier model release, but in real deployment many teams need exactly this kind of combination product that manages knowledge, permissions, and model access together.",
+        "For your site, items like this sharply improve practical usefulness."
+      ]
+    }
+  },
+  {
+    id: 2016,
+    slug: "comfyui-visual-workflow-layer",
+    live: true,
+    micro: true,
+    featured: false,
+    category: "tooling",
+    region: "global",
+    signal: "watch",
+    date: "2026-03-27",
+    sourceName: "GitHub / ComfyUI",
+    sourceType: "github",
+    sourceUrl: "https://github.com/comfyanonymous/ComfyUI",
+    readingTime: 2,
+    tags: ["ComfyUI", "Workflow", "Visual AI"],
+    briefType: {
+      zh: "可视化工作流",
+      en: "Visual workflow"
+    },
+    metricLabel: {
+      zh: "工具角色",
+      en: "Tool role"
+    },
+    metricValue: "Visual graph · workflow control · creator tooling",
+    title: {
+      zh: "ComfyUI 这类可视化工作流项目应该留在雷达里，因为它代表创作者真正会反复打开的 AI 界面",
+      en: "ComfyUI belongs in the radar because it represents the AI interface creators actually reopen again and again"
+    },
+    deck: {
+      zh: "不只是图片生成，ComfyUI 代表的是用户愿意亲手调流程、调节点、调结果的那一层界面。",
+      en: "This is not only about image generation. ComfyUI represents the layer where users willingly tune flows, nodes, and outputs by hand."
+    },
+    summaryPoints: {
+      zh: [
+        "创作者类 AI 工具不该只看模型，还要看工作流界面。",
+        "ComfyUI 这种项目有很强的长期使用属性，适合放在常驻工具位。",
+        "它能让网站覆盖到更真实的创作者生态。"
+      ],
+      en: [
+        "Creator-facing AI cannot be understood through models alone; workflow interfaces matter.",
+        "ComfyUI has strong repeat-usage value and deserves a standing slot in the tool lane.",
+        "It helps the site cover a more authentic creator ecosystem."
+      ]
+    },
+    editorialSummary: {
+      zh: "AI 走向主流后，真正留下来的不是所有模型，而是那些被用户嵌进工作流的界面。",
+      en: "As AI goes mainstream, what tends to stick is not every model, but the interfaces users embed into workflows."
+    },
+    aiSummary: {
+      zh: "ComfyUI 代表的是可视化 AI 工作流界面，它让用户可以更细地控制创作过程，而不是只点一次生成。",
+      en: "ComfyUI represents a visual AI workflow interface that lets users control creative processes more precisely than one-click generation."
+    },
+    insight: {
+      zh: "做 AI 内容产品时，别只问哪个模型强，也要问哪个界面会被人每天打开。",
+      en: "When building an AI content product, do not ask only which model is strongest; ask which interface people will open every day."
+    },
+    who: {
+      zh: "创作者、视觉工作流用户、AI 设计工具爱好者",
+      en: "Creators, visual-workflow users, and AI design-tool enthusiasts"
+    },
+    watchpoint: {
+      zh: "继续看它在插件生态、节点模板和创作者协作上的扩张。",
+      en: "Watch its growth in plugin ecosystems, node templates, and creator collaboration."
+    },
+    proNotes: {
+      zh: [
+        "这一类工具会让站点更接近真实创作者和工作流用户。",
+        "也能让视频与解读页有更自然的主题延伸。"
+      ],
+      en: [
+        "This class of tool brings the site closer to actual creators and workflow users.",
+        "It also creates more natural thematic bridges into the watch page."
+      ]
+    },
+    content: {
+      zh: [
+        "ComfyUI 这类项目的价值，在于它把 AI 从“点一下试试”变成“我真的把它放进流程里”。这种工具很容易带来重复访问和持续学习，也很适合成为你网站的长期工具内容。",
+        "如果你想提高留存，这种内容的价值通常比再多一条普通快讯更高。"
+      ],
+      en: [
+        "The value of projects like ComfyUI is that they move AI from a one-off experiment into something people put inside a repeatable process. That makes them ideal long-term tooling content for your site.",
+        "If you want retention, items like this can be more valuable than yet another generic quick update."
+      ]
+    }
   }
 ];

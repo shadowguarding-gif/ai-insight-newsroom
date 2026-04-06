@@ -57,25 +57,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (viewMode === "pro") {
       return {
         ...shared,
-        liveLimit: 5,
-        microLimit: 4,
-        briefLimit: 4,
-        boardroomLimit: 3,
-        chinaLimit: 3,
-        researchLimit: 3,
+        liveLimit: 6,
+        microLimit: 5,
+        briefLimit: 5,
+        boardroomLimit: 4,
+        chinaLimit: 4,
+        researchLimit: 4,
         journalLimit: 4,
         showProviders: true,
         showJournals: true,
         showQuickResearchRoute: true,
-        videoLimit: 3
+        videoLimit: 3,
+        digestLimit: 8
       };
     }
 
     if (viewMode === "light") {
       return {
         ...shared,
-        liveLimit: 5,
-        microLimit: 4,
+        liveLimit: 6,
+        microLimit: 5,
         briefLimit: 4,
         boardroomLimit: 3,
         chinaLimit: 3,
@@ -84,15 +85,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         showProviders: false,
         showJournals: false,
         showQuickResearchRoute: false,
-        videoLimit: 3
+        videoLimit: 3,
+        digestLimit: 7
       };
     }
 
     return {
       ...shared,
-      liveLimit: 4,
-      microLimit: 4,
-      briefLimit: 3,
+      liveLimit: 5,
+      microLimit: 5,
+      briefLimit: 4,
       boardroomLimit: 3,
       chinaLimit: 3,
       researchLimit: 2,
@@ -100,7 +102,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       showProviders: false,
       showJournals: false,
       showQuickResearchRoute: false,
-      videoLimit: 2
+      videoLimit: 2,
+      digestLimit: 6
     };
   }
 
@@ -127,6 +130,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         statusLead: meta.remoteConnected
           ? "首页当前会把远端 live 源、站内精选和工具雷达合并展示。"
           : "当前首页仍会优先使用站内高信号内容，远端接口连通后会自动继续扩容。",
+        digestTitle: "一分钟扫完",
+        digestNote: "先把今天最该知道的变化压成短句，再决定点开哪几条深读。",
         routesTitle: "先从这里开始",
         routesNote: isPro
           ? "把最常用的几条入口压成服务台，先帮用户做对第一步，再进入更密的专业工作台。"
@@ -199,6 +204,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         statusLead: meta.remoteConnected
           ? "The homepage is now blending remote live updates, in-house curation, and the tooling radar."
           : "The homepage still leans on in-house high-signal coverage first and expands naturally once the remote endpoint responds.",
+        digestTitle: "One-minute brief",
+        digestNote: "Compress the key shifts into short lines first, then let readers decide which items deserve a full click.",
         routesTitle: "Start here",
         routesNote: isPro
           ? "Turn the most-used actions into a service desk first, then let expert readers go deeper into the workbench."
@@ -278,6 +285,24 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         </div>
       </article>
+    `;
+  }
+
+  function createDigestLine(item, language) {
+    const quickRead = AIInsight.getStoryQuickRead(item, language);
+    const company = AIInsight.getStoryCompanyLabel(item, language) || item.sourceName || "AI Insight";
+    const summary = quickRead.why || quickRead.oneLine || AIInsight.getStoryLeadPreview(item, language, true);
+
+    return `
+      <a class="digest-line page-fade" href="detail.html?id=${item.id}">
+        <div class="digest-line-top">
+          <span class="ghost-badge">${AIInsight.escapeHtml(company)}</span>
+          <span class="${AIInsight.getBadgeClass(item.signal)}">${AIInsight.escapeHtml(AIInsight.getSignalLabel(item.signal, language))}</span>
+          <span class="ghost-badge">${AIInsight.escapeHtml(AIInsight.formatDate(item.date, language))}</span>
+        </div>
+        <strong>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</strong>
+        <p>${AIInsight.escapeHtml(summary)}</p>
+      </a>
     `;
   }
 
@@ -473,7 +498,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       ...headlineStories.filter((item) => !AIInsight.isMicroStory(item))
     ]), { maxPerCompany: 1, maxFallback: 2 })
       .filter((item) => String(item.id) !== featuredId && !liveIds.has(String(item.id)))
-      .slice(0, compactViewport ? 4 : 6);
+      .slice(0, compactViewport ? 5 : 8);
+    const digestStories = uniqueById([
+      featured,
+      ...liveStories,
+      ...smallStories,
+      ...briefStories,
+      ...microStories
+    ]).slice(0, compactViewport ? Math.min(profile.digestLimit, 5) : profile.digestLimit);
     const watchStories = AIInsight.limitStoriesPerCompany(
       uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).filter((item) => AIInsight.getStoryVideoLinks(item, language).length),
       { maxPerCompany: 1, maxFallback: 1 }
@@ -604,6 +636,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         </section>
 
         ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>${AIInsight.escapeHtml(pageCopy.digestTitle)}</h2>
+              <p class="section-note">${AIInsight.escapeHtml(pageCopy.digestNote)}</p>
+            </div>
+          </div>
+          <div class="digest-board panel">
+            ${digestStories.map((item) => createDigestLine(item, language)).join("")}
+          </div>
+        </section>
 
         <section class="section">
           <div class="scan-rail">
