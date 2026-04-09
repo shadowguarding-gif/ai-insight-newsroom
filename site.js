@@ -8,6 +8,8 @@
   const TRACKED_TOPICS_KEY = "ai-insight-tracked-topics";
   const BRIEFING_SETTINGS_KEY = "ai-insight-briefing-settings";
   const ACCOUNT_TOKEN_KEY = "ai-insight-account-token";
+  const GUIDE_DISMISSED_KEY = "ai-insight-guide-dismissed";
+  const GUIDE_SESSION_KEY = "ai-insight-guide-session-dismissed";
 
   const categories = [
     { key: "all", label: { zh: "全部", en: "All" } },
@@ -1803,6 +1805,21 @@
     `;
   }
 
+  function normalizeVideoLinks(value) {
+    return (Array.isArray(value) ? value : [])
+      .map((item, index) => ({
+        id: item.id || `video-${index + 1}`,
+        platform: item.platform || "Official",
+        platformKey: normalizeSearchToken(item.platformKey || item.platform || "official").replace(/\s+/g, "-") || "official",
+        title: item.title || "",
+        note: item.note || "",
+        url: String(item.url || "").trim(),
+        angle: item.angle || (String(item.id || "").toLowerCase().includes("analysis") ? "analysis" : "official"),
+        language: item.language || "all"
+      }))
+      .filter((item) => /^https?:\/\//i.test(item.url));
+  }
+
   function normalizeItem(item, index) {
     return {
       id: item.id || `story-${index}`,
@@ -1832,21 +1849,37 @@
       insight: item.insight || { zh: "", en: "" },
       who: item.who || { zh: "", en: "" },
       watchpoint: item.watchpoint || { zh: "", en: "" },
-      content: item.content || { zh: [], en: [] }
+      content: item.content || { zh: [], en: [] },
+      videoLinks: normalizeVideoLinks(item.videoLinks)
     };
   }
 
   function dedupeNews(news) {
-    const seen = new Set();
-    return news.filter((item) => {
+    const merged = new Map();
+
+    news.forEach((item) => {
       const key = item.sourceUrl || item.slug || `${localize(item.title, "en")}-${item.date}`;
-      if (seen.has(key)) {
-        return false;
+
+      if (!merged.has(key)) {
+        merged.set(key, item);
+        return;
       }
 
-      seen.add(key);
-      return true;
+      const current = merged.get(key);
+      merged.set(key, {
+        ...current,
+        ...item,
+        featured: Boolean(current.featured || item.featured),
+        tags: uniqueStrings([...(current.tags || []), ...(item.tags || [])]),
+        videoLinks: normalizeVideoLinks([...(current.videoLinks || []), ...(item.videoLinks || [])]),
+        proNotes: {
+          zh: uniqueStrings([...(localize(current.proNotes, "zh") || []), ...(localize(item.proNotes, "zh") || [])]),
+          en: uniqueStrings([...(localize(current.proNotes, "en") || []), ...(localize(item.proNotes, "en") || [])])
+        }
+      });
     });
+
+    return [...merged.values()];
   }
 
   function sortNews(news) {
@@ -2470,6 +2503,114 @@
     `;
   }
 
+  function getGuideCopy(language) {
+    return language === "zh"
+      ? {
+          title: "第一次来，先这样用",
+          body: "先扫首页和一分钟速读，再决定是看公司专栏、视频入口，还是用 Radar 盯一个主题。",
+          cards: [
+            { label: "资讯", value: "先扫主线和小新闻，别一上来就深读。" },
+            { label: "专栏", value: "大公司放进长期归档，适合连续跟踪。" },
+            { label: "视频", value: "这里只放已核实的视频，不再硬塞搜索链接。" },
+            { label: "Radar", value: "把想追的主题收进去，之后会自动影响简报。" }
+          ],
+          close: "知道了",
+          dismiss: "不再提醒"
+        }
+      : {
+          title: "Start here",
+          body: "Scan the homepage and the one-minute digest first, then decide whether you need company desks, verified video routes, or Radar tracking.",
+          cards: [
+            { label: "Feed", value: "Start with big stories and small updates before going deep." },
+            { label: "Desks", value: "Major companies stay in standing archives for long-term tracking." },
+            { label: "Watch", value: "This lane only shows verified videos instead of guessed search routes." },
+            { label: "Radar", value: "Track a theme once and let it shape your briefing later." }
+          ],
+          close: "Got it",
+          dismiss: "Don't remind me"
+        };
+  }
+
+  function hasGuideBeenDismissed() {
+    try {
+      return window.localStorage.getItem(GUIDE_DISMISSED_KEY) === "1" || window.sessionStorage.getItem(GUIDE_SESSION_KEY) === "1";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function dismissGuide(permanent) {
+    const slot = document.getElementById("site-guide-slot");
+
+    try {
+      if (permanent) {
+        window.localStorage.setItem(GUIDE_DISMISSED_KEY, "1");
+      } else {
+        window.sessionStorage.setItem(GUIDE_SESSION_KEY, "1");
+      }
+    } catch (error) {
+      // Ignore storage errors and still remove the banner from the page.
+    }
+
+    if (slot) {
+      slot.remove();
+    }
+  }
+
+  function renderGuideBanner(currentPage) {
+    const existing = document.getElementById("site-guide-slot");
+
+    if (existing) {
+      existing.remove();
+    }
+
+    if (currentPage !== "home" || hasGuideBeenDismissed()) {
+      return;
+    }
+
+    const header = document.getElementById("site-header");
+    if (!header || !header.parentNode) {
+      return;
+    }
+
+    const language = getLanguage();
+    const guide = getGuideCopy(language);
+    const slot = document.createElement("div");
+    slot.id = "site-guide-slot";
+    slot.innerHTML = `
+      <div class="page-shell">
+        <section class="guide-banner panel page-fade">
+          <div class="guide-banner-head">
+            <div>
+              <span class="meta-label">${escapeHtml(language === "zh" ? "站点提示" : "Quick guide")}</span>
+              <h2>${escapeHtml(guide.title)}</h2>
+              <p class="panel-text">${escapeHtml(guide.body)}</p>
+            </div>
+            <div class="guide-actions">
+              <button class="button button-secondary" type="button" data-guide-dismiss="session">${escapeHtml(guide.close)}</button>
+              <button class="button button-primary" type="button" data-guide-dismiss="forever">${escapeHtml(guide.dismiss)}</button>
+            </div>
+          </div>
+          <div class="guide-banner-grid">
+            ${guide.cards.map((item) => `
+              <article class="guide-banner-card">
+                <span class="mini-label">${escapeHtml(item.label)}</span>
+                <p>${escapeHtml(item.value)}</p>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      </div>
+    `;
+
+    header.insertAdjacentElement("afterend", slot);
+    slot.querySelectorAll("[data-guide-dismiss]").forEach((button) => {
+      button.addEventListener("click", () => {
+        dismissGuide(button.dataset.guideDismiss === "forever");
+      });
+    });
+  }
+
   async function initShell(currentPage) {
     const header = document.getElementById("site-header");
     const footer = document.getElementById("site-footer");
@@ -2487,6 +2628,7 @@
 
       bindLanguageButtons();
       bindViewModeButtons();
+      renderGuideBanner(currentPage);
     }
 
     drawShell();
@@ -2667,7 +2809,7 @@
     const language = options && options.language ? options.language : getLanguage();
     const compact = options && options.compact;
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(getStoryLeadPreview(item, language, true));
+    const deck = escapeHtml(getPracticalStorySummary(item, language, { compact: true }) || getStoryLeadPreview(item, language, true));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || `${item.readingTime} ${t("common.readingTimeSuffix", language)}`);
@@ -2751,7 +2893,7 @@
   function createSignalCard(item, options) {
     const language = options && options.language ? options.language : getLanguage();
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(getStoryLeadPreview(item, language, true));
+    const deck = escapeHtml(getPracticalStorySummary(item, language, { compact: true }) || getStoryLeadPreview(item, language, true));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || formatDate(item.date, language));
@@ -3051,105 +3193,41 @@
     return clampSummaryText(`${lead}${primary.replace(/[.!?]$/g, "")}.${whyLine}${focusLine || nextLine}`, model === "local-expanded" ? 280 : 240);
   }
 
-  function buildVideoSearchUrl(platform, query) {
-    const nextQuery = encodeURIComponent(normalizeSummaryText(query));
-
-    if (platform === "bilibili") {
-      return `https://search.bilibili.com/all?keyword=${nextQuery}`;
-    }
-
-    return `https://www.youtube.com/results?search_query=${nextQuery}`;
-  }
-
   function getStoryVideoLinks(story, language) {
     const nextLanguage = language || getLanguage();
-    const storyTitleZh = normalizeSummaryText(localize(story && story.title, "zh"));
-    const storyTitleEn = normalizeSummaryText(localize(story && story.title, "en"));
-    const sourceName = normalizeSummaryText(story && (story.sourceName || story.source));
-    const tags = uniqueStrings((story && story.tags) || []).slice(0, 3);
-    const companyKeys = getStoryCompanyKeys(story);
-    const englishTopic = uniqueStrings([sourceName, storyTitleEn, ...tags]).join(" ");
-    const chineseTopic = uniqueStrings([storyTitleZh, sourceName, ...tags]).join(" ");
-    const displayZh = nextLanguage === "zh";
-    const signalText = normalizeSearchToken([storyTitleZh, storyTitleEn, sourceName, ...tags, story && story.category, story && story.region].join(" "));
-    const launchTerms = ["发布", "发布会", "大会", "峰会", "演示", "keynote", "demo", "launch", "release", "announce", "introducing", "conference", "summit", "event", "gtc", "build", "wwdc", "connect", "io"];
-    const hasLaunchSignal = launchTerms.some((term) => signalText.includes(normalizeSearchToken(term)));
-    const majorCompany = Boolean(companyKeys.length);
-    const officialEligible = Boolean(story && story.sourceUrl) && (
-      story.sourceType === "official" ||
-      (hasLaunchSignal && story.sourceType !== "github") ||
-      (["chips", "products", "models", "robotics"].includes(story.category) && story.sourceType !== "github") ||
-      companyKeys.includes("apple")
-    );
-    const englishAnalysisEligible = majorCompany || hasLaunchSignal || ["chips", "products", "models", "tooling", "robotics"].includes(story.category);
-    const chineseAnalysisEligible = story.region === "china" || hasLaunchSignal || companyKeys.some((key) => ["nvidia", "microsoft", "openai", "anthropic", "apple", "meta"].includes(key));
-    const routes = [];
+    const links = normalizeVideoLinks(story && story.videoLinks);
 
-    if (officialEligible) {
-      routes.push({
-        id: `${story.id}-yt-official`,
-        platform: "YouTube",
-        title: displayZh ? "YouTube 原视频搜索" : "Search original video",
-        note: displayZh
-          ? "更适合查 keynote、演示或官方上传；如果没有公开视频，就直接回原文。"
-          : "Best for keynotes, demos, or official uploads; if no public video exists, go back to the source.",
-        url: buildVideoSearchUrl("youtube", `${englishTopic} official keynote demo launch`),
-        priority: 3
+    return links
+      .filter((item) => {
+        if (!item.language || item.language === "all") {
+          return true;
+        }
+
+        return item.language === nextLanguage || item.angle === "official";
+      })
+      .sort((left, right) => {
+        if ((left.angle === "official") !== (right.angle === "official")) {
+          return left.angle === "official" ? -1 : 1;
+        }
+
+        return String(left.platformKey || left.platform).localeCompare(String(right.platformKey || right.platform));
       });
-    }
-
-    if (englishAnalysisEligible) {
-      routes.push({
-        id: `${story.id}-yt-analysis`,
-        platform: "YouTube",
-        title: displayZh ? "YouTube 英文解读搜索" : "Search English explainers",
-        note: displayZh
-          ? "只在更可能有英文解析价值的话题上给这条路线。"
-          : "Only shown when the topic is likely to have useful English explainers.",
-        url: buildVideoSearchUrl("youtube", `${englishTopic} analysis breakdown review`),
-        priority: 2
-      });
-    }
-
-    if (chineseAnalysisEligible) {
-      routes.push({
-        id: `${story.id}-bili-analysis`,
-        platform: "Bilibili",
-        title: displayZh ? "B站中文解读搜索" : "Search Chinese explainers",
-        note: displayZh
-          ? "只在更可能出现中文讲解的话题上给这条路线，不再默认硬塞。"
-          : "Only shown when Chinese explainers are more plausible instead of forcing a weak route.",
-        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 解读 测评`),
-        priority: 2
-      });
-    }
-
-    if (chineseAnalysisEligible && hasLaunchSignal && story.sourceType !== "github") {
-      routes.push({
-        id: `${story.id}-bili-official`,
-        platform: "Bilibili",
-        title: displayZh ? "B站发布会搜索" : "Search launch clips on Bilibili",
-        note: displayZh
-          ? "更适合找搬运、切片或同步上传的发布会片段。"
-          : "Useful for mirrored launch clips, reposts, or conference cut-downs.",
-        url: buildVideoSearchUrl("bilibili", `${chineseTopic} 发布会 演示`),
-        priority: 1
-      });
-    }
-
-    return routes.sort((left, right) => (right.priority || 0) - (left.priority || 0));
   }
 
   function createVideoLinkCard(link, language) {
+    const angleLabel = language === "zh"
+      ? (link.angle === "analysis" ? "解读视频" : "原始视频")
+      : (link.angle === "analysis" ? "Explainer" : "Original video");
+
     return `
       <article class="video-link-card page-fade">
         <div class="story-meta">
-          <span class="ghost-badge">${escapeHtml(link.platform)}</span>
-          <span class="ghost-badge">${escapeHtml(language === "zh" ? "搜索路线" : "Search route")}</span>
+          <span class="ghost-badge">${escapeHtml(localize(link.platform, language))}</span>
+          <span class="ghost-badge">${escapeHtml(angleLabel)}</span>
         </div>
-        <h3>${escapeHtml(link.title)}</h3>
-        <p class="panel-text">${escapeHtml(link.note)}</p>
-        <a class="story-link" href="${escapeHtml(link.url)}"${getExternalLinkAttributes()}>${escapeHtml(language === "zh" ? "打开链接" : "Open link")}</a>
+        <h3>${escapeHtml(localize(link.title, language))}</h3>
+        <p class="panel-text">${escapeHtml(localize(link.note, language))}</p>
+        <a class="story-link" href="${escapeHtml(link.url)}"${getExternalLinkAttributes()}>${escapeHtml(language === "zh" ? "打开视频" : "Open video")}</a>
       </article>
     `;
   }

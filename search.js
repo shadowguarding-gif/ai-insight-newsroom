@@ -201,7 +201,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             <input
               id="search-input"
               class="search-input"
-              type="search"
+              type="text"
+              inputmode="search"
+              enterkeyhint="search"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
               value="${AIInsight.escapeHtml(state.query)}"
               placeholder="${AIInsight.escapeHtml(pageCopy.placeholder)}"
             >

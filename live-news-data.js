@@ -843,6 +843,26 @@ window.AIInsightLiveData = [
     "sourceName": "NVIDIA",
     "sourceType": "official",
     "sourceUrl": "https://nvidianews.nvidia.com/news/gtc-spotlights-nvidia-rtx-pcs-and-dgx-sparks-running-latest-open-models-and-ai-agents-locally",
+    "videoLinks": [
+      {
+        "id": "1014-official-gtc",
+        "platform": {
+          "zh": "NVIDIA",
+          "en": "NVIDIA"
+        },
+        "platformKey": "official",
+        "angle": "official",
+        "title": {
+          "zh": "GTC 官方主题演讲回放页",
+          "en": "Official GTC keynote replay page"
+        },
+        "note": {
+          "zh": "这是一条真实存在的官方观看入口，适合先看发布会主线，再回来读文章。",
+          "en": "A verified official watch page for the keynote, useful when the launch itself is worth watching before reading."
+        },
+        "url": "https://www.nvidia.com/en-us/gtc/keynote/"
+      }
+    ],
     "tags": ["NVIDIA", "RTX", "Local AI"],
     "title": {
       "zh": "NVIDIA 把 RTX PC 和 DGX Spark 重新讲成“本地跑开源模型与 Agent”的入口",
@@ -1227,6 +1247,26 @@ window.AIInsightLiveData = [
     "sourceName": "Apple",
     "sourceType": "official",
     "sourceUrl": "https://www.apple.com/in/newsroom/2025/03/apple-unveils-new-mac-studio-the-most-powerful-mac-ever/",
+    "videoLinks": [
+      {
+        "id": "1020-official-apple-event",
+        "platform": {
+          "zh": "Apple",
+          "en": "Apple"
+        },
+        "platformKey": "official",
+        "angle": "official",
+        "title": {
+          "zh": "Apple 活动官方回放入口",
+          "en": "Official Apple event replay hub"
+        },
+        "note": {
+          "zh": "如果你想先看苹果是怎么展示这条设备端 AI 路线的，可以先从官方活动回放进入。",
+          "en": "If you want to see how Apple presented this device-side AI direction, start with the official event replay hub."
+        },
+        "url": "https://www.apple.com/apple-events/"
+      }
+    ],
     "tags": ["Apple", "Mac Studio", "Local AI", "M4 Max"],
     "title": {
       "zh": "Apple 用新 Mac Studio 强化本地 AI 工作站叙事",

@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         audienceTitle: "适合谁看",
         nextTitle: "下一步看什么",
         mediaTitle: "原始材料与视频入口",
-        mediaLead: "先看官方原文或原视频，再看解读，会比一上来读长文更省时间。",
-        mediaEmpty: "这条内容当前不强推视频路线，直接看原文通常更有效。",
+        mediaLead: "先看官方原文或已核实的原视频，再看解读，会比一上来读长文更省时间。",
+        mediaEmpty: "这条内容当前没有已核实的视频链接，直接看原文通常更有效。",
         bodyHint: "默认只展示前几段，先帮你判断这条值不值得继续往下读。",
         expandBody: "展开全文",
         collapseBody: "收起全文",
@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         audienceTitle: "Who should care",
         nextTitle: "What to watch next",
         mediaTitle: "Source and video routes",
-        mediaLead: "Start with the official source or original video, then move to explainers if the topic deserves more time.",
-        mediaEmpty: "This story does not currently force a watch route. Going straight to the source is usually the better use of time.",
+        mediaLead: "Start with the official source or a verified original video, then move to explainers if the topic deserves more time.",
+        mediaEmpty: "This story does not currently have a verified video link. Going straight to the source is usually the better use of time.",
         bodyHint: "The article opens in a shorter preview first so you can decide whether the full read is worth it.",
         expandBody: "Expand full article",
         collapseBody: "Collapse article",
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <section class="detail-quick-nav page-fade">
           <a class="chip" href="#decide-fast">${AIInsight.escapeHtml(pageCopy.quickNav.decide)}</a>
           <a class="chip" href="#quick-read">${AIInsight.escapeHtml(pageCopy.quickNav.brief)}</a>
-          <a class="chip" href="#media-desk">${AIInsight.escapeHtml(pageCopy.quickNav.watch)}</a>
+          ${videoLinks.length ? `<a class="chip" href="#media-desk">${AIInsight.escapeHtml(pageCopy.quickNav.watch)}</a>` : ""}
           <a class="chip" href="#full-read">${AIInsight.escapeHtml(pageCopy.quickNav.full)}</a>
           <a class="chip" href="#ai-studio">${AIInsight.escapeHtml(pageCopy.quickNav.ai)}</a>
         </section>
@@ -351,10 +351,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                   ? `<a class="button button-primary" href="${AIInsight.escapeHtml(article.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.t("common.openSource", language))}</a>`
                   : ""
               }
-              <a class="button button-secondary" href="watch.html?q=${encodeURIComponent(AIInsight.localize(article.title, language))}">${AIInsight.escapeHtml(language === "zh" ? "打开视频页" : "Open watch desk")}</a>
+              ${videoLinks.length ? `<a class="button button-secondary" href="watch.html?q=${encodeURIComponent(AIInsight.localize(article.title, language))}">${AIInsight.escapeHtml(language === "zh" ? "打开视频页" : "Open watch desk")}</a>` : ""}
               ${primaryVideoLinks
                 .map(
-                  (link) => `<a class="button button-secondary" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(link.title)}</a>`
+                  (link) => `<a class="button button-secondary" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.localize(link.title, language))}</a>`
                 )
                 .join("")}
             </div>

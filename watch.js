@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let news = [];
   const platformChoices = [
     { key: "all", label: { zh: "全部平台", en: "All platforms" } },
+    { key: "official", label: { zh: "官方站点", en: "Official site" } },
     { key: "youtube", label: { zh: "YouTube", en: "YouTube" } },
     { key: "bilibili", label: { zh: "Bilibili", en: "Bilibili" } }
   ];
@@ -18,6 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     platform: platformChoices.some((item) => item.key === params.get("platform")) ? params.get("platform") : "all",
     angle: angleChoices.some((item) => item.key === params.get("angle")) ? params.get("angle") : "all"
   };
+  let queryCommitTimer = null;
+  let isComposingQuery = false;
 
   await AIInsight.initShell("watch");
   AIInsight.startAutoRefresh();
@@ -26,39 +29,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     return {
       zh: {
         eyebrow: "Watch The Signal",
-        title: "把原视频、英文分析和中文解读收进一个更省时间的观看入口",
-        lead: "这个页面不做昂贵的视频转写，而是只在更有把握的话题上给出视频搜索路线。适合先看原始材料，再决定要不要读长文。",
+        title: "只把已核实的视频和回放放进这个入口",
+        lead: "这里不再猜测 YouTube 或 B 站搜索结果，只保留已经确认存在的官方视频、回放和解读入口。",
         statusLead: meta.remoteConnected
-          ? "视频页会跟着远端 live 条目一起更新，所以更适合追发布会、演示和产品讲解。"
-          : "当前视频页优先用站内高信号条目生成观看路线，接上 live backend 后会跟着实时新闻扩充。",
+          ? "视频页会跟着远端 live 条目一起扩充，但只有出现真实视频链接时才会进入这里。"
+          : "当前视频页优先展示站内已核实的视频条目，接上 live backend 后也只会补进真实可看的链接。",
         searchLabel: "搜公司、产品、会议或工具",
         placeholder: "例如：英伟达、OpenAI、马斯克、Qwen、agent、GTC",
         categoryLabel: "新闻分类",
         platformLabel: "视频平台",
         angleLabel: "观看路线",
-        resultsMeta: `当前整理出 ${count} 条可观看主题，全站共有 ${allCount} 条新闻可生成视频路线`,
+        resultsMeta: `当前整理出 ${count} 条已核实的视频主题，全站共有 ${allCount} 条新闻进入候选池`,
         highlightTitle: "先看这几条",
-        highlightNote: "优先放最适合先看原始视频或演示回放的主题。",
+        highlightNote: "优先放最适合先看发布会回放、官方演示或高质量解读的视频主题。",
         emptyTitle: "暂时没有匹配的视频主题",
-        emptyBody: "试试换个公司名、产品名或会议关键词，或者先把筛选条件放宽。"
+        emptyBody: "试试换个公司名、产品名或会议关键词。这里不会硬塞不存在的视频。"
       },
       en: {
         eyebrow: "Watch The Signal",
-        title: "Collect original videos, English analysis, and Chinese explainers into one lower-friction watch desk",
-        lead: "This page avoids expensive transcript pipelines and only surfaces watch routes when the topic is likely to have real video value. Watch first, then decide whether the full article is worth your time.",
+        title: "Only surface verified videos and replays in this watch desk",
+        lead: "This page no longer guesses search routes. It only keeps video links that actually exist, including official replays and selected explainers.",
         statusLead: meta.remoteConnected
-          ? "The watch desk refreshes with the remote live feed, so it works well for launches, demos, and conference coverage."
-          : "The watch desk currently builds routes from high-signal in-house coverage first and expands naturally once the live backend is connected.",
+          ? "The watch desk expands with the remote live feed, but only when a story has a real video link behind it."
+          : "The watch desk currently shows only verified video-backed stories from the in-house pool and keeps the same rule when live coverage is connected.",
         searchLabel: "Search a company, product, conference, or tool",
         placeholder: "Try: NVIDIA, OpenAI, Musk, Qwen, agent, GTC",
         categoryLabel: "News lane",
         platformLabel: "Platform",
         angleLabel: "Route",
-        resultsMeta: `${count} watch themes ready, built from ${allCount} stories in the newsroom`,
+        resultsMeta: `${count} verified watch themes built from ${allCount} stories in the newsroom`,
         highlightTitle: "Start here",
-        highlightNote: "Prioritized for topics where the original video or demo is often more useful than opening a long article first.",
+        highlightNote: "Prioritized for launches, demos, replays, and explainers that are genuinely worth watching first.",
         emptyTitle: "No watch themes matched yet",
-        emptyBody: "Try another company, product, or conference keyword, or loosen the filters first."
+        emptyBody: "Try another company, product, or conference keyword. This page will not invent weak watch routes."
       }
     }[language];
   }
@@ -95,18 +98,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function getFilteredLinks(item, language) {
     return AIInsight.getStoryVideoLinks(item, language).filter((link) => {
-      const id = String(link.id || "").toLowerCase();
-      const platform = String(link.platform || "").toLowerCase();
+      const platform = String(link.platformKey || link.platform || "").toLowerCase();
+      const angle = String(link.angle || "").toLowerCase();
 
       if (state.platform !== "all" && platform !== state.platform) {
         return false;
       }
 
-      if (state.angle === "official" && !id.includes("official")) {
-        return false;
-      }
-
-      if (state.angle === "analysis" && !id.includes("analysis")) {
+      if (state.angle !== "all" && angle !== state.angle) {
         return false;
       }
 
@@ -152,8 +151,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="video-link-list">
           ${links.slice(0, 3).map((link) => `
             <a class="video-link-pill" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>
-              <span>${AIInsight.escapeHtml(link.platform)}</span>
-              <strong>${AIInsight.escapeHtml(link.title)}</strong>
+              <span>${AIInsight.escapeHtml(AIInsight.localize(link.platform, language))}</span>
+              <strong>${AIInsight.escapeHtml(AIInsight.localize(link.title, language))}</strong>
             </a>
           `).join("")}
         </div>
@@ -203,7 +202,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             <input
               id="watch-search-input"
               class="search-input"
-              type="search"
+              type="text"
+              inputmode="search"
+              enterkeyhint="search"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
               value="${AIInsight.escapeHtml(state.query)}"
               placeholder="${AIInsight.escapeHtml(pageCopy.placeholder)}"
             >
@@ -271,9 +275,46 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    document.getElementById("watch-search-input").addEventListener("input", (event) => {
-      state.query = event.target.value;
-      render({ focusSearch: true });
+    const searchInput = document.getElementById("watch-search-input");
+    const commitQuery = (nextValue, immediate) => {
+      const apply = () => {
+        state.query = nextValue;
+        render({ focusSearch: true });
+      };
+
+      window.clearTimeout(queryCommitTimer);
+
+      if (immediate) {
+        apply();
+        return;
+      }
+
+      queryCommitTimer = window.setTimeout(apply, 220);
+    };
+
+    searchInput.addEventListener("compositionstart", () => {
+      isComposingQuery = true;
+      window.clearTimeout(queryCommitTimer);
+    });
+
+    searchInput.addEventListener("compositionend", (event) => {
+      isComposingQuery = false;
+      commitQuery(event.target.value, true);
+    });
+
+    searchInput.addEventListener("input", (event) => {
+      if (event.isComposing || isComposingQuery) {
+        return;
+      }
+
+      commitQuery(event.target.value, false);
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        commitQuery(event.currentTarget.value, true);
+      }
     });
 
     AIInsight.bindChoiceButtons(app, (group, value) => {
@@ -291,10 +332,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     AIInsight.bindSaveButtons(app, () => render(shouldFocus ? { focusSearch: true } : undefined));
 
     if (shouldFocus) {
-      const input = document.getElementById("watch-search-input");
-      const length = input.value.length;
-      input.focus();
-      input.setSelectionRange(length, length);
+      const nextInput = document.getElementById("watch-search-input");
+      const length = nextInput.value.length;
+      nextInput.focus();
+      nextInput.setSelectionRange(length, length);
     }
   }
 

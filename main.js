@@ -115,18 +115,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       zh: {
         eyebrow: isPro ? "Professional AI Desk" : isLight ? "Global AI Digest" : "AI Pulse",
         title: isPro
-          ? "把主线新闻、公司动态、工具雷达和期刊入口压进一个更专业的 AI 工作台"
+          ? "今天先看主线，再决定要不要进专业工作台"
           : isLight
-            ? "先给用户一个清楚、耐看的 AI 日报入口，而不是堆满所有信息"
-            : "更快地看到 AI 行业今天最值得扫一遍的新闻、工具和变化",
+            ? "先看今天最重要的 AI 变化"
+            : "今天先看这些 AI 变化",
         lead: isPro
-          ? "专业版不再只是换肤，而是把新闻主线、区域观察、开发者工具和期刊入口分层摆出来，减少跳出和来回寻找的负担。"
+          ? "专业版先压缩主线和热点，再把研究与期刊留给真正需要深读的人。"
           : isLight
-            ? "亮色版会优先给出更清楚的视觉层级和较低的认知负担，适合持续阅读与跨区域扫盘。"
-            : "Pulse 会优先服务想快速了解 AI 行业发生了什么的人，减少首屏决策成本，把注意力集中在最值得点开的内容上。",
+            ? "亮色版优先给清楚的层级和更低的认知负担，适合持续扫盘。"
+            : "先扫一分钟速读和今日热点，再决定要不要点开全文、专栏或视频。",
         primary: "进入资讯流",
         secondary: "按主题搜索",
         featuredLabel: isPro ? "值班主线" : "主线头条",
+        hotTitle: "今日热点",
+        hotNote: "先扫侧栏里的关键变化，再决定要不要进文章详情。",
         statusLead: meta.remoteConnected
           ? "首页当前会把远端 live 源、站内精选和工具雷达合并展示。"
           : "当前首页仍会优先使用站内高信号内容，远端接口连通后会自动继续扩容。",
@@ -154,7 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         toolsTitle: "工具与开源 Radar",
         toolsNote: "专门放高信号小新闻、热门工具、GitHub 项目和本地模型接口路线。",
         watchDeskTitle: "视频与解读入口",
-        watchDeskNote: "只在更可能真有视频价值的话题上给搜索路线，弱信号时就别硬塞 YouTube 或 B 站。",
+        watchDeskNote: "这里只放已经核实的原视频、回放或解读，弱信号时就不硬塞视频入口。",
         briefsTitle: "深度简报",
         briefsNote: "把热点之外更值得慢读的判断放在第二层，适合从“知道发生了什么”进入“理解为什么重要”。",
         providersTitle: "摘要引擎与开源接口",
@@ -189,18 +191,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       en: {
         eyebrow: isPro ? "Professional AI Desk" : isLight ? "Global AI Digest" : "AI Pulse",
         title: isPro
-          ? "Turn headline news, company movement, tooling radar, and journals into a denser AI workbench"
+          ? "Start with the lead story, then move into a denser AI workbench only when needed"
           : isLight
-            ? "Give readers a clearer, calmer AI daily front page instead of a wall of information"
-            : "See the AI news, launches, and shifts worth scanning first today",
+            ? "Start with the AI shifts that matter today"
+            : "Start with the AI shifts that matter today",
         lead: isPro
-          ? "Pro mode is no longer just a visual skin. It separates lead news, regional watch, developer tools, and journal routes so readers spend less time hunting."
+          ? "Pro mode now compresses the lead signal first, then keeps research and journal routes available for readers who genuinely want depth."
           : isLight
-            ? "Light mode prioritizes cleaner hierarchy and lower cognitive load for readers who want to stay longer and scan across regions."
-            : "Pulse is tuned for readers who want the fastest useful snapshot of what changed in AI without too many early decisions.",
+            ? "Light mode prioritizes clearer hierarchy and lower cognitive load for longer reading."
+            : "Scan the one-minute brief and hot rail first, then decide whether the full story, company desk, or watch route is worth your time.",
         primary: "Open the feed",
         secondary: "Search themes",
         featuredLabel: isPro ? "Duty lead" : "Lead story",
+        hotTitle: "Hot now",
+        hotNote: "Use the side rail to skim the most useful changes before opening long reads.",
         statusLead: meta.remoteConnected
           ? "The homepage is now blending remote live updates, in-house curation, and the tooling radar."
           : "The homepage still leans on in-house high-signal coverage first and expands naturally once the remote endpoint responds.",
@@ -228,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         toolsTitle: "Launches & OSS Radar",
         toolsNote: "A dedicated lane for high-signal small news, hot tools, GitHub projects, and local-model interface routes.",
         watchDeskTitle: "Video and explainer routes",
-        watchDeskNote: "Only show watch routes when the topic is likely to have real video value instead of forcing weak YouTube or Bilibili links.",
+        watchDeskNote: "Only keep verified original videos, replays, or explainers here instead of forcing weak watch links.",
         briefsTitle: "Deep briefs",
         briefsNote: "The second layer is reserved for slower, more interpretive reading after the headlines.",
         providersTitle: "Summary engines and OSS routes",
@@ -289,9 +293,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function createDigestLine(item, language) {
-    const quickRead = AIInsight.getStoryQuickRead(item, language);
     const company = AIInsight.getStoryCompanyLabel(item, language) || item.sourceName || "AI Insight";
-    const summary = quickRead.why || quickRead.oneLine || AIInsight.getStoryLeadPreview(item, language, true);
+    const summary = AIInsight.getPracticalStorySummary(item, language, { compact: true }) || AIInsight.getStoryLeadPreview(item, language, true);
 
     return `
       <a class="digest-line page-fade" href="detail.html?id=${item.id}">
@@ -306,8 +309,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  function createHotRailItem(item, language) {
+    const company = AIInsight.getStoryCompanyLabel(item, language) || item.sourceName || "AI Insight";
+    const summary = AIInsight.getPracticalStorySummary(item, language, { compact: true }) || AIInsight.getStoryLeadPreview(item, language, true);
+
+    return `
+      <a class="hot-rail-item" href="detail.html?id=${item.id}">
+        <div class="hot-rail-meta">
+          <span class="ghost-badge">${AIInsight.escapeHtml(company)}</span>
+          <span class="${AIInsight.getBadgeClass(item.signal)}">${AIInsight.escapeHtml(AIInsight.getSignalLabel(item.signal, language))}</span>
+        </div>
+        <strong>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</strong>
+        <p>${AIInsight.escapeHtml(summary)}</p>
+      </a>
+    `;
+  }
+
   function createWatchCard(item, language) {
-    const quickRead = AIInsight.getStoryQuickRead(item, language);
     const featuredLinks = AIInsight.getStoryVideoLinks(item, language).slice(0, 2);
 
     if (!featuredLinks.length) {
@@ -321,14 +339,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="ghost-badge">${AIInsight.escapeHtml(AIInsight.getCategoryLabel(item.category, language))}</span>
         </div>
         <h3>${AIInsight.escapeHtml(AIInsight.localize(item.title, language))}</h3>
-        <p class="panel-text">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(item, language, true) || quickRead.oneLine)}</p>
+        <p class="panel-text">${AIInsight.escapeHtml(AIInsight.getPracticalStorySummary(item, language, { compact: true }) || AIInsight.getStoryLeadPreview(item, language, true))}</p>
         <div class="video-link-list">
           ${featuredLinks
             .map(
               (link) => `
                 <a class="video-link-pill" href="${AIInsight.escapeHtml(link.url)}"${AIInsight.getExternalLinkAttributes()}>
-                  <span>${AIInsight.escapeHtml(link.platform)}</span>
-                  <strong>${AIInsight.escapeHtml(link.title)}</strong>
+                  <span>${AIInsight.escapeHtml(AIInsight.localize(link.platform, language))}</span>
+                  <strong>${AIInsight.escapeHtml(AIInsight.localize(link.title, language))}</strong>
                 </a>
               `
             )
@@ -506,6 +524,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       ...briefStories,
       ...microStories
     ]).slice(0, compactViewport ? Math.min(profile.digestLimit, 5) : profile.digestLimit);
+    const hotRailStories = uniqueById([
+      ...smallStories,
+      ...liveStories,
+      ...briefStories
+    ])
+      .filter((item) => String(item.id) !== featuredId)
+      .slice(0, compactViewport ? 4 : 5);
     const watchStories = AIInsight.limitStoriesPerCompany(
       uniqueById([...allLiveStories, ...allMicroStories, ...headlineStories]).filter((item) => AIInsight.getStoryVideoLinks(item, language).length),
       { maxPerCompany: 1, maxFallback: 1 }
@@ -547,11 +572,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       },
       {
         title: language === "zh" ? "视频与解读" : "Watch routes",
-        note: language === "zh" ? "直接跳到原始视频、英文分析和中文解读入口。" : "Jump to original videos, English analysis, and Chinese explainers.",
+        note: language === "zh" ? "这里只放已经核实的视频或官方回放，不再默认附会搜索路线。" : "This lane only shows verified videos or official replays instead of guessed search routes.",
         href: "watch.html",
-        metric: language === "zh" ? `${watchStories.length} 条观看路线` : `${watchStories.length} watch routes`,
+        metric: language === "zh" ? `${watchStories.length} 条真实视频` : `${watchStories.length} verified videos`,
         story: watchStories[0] || null,
-        peekTitle: watchStories[0] ? AIInsight.localize(watchStories[0].title, language) : (language === "zh" ? "原视频与解读入口" : "Video and explainer routes"),
+        peekTitle: watchStories[0] ? AIInsight.localize(watchStories[0].title, language) : (language === "zh" ? "已核实的视频入口" : "Verified video routes"),
         peekNote: watchStories[0] ? AIInsight.getStoryLeadPreview(watchStories[0], language, true) : ""
       }
     ];
@@ -576,63 +601,82 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     app.innerHTML = `
       <div class="page-shell">
-        <section class="hero home-hero page-fade">
-          <div class="hero-grid">
-            <div>
+        <section class="home-topline panel page-fade">
+          <div class="home-topline-head">
+            <div class="home-topline-copy">
               <span class="eyebrow">${AIInsight.escapeHtml(pageCopy.eyebrow)}</span>
               <h1>${AIInsight.escapeHtml(pageCopy.title)}</h1>
               <p class="lead">${AIInsight.escapeHtml(pageCopy.lead)}</p>
-              <div class="hero-actions">
-                <a class="button button-primary" href="list.html">${AIInsight.escapeHtml(pageCopy.primary)}</a>
-                <a class="button button-secondary" href="search.html">${AIInsight.escapeHtml(pageCopy.secondary)}</a>
+            </div>
+            <div class="home-topline-actions">
+              <a class="button button-primary" href="list.html">${AIInsight.escapeHtml(pageCopy.primary)}</a>
+              <a class="button button-secondary" href="search.html">${AIInsight.escapeHtml(pageCopy.secondary)}</a>
+            </div>
+          </div>
+          <div class="hero-note-row">
+            <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "最近刷新" : "Last refresh")}: ${AIInsight.escapeHtml(latestDate)}</span>
+            <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "全站内容" : "All coverage")}: ${AIInsight.escapeHtml(String(counts.total))}</span>
+            <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "当前模式" : "Current mode")}: ${AIInsight.escapeHtml(viewMode === "pro" ? "Pro" : viewMode === "light" ? "Light" : "Pulse")}</span>
+          </div>
+        </section>
+
+        <section class="home-front-grid">
+          <article class="featured-panel panel page-fade">
+            <div>
+              <div class="featured-topline">
+                ${AIInsight.isLiveItem(featured) ? `<span class="badge badge-live">${AIInsight.escapeHtml(AIInsight.t("common.live", language))}</span>` : ""}
+                <span class="${AIInsight.getBadgeClass(featured.signal)}">${AIInsight.escapeHtml(AIInsight.getSignalLabel(featured.signal, language))}</span>
+                <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.featuredLabel)}</span>
               </div>
-              <div class="hero-note-row">
-                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "最近刷新" : "Last refresh")}: ${AIInsight.escapeHtml(latestDate)}</span>
-                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "全站内容" : "All coverage")}: ${AIInsight.escapeHtml(String(counts.total))}</span>
-                <span class="ghost-badge">${AIInsight.escapeHtml(language === "zh" ? "当前模式" : "Current mode")}: ${AIInsight.escapeHtml(viewMode === "pro" ? "Pro" : viewMode === "light" ? "Light" : "Pulse")}</span>
+              <h2>${AIInsight.escapeHtml(AIInsight.localize(featured.title, language))}</h2>
+              <p class="lead">${AIInsight.escapeHtml(AIInsight.getPracticalStorySummary(featured, language, { includeNext: true }) || AIInsight.getStoryLeadPreview(featured, language))}</p>
+              <div class="story-source">
+                <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
+                <strong>${AIInsight.escapeHtml(featured.sourceName || "AI Insight")}</strong>
+                <span>·</span>
+                <span>${AIInsight.escapeHtml(AIInsight.formatDate(featured.date, language))}</span>
               </div>
             </div>
 
-            <article class="featured-panel panel">
+            <div class="featured-stack">
+              ${AIInsight.createMiniInsightCard(
+                AIInsight.t(featuredSummary.labelKey, language),
+                AIInsight.isLiveItem(featured) ? AIInsight.t("common.sourceBacked", language) : AIInsight.t("common.summarySeed", language),
+                featuredSummary.text
+              )}
+              ${AIInsight.createMiniInsightCard(
+                language === "zh" ? "下一观察点" : "Next watchpoint",
+                AIInsight.getCategoryLabel(featured.category, language),
+                AIInsight.localize(featured.watchpoint, language)
+              )}
+            </div>
+
+            <div class="detail-actions">
+              <a class="button button-primary" href="detail.html?id=${featured.id}">${AIInsight.escapeHtml(AIInsight.t("common.viewDetail", language))}</a>
+              ${
+                featured.sourceUrl
+                  ? `<a class="button button-secondary" href="${AIInsight.escapeHtml(featured.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.t("common.openSource", language))}</a>`
+                  : ""
+              }
+            </div>
+          </article>
+
+          <aside class="hot-rail panel page-fade">
+            <div class="hot-rail-head">
               <div>
-                <div class="featured-topline">
-                  ${AIInsight.isLiveItem(featured) ? `<span class="badge badge-live">${AIInsight.escapeHtml(AIInsight.t("common.live", language))}</span>` : ""}
-                  <span class="${AIInsight.getBadgeClass(featured.signal)}">${AIInsight.escapeHtml(AIInsight.getSignalLabel(featured.signal, language))}</span>
-                  <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.featuredLabel)}</span>
-                </div>
-                <h2>${AIInsight.escapeHtml(AIInsight.localize(featured.title, language))}</h2>
-                <p class="lead">${AIInsight.escapeHtml(AIInsight.getStoryLeadPreview(featured, language))}</p>
-                <div class="story-source">
-                  <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
-                  <strong>${AIInsight.escapeHtml(featured.sourceName || "AI Insight")}</strong>
-                  <span>·</span>
-                  <span>${AIInsight.escapeHtml(AIInsight.formatDate(featured.date, language))}</span>
-                </div>
+                <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "侧栏" : "Side rail")}</span>
+                <h2>${AIInsight.escapeHtml(pageCopy.hotTitle)}</h2>
+                <p class="panel-text">${AIInsight.escapeHtml(pageCopy.hotNote)}</p>
               </div>
-
-              <div class="featured-stack">
-                ${AIInsight.createMiniInsightCard(
-                  AIInsight.t(featuredSummary.labelKey, language),
-                  AIInsight.isLiveItem(featured) ? AIInsight.t("common.sourceBacked", language) : AIInsight.t("common.summarySeed", language),
-                  featuredSummary.text
-                )}
-                ${AIInsight.createMiniInsightCard(
-                  language === "zh" ? "下一观察点" : "Next watchpoint",
-                  AIInsight.getCategoryLabel(featured.category, language),
-                  AIInsight.localize(featured.watchpoint, language)
-                )}
-              </div>
-
-              <div class="detail-actions">
-                <a class="button button-primary" href="detail.html?id=${featured.id}">${AIInsight.escapeHtml(AIInsight.t("common.viewDetail", language))}</a>
-                ${
-                  featured.sourceUrl
-                    ? `<a class="button button-secondary" href="${AIInsight.escapeHtml(featured.sourceUrl)}"${AIInsight.getExternalLinkAttributes()}>${AIInsight.escapeHtml(AIInsight.t("common.openSource", language))}</a>`
-                    : ""
-                }
-              </div>
-            </article>
-          </div>
+              <a class="story-link" href="list.html?format=live">${AIInsight.escapeHtml(language === "zh" ? "看全部实时新闻" : "Open live feed")}</a>
+            </div>
+            <div class="hot-rail-list">
+              ${hotRailStories.length
+                ? hotRailStories.map((item) => createHotRailItem(item, language)).join("")
+                : `<p class="panel-text">${AIInsight.escapeHtml(language === "zh" ? "热点栏会随着更多内容自动补齐。" : "The hot rail will fill in automatically as more stories arrive.")}</p>`
+              }
+            </div>
+          </aside>
         </section>
 
         ${AIInsight.createRefreshStatusCard(meta, language, { lead: pageCopy.statusLead, compact: true })}

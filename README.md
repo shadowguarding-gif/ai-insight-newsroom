@@ -1,5 +1,7 @@
 # AI Insight
 
+- Chinese guide: [README.zh-CN.md](./README.zh-CN.md)
+
 ## What is already wired
 
 - Static bilingual site pages
