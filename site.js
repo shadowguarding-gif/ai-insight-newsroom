@@ -2213,10 +2213,39 @@
     const category = getCategoryLabel(story && story.category, "zh") || "AI";
     const tags = uniqueStrings((story && story.tags) || []).slice(0, 2);
     const topic = tags.length ? tags.join("、") : "产品、能力或平台动作";
+    const categoryKey = String((story && story.category) || "");
+
+    const templates = {
+      chips: {
+        oneLine: `${company}这次不只是硬件上新，更是在抢${topic}这条算力入口。`,
+        why: "它最容易影响本地模型、企业采购和下一轮算力分配。"
+      },
+      "products-apps": {
+        oneLine: `${company}正在把 AI 能力继续压进${topic}这条产品线。`,
+        why: "它会直接影响用户入口、订阅转化和平台控制力。"
+      },
+      "foundation-models": {
+        oneLine: `${company}又把模型能力往${topic}推进了一步。`,
+        why: "这类升级最容易影响开发者选型、Agent 工作流和后续 API 采用。"
+      },
+      research: {
+        oneLine: `${company}放出的这条${category}信号，更像是在提前铺下一轮路线。`,
+        why: `先抓${topic}上的结论，再决定要不要深读原文就够了。`
+      },
+      tooling: {
+        oneLine: `${company}这次更新重点落在${topic}这条开发者工作流。`,
+        why: "先判断它有没有真实可用性，再决定要不要继续跟版本和生态。"
+      }
+    };
+
+    const chosen = templates[categoryKey] || {
+      oneLine: `${company}这条${category}信号重点落在${topic}。`,
+      why: "如果只想先抓重点，看这一层已经够判断值不值得点进去了。"
+    };
 
     return {
-      oneLine: `这条${category}动态主要围绕${company}展开，重点涉及${topic}。`,
-      why: `如果你在跟踪${company}与 AI 产业链，这条更适合先看原文，再判断后续产品、芯片或平台影响。`
+      oneLine: chosen.oneLine,
+      why: chosen.why
     };
   }
 
@@ -2815,13 +2844,12 @@
     const language = options && options.language ? options.language : getLanguage();
     const compact = options && options.compact;
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(getPracticalStorySummary(item, language, { compact: true }) || getStoryLeadPreview(item, language, true));
+    const teaser = escapeHtml(
+      getPracticalStorySummary(item, language, { compact, includeNext: false }) || getStoryLeadPreview(item, language, true)
+    );
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || `${item.readingTime} ${t("common.readingTimeSuffix", language)}`);
-    const storySnapshot = getStoryCardSnapshot(item, language, compact);
-    const quickRead = getStoryQuickRead(item, language);
-    const summary = (quickRead.bullets.length ? quickRead.bullets : localize(item.summaryPoints, language)).slice(0, compact ? 1 : 2);
     const tags = item.tags.slice(0, compact ? 2 : 3);
     const wrapperClass = compact ? "compact-card" : "story-card";
     const liveBadge = isLiveItem(item)
@@ -2859,29 +2887,7 @@
           <span>${metricLabel}: ${metricValue}</span>
           <span>${escapeHtml(formatDate(item.date, language))}</span>
         </div>
-        <p class="story-deck">${deck}</p>
-        <div class="story-brief-grid${compact ? " is-compact" : ""}">
-          ${storySnapshot
-            .map(
-              (entry) => `
-                <article class="story-brief-item">
-                  <span class="mini-label">${escapeHtml(entry.label)}</span>
-                  <p>${escapeHtml(entry.value)}</p>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-
-        ${
-          summary.length && !compact
-            ? `
-              <ul class="story-points story-points-tight">
-                ${summary.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
-              </ul>
-            `
-            : ""
-        }
+        <p class="story-deck story-teaser${compact ? " is-compact" : ""}">${teaser}</p>
 
         <div class="story-footer">
           <div class="tag-row">
@@ -2899,12 +2905,10 @@
   function createSignalCard(item, options) {
     const language = options && options.language ? options.language : getLanguage();
     const title = escapeHtml(localize(item.title, language));
-    const deck = escapeHtml(getPracticalStorySummary(item, language, { compact: true }) || getStoryLeadPreview(item, language, true));
+    const deck = escapeHtml(getPracticalStorySummary(item, language, { compact: false }) || getStoryLeadPreview(item, language, true));
     const formatLabel = escapeHtml(getStoryFormatLabel(item, language));
     const metricLabel = escapeHtml(localize(item.metricLabel, language) || (language === "zh" ? "信号" : "Signal"));
     const metricValue = escapeHtml(item.metricValue || formatDate(item.date, language));
-    const notes = localize(item.proNotes, language).slice(0, 2);
-    const summary = localize(item.summaryPoints, language).slice(0, 2);
     const savedLabel = isStorySaved(item.id) ? t("common.saved", language) : t("common.save", language);
 
     return `
@@ -2917,16 +2921,12 @@
         </div>
 
         <h3>${title}</h3>
-        <p class="story-deck">${deck}</p>
+        <p class="story-deck story-teaser signal-teaser">${deck}</p>
 
         <div class="signal-metric">
           <span>${metricLabel}</span>
           <strong>${metricValue}</strong>
         </div>
-
-        <ul class="signal-notes">
-          ${(notes.length ? notes : summary).map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
-        </ul>
 
         <div class="story-footer">
           <div class="tag-row">
@@ -3117,32 +3117,58 @@
     const maxLength = compact
       ? (nextLanguage === "zh" ? 58 : 136)
       : (nextLanguage === "zh" ? 124 : 260);
+    const pieces = uniqueStrings([oneLine, why, includeNext ? next : ""])
+      .map(stripTerminalPunctuation)
+      .filter(Boolean);
+
+    if (!pieces.length) {
+      return "";
+    }
 
     if (nextLanguage === "zh") {
-      const pieces = [`发生了什么：${oneLine || why}`];
+      const summaryParts = [pieces[0]];
+      const latinHeavyLead = ((pieces[0].match(/[A-Za-z]/g) || []).length) >= 10;
+      const genericSecondLine = pieces[1] && /^(如果只想先抓重点|先抓|它最容易影响|它会直接影响|这类升级最容易影响)/.test(pieces[1]);
 
-      if (why && why !== oneLine) {
-        pieces.push(`为什么重要：${why}`);
+      if (pieces[1] && !latinHeavyLead && !genericSecondLine) {
+        const connector = pieces[0].length <= 26 && pieces[1].length <= 34 ? "，" : "。";
+        summaryParts.push(`${connector}${pieces[1]}`);
       }
 
-      if (includeNext && next && next !== why) {
-        pieces.push(`下一步看什么：${next}`);
+      if (pieces[2]) {
+        const tail = /^接下来|后续|下一步/.test(pieces[2]) ? pieces[2] : `后续更值得留意的是${pieces[2]}`;
+        summaryParts.push(`。${tail}`);
       }
 
-      return clampSummaryText(pieces.join(" "), maxLength);
+      return clampSummaryText(
+        summaryParts
+          .join("")
+          .replace(/。+/g, "。")
+          .replace(/，+/g, "，")
+          .replace(/，。/g, "。"),
+        maxLength
+      );
     }
 
-    const pieces = [`What changed: ${oneLine || why}`];
+    const summaryParts = [pieces[0]];
 
-    if (why && why !== oneLine) {
-      pieces.push(`Why it matters: ${why}`);
+    if (pieces[1]) {
+      const connector = pieces[0].length <= 72 && pieces[1].length <= 110 ? ", " : ". ";
+      summaryParts.push(`${connector}${pieces[1]}`);
     }
 
-    if (includeNext && next && next !== why) {
-      pieces.push(`What to watch next: ${next}`);
+    if (pieces[2]) {
+      const tail = /^(Next|Watch|Keep|Then)/i.test(pieces[2]) ? pieces[2] : `Watch next: ${pieces[2]}`;
+      summaryParts.push(`. ${tail}`);
     }
 
-    return clampSummaryText(pieces.join(" "), maxLength);
+    return clampSummaryText(
+      summaryParts
+        .join("")
+        .replace(/\.\s*\./g, ". ")
+        .replace(/,\s*\./g, ". "),
+      maxLength
+    );
   }
 
   function getStoryCardSnapshot(story, language, compact) {

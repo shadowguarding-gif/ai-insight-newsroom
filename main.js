@@ -416,37 +416,44 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function createServiceLaneCard(route, pageCopy, language) {
+    const leadCompany = route.story
+      ? (AIInsight.getStoryCompanyLabel(route.story, language) || route.story.sourceName || "")
+      : "";
     const leadTitle = route.story
       ? AIInsight.localize(route.story.title, language)
       : route.peekTitle;
     const leadPreview = route.story
-      ? (AIInsight.getStoryLeadPreview(route.story, language, true) || AIInsight.getStoryQuickRead(route.story, language).oneLine)
+      ? (AIInsight.getPracticalStorySummary(route.story, language, { compact: true }) || AIInsight.getStoryLeadPreview(route.story, language, true))
       : route.peekNote;
 
     return `
       <article class="service-lane-card panel page-fade">
         <div class="service-lane-top">
-          <span class="meta-label">${AIInsight.escapeHtml(language === "zh" ? "服务入口" : "Service lane")}</span>
+          <h3>${AIInsight.escapeHtml(route.title)}</h3>
           <span class="ghost-badge">${AIInsight.escapeHtml(route.metric)}</span>
         </div>
-        <h3>${AIInsight.escapeHtml(route.title)}</h3>
-        <p class="panel-text">${AIInsight.escapeHtml(route.note)}</p>
+        <p class="panel-text service-lane-note">${AIInsight.escapeHtml(route.note)}</p>
 
         <div class="service-peek">
-          <span class="mini-label">${AIInsight.escapeHtml(pageCopy.servicePeekLabel)}</span>
+          <div class="service-peek-meta">
+            ${leadCompany ? `<span class="ghost-badge">${AIInsight.escapeHtml(leadCompany)}</span>` : ""}
+            ${
+              route.story
+                ? `<span class="${AIInsight.getBadgeClass(route.story.signal)}">${AIInsight.escapeHtml(AIInsight.getSignalLabel(route.story.signal, language))}</span>`
+                : ""
+            }
+          </div>
           <strong>${AIInsight.escapeHtml(leadTitle || route.title)}</strong>
           ${leadPreview ? `<p>${AIInsight.escapeHtml(leadPreview)}</p>` : ""}
         </div>
 
-        <div class="story-footer">
-          <div class="story-links">
-            <a class="story-link" href="${AIInsight.escapeHtml(route.href)}">${AIInsight.escapeHtml(pageCopy.serviceOpenLabel)}</a>
-            ${
-              route.story
-                ? `<a class="story-link" href="detail.html?id=${route.story.id}">${AIInsight.escapeHtml(pageCopy.serviceLeadLabel)}</a>`
-                : ""
-            }
-          </div>
+        <div class="story-links service-lane-links">
+          <a class="story-link" href="${AIInsight.escapeHtml(route.href)}">${AIInsight.escapeHtml(pageCopy.serviceOpenLabel)}</a>
+          ${
+            route.story
+              ? `<a class="story-link" href="detail.html?id=${route.story.id}">${AIInsight.escapeHtml(pageCopy.serviceLeadLabel)}</a>`
+              : ""
+          }
         </div>
       </article>
     `;
@@ -629,7 +636,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <span class="ghost-badge">${AIInsight.escapeHtml(pageCopy.featuredLabel)}</span>
               </div>
               <h2>${AIInsight.escapeHtml(AIInsight.localize(featured.title, language))}</h2>
-              <p class="lead">${AIInsight.escapeHtml(AIInsight.getPracticalStorySummary(featured, language, { includeNext: true }) || AIInsight.getStoryLeadPreview(featured, language))}</p>
+              <p class="lead">${AIInsight.escapeHtml(AIInsight.getPracticalStorySummary(featured, language) || AIInsight.getStoryLeadPreview(featured, language))}</p>
               <div class="story-source">
                 <span>${AIInsight.escapeHtml(AIInsight.t("common.source", language))}</span>
                 <strong>${AIInsight.escapeHtml(featured.sourceName || "AI Insight")}</strong>
