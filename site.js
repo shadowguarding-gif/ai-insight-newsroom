@@ -293,6 +293,7 @@
     accountEndpoint: "",
     autoRefreshMs: 300000,
     openExternalLinksInNewTab: true,
+    preferredSummaryProvider: "deepseek",
     summaryProviders: {
       local: {
         label: {
@@ -857,6 +858,11 @@
     return ids.includes(providerId) ? providerId : ids[0];
   }
 
+  function getDefaultProviderId() {
+    const preferred = String(getConfig().preferredSummaryProvider || "").trim();
+    return normalizeProviderId(preferred || "local");
+  }
+
   function getProviderIds() {
     return Object.keys(getProviderCatalog());
   }
@@ -868,7 +874,7 @@
 
   function getSelectedProvider() {
     const provider = localStorage.getItem(SUMMARY_PROVIDER_KEY);
-    return normalizeProviderId(provider);
+    return normalizeProviderId(provider || getDefaultProviderId());
   }
 
   function getDefaultModelForProvider(providerId) {

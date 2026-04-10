@@ -18,6 +18,7 @@ window.AIInsightConfig = {
   autoRefreshMs: 300000,
 
   openExternalLinksInNewTab: true,
+  preferredSummaryProvider: "deepseek",
 
   summaryProviders: {
     local: {

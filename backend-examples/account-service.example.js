@@ -123,7 +123,7 @@ function normalizeSummaryPreference(value) {
   const provider =
     source.provider === "deepseek" || source.provider === "local" || source.provider === "oss"
       ? source.provider
-      : "openai";
+      : "deepseek";
   const modelSet = provider === "local"
     ? LOCAL_MODELS
     : provider === "deepseek"
